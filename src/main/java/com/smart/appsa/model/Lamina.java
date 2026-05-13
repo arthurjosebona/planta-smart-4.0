@@ -1,5 +1,6 @@
 package com.smart.appsa.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.smart.appsa.model.enums.CorLamina;
 import com.smart.appsa.model.enums.PadraoLamina;
 import com.smart.appsa.model.enums.PosicaoLamina;
@@ -38,5 +39,6 @@ public class Lamina {
     private PosicaoLamina posicao;
     @ManyToOne
     @JoinColumn(name = "id_bloco")
+    @JsonBackReference
     private Bloco bloco;
 }

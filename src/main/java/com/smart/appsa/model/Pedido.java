@@ -3,6 +3,8 @@ package com.smart.appsa.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.smart.appsa.model.enums.CorTampa;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.model.enums.TipoPedido;
@@ -36,6 +38,7 @@ public class Pedido {
     private Long id;
     private int ordemDeProducao;
     @OneToMany(mappedBy = "t_sa_bloco")
+    @JsonManagedReference
     private List<Bloco> blocos;
     @Enumerated(EnumType.ORDINAL)
     private StatusPedido status;
@@ -48,5 +51,6 @@ public class Pedido {
     private LocalDateTime registroSaidaExpedicao;
     @ManyToOne
     @JoinColumn(name = "id_expedicao")
+    @JsonBackReference
     private Expedicao expedicao;
 }
