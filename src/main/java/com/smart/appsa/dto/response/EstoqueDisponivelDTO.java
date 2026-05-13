@@ -1,5 +1,9 @@
 package com.smart.appsa.dto.response;
 
+import java.util.List;
+
+import com.smart.appsa.model.enums.CorEstoque;
+
 public record EstoqueDisponivelDTO(
-    int posicoesNaoVazias
+    List<CorEstoque> posicoesNaoVazias
 ) {} 
