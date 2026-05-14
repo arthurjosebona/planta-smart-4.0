@@ -25,14 +25,12 @@ public class EstoqueService {
                 .orElseThrow(() -> new RuntimeException("Estoque não encontrado com ID: " + id));
     }
 
-   
     public List<Estoque> listarDisponivel() {
         return estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO);
     }
 
     // ─── CREATE ──────────────────────────────────────────────────────────────────
 
-    
     public Estoque adicionarBloco(Estoque request) {
         validarPosicao(request.getPosicaoFisica());
 
@@ -43,11 +41,17 @@ public class EstoqueService {
         if (posicaoAtual.getCorEstoque() != CorEstoque.VAZIO) {
             throw new RuntimeException(
                     "Posição " + request.getPosicaoFisica() + " já está ocupada com bloco de cor "
-                    + posicaoAtual.getCorEstoque() + ".");
+                            + posicaoAtual.getCorEstoque() + ".");
         }
 
         posicaoAtual.setCorEstoque(request.getCorEstoque());
         return estoqueRepository.save(posicaoAtual);
+    }
+
+    // ─── QUERY: CONTAGEM POR COR ───────────────────────────────────────────────
+
+    public long countByCorEstoque(CorEstoque cor) {
+        return estoqueRepository.countByCorEstoque(cor);
     }
 
     // ─── UPDATE ──────────────────────────────────────────────────────────────────
@@ -59,7 +63,7 @@ public class EstoqueService {
         if (estoque.getCorEstoque() == CorEstoque.VAZIO) {
             throw new RuntimeException(
                     "Posição " + estoque.getPosicaoFisica() + " está vazia. "
-                    + "Use adicionarBloco para inserir um bloco.");
+                            + "Use adicionarBloco para inserir um bloco.");
         }
 
         estoque.setCorEstoque(novaCor);
@@ -68,7 +72,6 @@ public class EstoqueService {
 
     // ─── DELETE ──────────────────────────────────────────────────────────────────
 
-    
     public Estoque removerBloco(int posicaoFisica) {
         validarPosicao(posicaoFisica);
 
