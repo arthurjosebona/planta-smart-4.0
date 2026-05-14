@@ -26,9 +26,9 @@ public class EstoqueService {
     }
 
     public List<Estoque> listarDisponivel() {
-        return estoqueRepository.findByCorEstoque(CorEstoque.VAZIO);
+        return estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO); // era findByCorEstoque
     }
-
+    
     // ─── CREATE ──────────────────────────────────────────────────────────────────
 
     public Estoque adicionarBloco(Estoque request) {
