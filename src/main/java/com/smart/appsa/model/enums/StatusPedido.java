@@ -1,16 +1,27 @@
 package com.smart.appsa.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum StatusPedido {
     PENDENTE(1),
     PRODUCAO(2),
     CONCLUIDO(3);
 
-    int value;
+    Integer value;
 
-    private StatusPedido(int value) {
+    @JsonCreator
+    public static StatusPedido fromValue(String value) {
+        Integer parsed = Integer.valueOf(value);
+        for (StatusPedido s : values()) {
+            if (parsed.equals(s.value)) return s;
+        }
+        throw new IllegalArgumentException("StatusPedido inválido: " + value);
+    }
+
+    private StatusPedido(Integer value) {
         this.value = value;
     }
 
-    public int getValue() {return value;};
+    public Integer getValue() { return value; }
 }
 

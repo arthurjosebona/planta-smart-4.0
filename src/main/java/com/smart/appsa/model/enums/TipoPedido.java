@@ -1,15 +1,26 @@
 package com.smart.appsa.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum TipoPedido {
     SIMPLES(1),
     DUPLO(2),
     TRIPLO(3);
 
-    int value;
+    Integer value;
 
-    private TipoPedido(int value) {
+    @JsonCreator
+    public static TipoPedido fromValue(String value) {
+        Integer parsed = Integer.valueOf(value);
+        for (TipoPedido t : values()) {
+            if (parsed.equals(t.value)) return t;
+        }
+        throw new IllegalArgumentException("TipoPedido inválido: " + value);
+    }
+
+    private TipoPedido(Integer value) {
         this.value = value;
     }
 
-    public int getValue() {return value;};
+    public Integer getValue() { return value; }
 }
