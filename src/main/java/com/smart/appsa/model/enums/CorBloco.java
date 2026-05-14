@@ -2,11 +2,14 @@ package com.smart.appsa.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import jakarta.persistence.EnumeratedValue;
+
 public enum CorBloco {
     PRETO(1),
     VERMELHO(2),
     AZUL(3);
 
+    @EnumeratedValue
     Integer value;
 
     @JsonCreator

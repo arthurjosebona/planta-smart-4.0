@@ -2,11 +2,14 @@ package com.smart.appsa.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import jakarta.persistence.EnumeratedValue;
+
 public enum TipoPedido {
     SIMPLES(1),
     DUPLO(2),
     TRIPLO(3);
 
+    @EnumeratedValue
     Integer value;
 
     @JsonCreator

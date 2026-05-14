@@ -4,8 +4,6 @@ import com.smart.appsa.model.enums.CorEstoque;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,6 +33,5 @@ public class Estoque {
     @Max(28)
     private Integer posicaoFisica;
     @Column(name = "vl_cor", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
     private CorEstoque corEstoque;
 }
