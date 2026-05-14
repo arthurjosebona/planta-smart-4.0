@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ExpedicaoRepository extends JpaRepository<Expedicao, Long> {
 
     boolean existsByOrdemDeProducaoAtual(int ordemDeProducaoAtual);
+    
+    Optional<Expedicao> findByPosicaoFisica(int posicaoFisica);
 
     Optional<Expedicao> findByOrdemDeProducaoAtual(int ordemDeProducaoAtual);
 
