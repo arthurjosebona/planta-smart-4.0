@@ -30,7 +30,7 @@ public class ExpedicaoService {
                         "Nenhuma expedição encontrada para a ordem: " + ordemDeProducao));
     }
 
-    public int buscarPrimeiraPosicaoLivre() {
+    public Expedicao buscarPrimeiraPosicaoLivre() {
         return encontrarProximaPosicaoLivre();
     }
 
@@ -42,13 +42,8 @@ public class ExpedicaoService {
                     "Ordem de produção " + ordemDeProducao + " já foi expedida.");
         }
 
-        int proximaPosicao = encontrarProximaPosicaoLivre();
-
-        Expedicao expedicao = Expedicao.builder()
-                .posicaoFisica(proximaPosicao)
-                .ordemDeProducaoAtual(ordemDeProducao)
-                .build();
-
+        Expedicao expedicao = encontrarProximaPosicaoLivre();
+        expedicao.setOrdemDeProducaoAtual(ordemDeProducao);
         return expedicaoRepository.save(expedicao);
     }
 
@@ -68,11 +63,9 @@ public class ExpedicaoService {
             throw new RuntimeException("Posição " + posicaoFisica + " já está ocupada na expedição.");
         }
 
-        Expedicao expedicao = Expedicao.builder()
-                .posicaoFisica(posicaoFisica)
-                .ordemDeProducaoAtual(ordemDeProducao)
-                .build();
-
+        Expedicao expedicao = expedicaoRepository.findByPosicaoFisica(posicaoFisica)
+                .orElseThrow(() -> new RuntimeException("Posição não encontrada no banco."));
+        expedicao.setOrdemDeProducaoAtual(ordemDeProducao);
         return expedicaoRepository.save(expedicao);
     }
 
@@ -107,10 +100,13 @@ public class ExpedicaoService {
 
     // ─── HELPER ──────────────────────────────────────────────────────────────────
 
-    private int encontrarProximaPosicaoLivre() {
+    private Expedicao encontrarProximaPosicaoLivre() {
         List<Integer> posicoesOcupadas = expedicaoRepository.findPosicoesOcupadas();
         for (int pos = 1; pos <= 12; pos++) {
-            if (!posicoesOcupadas.contains(pos)) return pos;
+            if (!posicoesOcupadas.contains(pos)) {
+                return expedicaoRepository.findByPosicaoFisica(pos)
+                        .orElseThrow(() -> new RuntimeException("Posição não encontrada no banco."));
+            }
         }
         throw new RuntimeException("Expedição lotada. Todas as 12 posições estão ocupadas.");
     }
