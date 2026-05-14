@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface EstoqueRepository extends JpaRepository<Estoque, Long> {
  
     List<Estoque> findByCorEstoque(CorEstoque corEstoque);
+
+    List<Estoque> findByCorEstoqueNot(CorEstoque corEstoque);
  
     Optional<Estoque> findByPosicaoFisica(int posicaoFisica);
  
