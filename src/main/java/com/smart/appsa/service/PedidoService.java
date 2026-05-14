@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.model.Bloco;
+import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.enums.AndarBloco;
 import com.smart.appsa.model.enums.CorBloco;
@@ -28,6 +29,7 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final BlocoService blocoService;
     private final EstoqueService estoqueService;
+    private final ExpedicaoService expedicaoService;
 
     @Transactional
     public PedidoResponseDTO create(PedidoRequestDTO requestDTO) {
@@ -56,7 +58,9 @@ public class PedidoService {
         validarEstoqueParaCores(requestDTO.blocos());
         Pedido pedido = mapEntityByRequestDTO(requestDTO);
         pedido.setRegistroCriacao(LocalDateTime.now());
-
+        Expedicao proximaLivre = expedicaoService.buscarPrimeiraPosicaoLivre();
+        pedido.setExpedicao(proximaLivre);
+        expedicaoService.atribuirOrdemDeProducao(proximaLivre.getPosicaoFisica(), pedido.getOrdemDeProducao());
         // Salva o pedido primeiro para ter ID
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
