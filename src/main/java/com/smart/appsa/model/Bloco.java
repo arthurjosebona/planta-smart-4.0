@@ -4,12 +4,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.smart.appsa.model.enums.AndarBloco;
 import com.smart.appsa.model.enums.CorBloco;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -55,7 +54,8 @@ public class Bloco {
     @JsonManagedReference
     private List<Lamina> laminas;
     @Column(name = "vl_cor", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
     private CorBloco cor;
-
+    @Column(name = "nr_andar", nullable = false)
+    private AndarBloco andar;
+    
 }

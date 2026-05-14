@@ -2,6 +2,8 @@ package com.smart.appsa.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import jakarta.persistence.EnumeratedValue;
+
 public enum CorLamina {
     VERMELHO(1),
     AZUL(2),
@@ -10,6 +12,7 @@ public enum CorLamina {
     PRETO(5),
     BRANCO(6);
 
+    @EnumeratedValue
     Integer value;
 
     @JsonCreator

@@ -4,24 +4,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 import jakarta.persistence.EnumeratedValue;
 
-public enum PosicaoLamina {
-    ESQUERDA(1),
-    FRENTE(2),
-    DIREITA(3);
+public enum AndarBloco {
+    PRIMEIRO(1),
+    SEGUNDO(2),
+    TERCEITO(3);
 
     @EnumeratedValue
     Integer value;
 
     @JsonCreator
-    public static PosicaoLamina fromValue(String value) {
+    public static AndarBloco fromValue(String value) {
         Integer parsed = Integer.valueOf(value);
-        for (PosicaoLamina p : values()) {
+        for (AndarBloco p : values()) {
             if (parsed.equals(p.value)) return p;
         }
-        throw new IllegalArgumentException("PosicaoLamina inválida: " + value);
+        throw new IllegalArgumentException("AndarBloco inválido: " + value);
     }
 
-    private PosicaoLamina(Integer value) {
+    private AndarBloco(Integer value) {
         this.value = value;
     }
 
