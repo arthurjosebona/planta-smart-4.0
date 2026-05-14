@@ -30,6 +30,10 @@ public class ExpedicaoService {
                         "Nenhuma expedição encontrada para a ordem: " + ordemDeProducao));
     }
 
+    public int buscarPrimeiraPosicaoLivre() {
+        return encontrarProximaPosicaoLivre();
+    }
+
     // ─── CREATE ──────────────────────────────────────────────────────────────────
 
     public Expedicao registrarExpedicao(int ordemDeProducao) {
@@ -42,6 +46,30 @@ public class ExpedicaoService {
 
         Expedicao expedicao = Expedicao.builder()
                 .posicaoFisica(proximaPosicao)
+                .ordemDeProducaoAtual(ordemDeProducao)
+                .build();
+
+        return expedicaoRepository.save(expedicao);
+    }
+
+    public Expedicao atribuirOrdemDeProducao(int posicaoFisica, int ordemDeProducao) {
+        if (posicaoFisica < 1 || posicaoFisica > 12) {
+            throw new RuntimeException(
+                    "Posição inválida: " + posicaoFisica + ". A expedição tem 12 posições (1 a 12).");
+        }
+
+        if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) {
+            throw new RuntimeException(
+                    "Ordem de produção " + ordemDeProducao + " já foi expedida.");
+        }
+
+        boolean posicaoOcupada = expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica);
+        if (posicaoOcupada) {
+            throw new RuntimeException("Posição " + posicaoFisica + " já está ocupada na expedição.");
+        }
+
+        Expedicao expedicao = Expedicao.builder()
+                .posicaoFisica(posicaoFisica)
                 .ordemDeProducaoAtual(ordemDeProducao)
                 .build();
 
