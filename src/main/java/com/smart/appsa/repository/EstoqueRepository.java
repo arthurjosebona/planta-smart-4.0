@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface EstoqueRepository extends JpaRepository<Estoque, Long> {
  
-    List<Estoque> findByCorEstoqueNot(CorEstoque corEstoque);
+    List<Estoque> findByCorEstoque(CorEstoque corEstoque);
  
     Optional<Estoque> findByPosicaoFisica(int posicaoFisica);
  

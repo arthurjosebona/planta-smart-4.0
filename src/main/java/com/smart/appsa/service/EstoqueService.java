@@ -26,7 +26,7 @@ public class EstoqueService {
     }
 
     public List<Estoque> listarDisponivel() {
-        return estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO);
+        return estoqueRepository.findByCorEstoque(CorEstoque.VAZIO);
     }
 
     // ─── CREATE ──────────────────────────────────────────────────────────────────
