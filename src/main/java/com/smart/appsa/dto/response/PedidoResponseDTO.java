@@ -9,6 +9,9 @@ import com.smart.appsa.model.enums.CorTampa;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.model.enums.TipoPedido;
 
+import lombok.Builder;
+
+@Builder
 public record PedidoResponseDTO(
     Long id,
     int ordemDeProducao,
