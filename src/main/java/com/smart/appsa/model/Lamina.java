@@ -5,9 +5,11 @@ import com.smart.appsa.model.enums.CorLamina;
 import com.smart.appsa.model.enums.PadraoLamina;
 import com.smart.appsa.model.enums.PosicaoLamina;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,15 +32,23 @@ import lombok.Setter;
 public class Lamina {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_lamina")
     private Long id;
+    @Column(name = "vl_cor", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private CorLamina cor;
+    @Column(name = "vl_padrao", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private PadraoLamina padrao;
+    @Column(name = "vl_posicao", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private PosicaoLamina posicao;
     @ManyToOne
-    @JoinColumn(name = "id_bloco")
+    @JoinColumn(
+        name = "id_bloco",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_bloco_lamina")
+    )
     @JsonBackReference
     private Bloco bloco;
 }
