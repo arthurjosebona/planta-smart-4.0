@@ -10,7 +10,7 @@ public enum StatusPedido {
     CONCLUIDO(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static StatusPedido fromValue(String value) {

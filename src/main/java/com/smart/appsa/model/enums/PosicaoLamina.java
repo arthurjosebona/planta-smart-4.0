@@ -10,7 +10,7 @@ public enum PosicaoLamina {
     DIREITA(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static PosicaoLamina fromValue(String value) {

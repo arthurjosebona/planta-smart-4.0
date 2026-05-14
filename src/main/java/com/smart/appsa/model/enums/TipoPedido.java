@@ -10,7 +10,7 @@ public enum TipoPedido {
     TRIPLO(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static TipoPedido fromValue(String value) {

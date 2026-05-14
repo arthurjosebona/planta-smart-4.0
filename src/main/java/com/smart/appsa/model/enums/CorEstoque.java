@@ -11,7 +11,7 @@ public enum CorEstoque {
     AZUL(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static CorEstoque fromValue(String value) {

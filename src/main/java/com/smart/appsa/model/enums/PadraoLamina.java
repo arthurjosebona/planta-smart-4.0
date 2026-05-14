@@ -11,7 +11,7 @@ public enum PadraoLamina {
     ESTRELA(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static PadraoLamina fromValue(String value) {

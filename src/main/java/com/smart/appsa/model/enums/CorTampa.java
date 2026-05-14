@@ -10,7 +10,7 @@ public enum CorTampa {
     AZUL(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static CorTampa fromValue(String value) {

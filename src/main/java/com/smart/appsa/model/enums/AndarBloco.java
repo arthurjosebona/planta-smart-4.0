@@ -10,7 +10,7 @@ public enum AndarBloco {
     TERCEITO(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static AndarBloco fromValue(String value) {

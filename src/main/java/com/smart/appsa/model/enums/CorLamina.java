@@ -13,7 +13,7 @@ public enum CorLamina {
     BRANCO(6);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static CorLamina fromValue(String value) {

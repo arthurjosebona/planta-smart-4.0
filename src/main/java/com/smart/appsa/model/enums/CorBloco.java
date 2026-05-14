@@ -10,7 +10,7 @@ public enum CorBloco {
     AZUL(3);
 
     @EnumeratedValue
-    Integer value;
+    int value;
 
     @JsonCreator
     public static CorBloco fromValue(String value) {
