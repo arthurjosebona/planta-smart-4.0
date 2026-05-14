@@ -1,6 +1,7 @@
 package com.smart.appsa.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PedidoService {
-    private PedidoRepository pedidoRepository;
-    private BlocoService blocoService;
-    private EstoqueService estoqueService;
+    private final PedidoRepository pedidoRepository;
+    private final BlocoService blocoService;
+    private final EstoqueService estoqueService;
 
     @Transactional
     public PedidoResponseDTO create(PedidoRequestDTO requestDTO) {
@@ -52,12 +53,18 @@ public class PedidoService {
         }
         validarEstoqueParaCores(requestDTO.blocos());
         Pedido pedido = mapEntityByRequestDTO(requestDTO);
-        for (Bloco bloco : pedido.getBlocos()) {
-            bloco.setPedido(pedido);
-            pedido.getBlocos().add(blocoService.create(bloco));
+        pedido.setRegistroCriacao(LocalDateTime.now());
+
+        // Salva o pedido primeiro para ter ID
+        Pedido pedidoSalvo = pedidoRepository.save(pedido);
+
+        // Salva os blocos vinculados ao pedido já persistido
+        for (Bloco bloco : requestDTO.blocos()) {
+            bloco.setPedido(pedidoSalvo);
+            blocoService.create(bloco);
         }
-        pedido.setRegistroCriacao(java.time.LocalDateTime.now());
-        return mapDto(pedidoRepository.save(pedido));
+
+        return mapDto(pedidoRepository.findById(pedidoSalvo.getId()).get());
     }
 
     private void validarEstoqueParaCores(List<Bloco> blocos) {
@@ -107,7 +114,7 @@ public class PedidoService {
         return PedidoResponseDTO.builder()
             .id(pedido.getId())
             .ordemDeProducao(pedido.getOrdemDeProducao())
-            .blocos(pedido.getBlocos())
+            .blocos(new ArrayList<>()) // Envia vazio pois é responsabilidade do BlocoService salvar os blocos
             .status(pedido.getStatus())
             .tipo(pedido.getTipo())
             .corTampa(pedido.getCorTampa())

@@ -1,6 +1,5 @@
 package com.smart.appsa.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -32,21 +31,23 @@ public class BlocoService {
     // ─── CREATE ──────────────────────────────────────────────────────────────────
 
     public Bloco create(Bloco bloco) {
-        // 3. Valida máximo de lâminas se já vieram lâminas no objeto
         if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) {
             throw new RuntimeException("O bloco deve conter pelo menos uma lâmina");
         }
-
-        List<Lamina> laminas = new ArrayList<>();
-
-        for (Lamina lamina : bloco.getLaminas()) {
-            lamina.setBloco(bloco);
-            laminas.add(laminaService.adicionarLamina(lamina));
+        if (bloco.getLaminas().size() > 3) {
+            throw new RuntimeException("O bloco deve conter no máximo 3 lâminas");
         }
 
-        validarMaximoLaminas(bloco);
+        // Salva o bloco PRIMEIRO para ter ID
+        Bloco blocoSalvo = blocoRepository.save(bloco);
 
-        return blocoRepository.save(bloco);
+        // Agora salva as lâminas com o bloco já persistido
+        for (Lamina lamina : bloco.getLaminas()) {
+            lamina.setBloco(blocoSalvo);
+            laminaService.adicionarLamina(lamina);
+        }
+
+        return blocoSalvo;
     }
 
     // ─── UPDATE ──────────────────────────────────────────────────────────────────
