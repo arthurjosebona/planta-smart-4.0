@@ -62,7 +62,8 @@ CREATE TABLE T_SA_BLOCO (
     id_bloco 			BIGINT 		NOT NULL,
     id_pedido			BIGINT		NOT NULL,
     id_estoque	        BIGINT		NOT NULL,
-    vl_cor 				TINYINT 	NOT NULL
+    vl_cor 				TINYINT 	NOT NULL,
+	nr_andar			TINYINT		NOT NULL
 );
 
 ALTER TABLE T_SA_BLOCO
@@ -74,7 +75,9 @@ ALTER TABLE T_SA_BLOCO
 		FOREIGN KEY(id_estoque) REFERENCES T_SA_ESTOQUE(id_estoque),
 	ADD CONSTRAINT UN_BLOCO_ID_ESTOQUE UNIQUE (id_estoque),
 	ADD CONSTRAINT CK_BLOCO_COR
-		CHECK (vl_cor IN (1, 2, 3));
+		CHECK (vl_cor IN (1, 2, 3)),
+	ADD CONSTRAINT CK_BLOCO_ANDAR
+		CHECK (nr_andar IN (1, 2, 3));
     
 CREATE TABLE T_SA_LAMINA (
     id_lamina	BIGINT	NOT NULL,

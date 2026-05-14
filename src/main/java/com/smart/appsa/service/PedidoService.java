@@ -12,6 +12,7 @@ import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Pedido;
+import com.smart.appsa.model.enums.AndarBloco;
 import com.smart.appsa.model.enums.CorBloco;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.model.enums.StatusPedido;
@@ -51,6 +52,7 @@ public class PedidoService {
         if (requestDTO.tipo().getValue() != requestDTO.blocos().size()) {
             throw new IllegalArgumentException("O tipo do pedido deve ser compatível com a quantidade de blocos");
         }
+        validarAndaresDuplicados(requestDTO.blocos());
         validarEstoqueParaCores(requestDTO.blocos());
         Pedido pedido = mapEntityByRequestDTO(requestDTO);
         pedido.setRegistroCriacao(LocalDateTime.now());
@@ -65,6 +67,26 @@ public class PedidoService {
         }
 
         return mapDto(pedidoRepository.findById(pedidoSalvo.getId()).get());
+    }
+
+    private void validarAndaresDuplicados(List<Bloco> blocos) {
+        Map<AndarBloco, Long> contagemPorAndar = blocos.stream()
+            .collect(Collectors.groupingBy(
+                Bloco::getAndar,
+                Collectors.counting()
+            ));
+
+        List<AndarBloco> andaresDuplicados = contagemPorAndar.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .toList();
+
+        if (!andaresDuplicados.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Existem blocos com andares duplicados: " + andaresDuplicados
+            );
+        }
     }
 
     private void validarEstoqueParaCores(List<Bloco> blocos) {

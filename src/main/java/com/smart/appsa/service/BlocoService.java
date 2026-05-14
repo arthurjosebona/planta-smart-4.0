@@ -60,6 +60,7 @@ public class BlocoService {
 
         blocoExistente.setCor(dadosAtualizados.getCor());
         blocoExistente.setEstoque(dadosAtualizados.getEstoque());
+        blocoExistente.setAndar(dadosAtualizados.getAndar());
 
         return blocoRepository.save(blocoExistente);
     }
