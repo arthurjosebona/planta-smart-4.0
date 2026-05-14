@@ -90,11 +90,13 @@ public class PedidoService {
         }
     }
 
+    @Transactional
     public PedidoResponseDTO findById(Long id) {
         return mapDto(pedidoRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado com id: " + id)));
     }
 
+    @Transactional
     public List<PedidoResponseDTO> findAll() {
         return pedidoRepository.findAll()
             .stream()
@@ -114,7 +116,7 @@ public class PedidoService {
         return PedidoResponseDTO.builder()
             .id(pedido.getId())
             .ordemDeProducao(pedido.getOrdemDeProducao())
-            .blocos(new ArrayList<>()) // Envia vazio pois é responsabilidade do BlocoService salvar os blocos
+            .blocos(pedido.getBlocos()) 
             .status(pedido.getStatus())
             .tipo(pedido.getTipo())
             .corTampa(pedido.getCorTampa())
@@ -127,7 +129,7 @@ public class PedidoService {
     private Pedido mapEntityByRequestDTO(PedidoRequestDTO requestDTO) {
         return Pedido.builder()
             .ordemDeProducao(requestDTO.ordemDeProducao())
-            .blocos(requestDTO.blocos())
+            .blocos(new ArrayList<>()) // Envia vazio pois é responsabilidade do BlocoService salvar os blocos
             .status(requestDTO.status())
             .tipo(requestDTO.tipo())
             .corTampa(requestDTO.corTampa())
