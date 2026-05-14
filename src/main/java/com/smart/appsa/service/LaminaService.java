@@ -36,25 +36,19 @@ public class LaminaService {
     // ─── CREATE ──────────────────────────────────────────────────────────────────
 
     
-    public Lamina adicionarLamina(Long blocoId, Lamina lamina) {
-        Bloco bloco = blocoRepository.findById(blocoId)
-                .orElseThrow(() -> new RuntimeException("Bloco não encontrado com ID: " + blocoId));
-
-        List<Lamina> laminasExistentes = laminaRepository.findByBloco(bloco);
-
-        if (laminasExistentes.size() >= 3) {
-            throw new RuntimeException("Bloco já possui o máximo de 3 lâminas.");
+    public Lamina adicionarLamina(Lamina lamina) {
+        if (lamina.getCor() == null) {
+            throw new IllegalArgumentException("Cor da lâmina não pode ser nula");
         }
-
-        boolean posicaoOcupada = laminasExistentes.stream()
-                .anyMatch(l -> l.getPosicao() == lamina.getPosicao());
-
-        if (posicaoOcupada) {
-            throw new RuntimeException(
-                    "Já existe uma lâmina na posição " + lamina.getPosicao() + " neste bloco.");
+        if (lamina.getPadrao() == null) {
+            throw new IllegalArgumentException("Padrão da lâmina não pode ser nulo");
         }
-
-        lamina.setBloco(bloco);
+        if (lamina.getPosicao() == null) {
+            throw new IllegalArgumentException("Posição da lâmina não pode ser nula");
+        }
+        if (lamina.getBloco() == null) {
+            throw new IllegalArgumentException("Bloco não pode ser nulo");
+        }
         return laminaRepository.save(lamina);
     }
 

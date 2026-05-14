@@ -36,8 +36,9 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}/status")
-    public String atualizarStatusParaConcluido(@PathVariable Long id) {
-        return pedidoService.atualizarStatusParaConcluido(id);
+    public ResponseEntity<Void> atualizarStatusParaConcluido(@PathVariable Long id) {
+        pedidoService.atualizarStatusParaConcluido(id);
+        return ResponseEntity.noContent().build();
     }
     
 }

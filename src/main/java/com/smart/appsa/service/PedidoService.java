@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.model.Bloco;
-import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.enums.CorBloco;
 import com.smart.appsa.model.enums.CorEstoque;
@@ -73,7 +72,7 @@ public class PedidoService {
         for (Map.Entry<CorBloco, Long> entry : contagemPorCor.entrySet()) {
             CorBloco cor = entry.getKey();
             long quantidadeNecessaria = entry.getValue();
-            long quantidadeEmEstoque = estoqueService.countByCorEstoque(cor);
+            long quantidadeEmEstoque = estoqueService.countByCorEstoque(CorEstoque.valueOf(cor.name()));
             
             if (quantidadeEmEstoque < quantidadeNecessaria) {
                 throw new IllegalArgumentException(
