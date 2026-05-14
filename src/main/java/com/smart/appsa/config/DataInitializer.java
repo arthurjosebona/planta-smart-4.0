@@ -19,8 +19,10 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        repository.deleteAll(); // limpa tudo antes de recriar
-
+        if (repository.count() > 0) {
+            System.out.println(">> Estoque já contém dados. Pulando inicialização.");
+            return;
+        }
         repository.saveAll(List.of(
             Estoque.builder().posicaoFisica(1).corEstoque(CorEstoque.AZUL).build(),
             Estoque.builder().posicaoFisica(2).corEstoque(CorEstoque.AZUL).build(),
