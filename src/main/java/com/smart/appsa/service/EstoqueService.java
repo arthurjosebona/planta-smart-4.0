@@ -33,12 +33,12 @@ public class EstoqueService {
 
     @Transactional(readOnly = true)
     public List<EstoqueResponseDTO> findAvailable() {
-        return estoqueRepository.findByCorEstoque(CorEstoque.VAZIO).stream().map(e -> EstoqueMapper.mapDTO(e)).toList(); 
+        return estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO).stream().map(e -> EstoqueMapper.mapDTO(e)).toList(); 
     }
 
     @Transactional(readOnly = true)
     public List<EstoqueResponseDTO> findUnavailable() {
-        return estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO).stream().map(e -> EstoqueMapper.mapDTO(e)).toList(); 
+        return estoqueRepository.findByCorEstoque(CorEstoque.VAZIO).stream().map(e -> EstoqueMapper.mapDTO(e)).toList(); 
     }
     
     @Transactional(readOnly = true)
