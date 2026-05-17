@@ -1,26 +1,31 @@
 package com.smart.appsa.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
+import com.smart.appsa.exception.CorIncompatibleWithEstoqueException;
+import com.smart.appsa.exception.DuplicateAndarException;
+import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
+import com.smart.appsa.exception.RequiredFieldException;
+import com.smart.appsa.exception.ResourceNotFoundException;
+import com.smart.appsa.exception.TipoIncompativelComBlocosException;
+import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
+import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.enums.AndarBloco;
-import com.smart.appsa.model.enums.CorBloco;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.repository.PedidoRepository;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,132 +38,108 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO create(PedidoRequestDTO requestDTO) {
-        if (requestDTO == null) {
-            throw new IllegalArgumentException("PedidoRequestDTO não pode ser nulo");
-        }
-        if (requestDTO.ordemDeProducao() <= 0) {
-            throw new IllegalArgumentException("Ordem de produção deve ser maior que zero");
-        }
-        if (requestDTO.blocos() == null || requestDTO.blocos().isEmpty()) {
-            throw new IllegalArgumentException("A lista de blocos não pode ser nula ou vazia, deve conter pelo menos um bloco");
-        }
-        if (requestDTO.status() == null) {
-            throw new IllegalArgumentException("Status do pedido não pode ser nulo");
-        }
-        if (requestDTO.tipo() == null) {
-            throw new IllegalArgumentException("Tipo do pedido não pode ser nulo");
-        }
-        if (requestDTO.corTampa() == null) {
-            throw new IllegalArgumentException("Cor da tampa não pode ser nula");
-        }
-        if (requestDTO.tipo().getValue() != requestDTO.blocos().size()) {
-            throw new IllegalArgumentException("O tipo do pedido deve ser compatível com a quantidade de blocos");
-        }
-        validarAndaresDuplicados(requestDTO.blocos());
-        validarEstoqueParaCores(requestDTO.blocos());
-        Pedido pedido = mapEntityByRequestDTO(requestDTO);
+        validatePedido(requestDTO);
+        Pedido pedido = PedidoMapper.mapEntityByRequestDTO(requestDTO);
         pedido.setRegistroCriacao(LocalDateTime.now());
-        Expedicao proximaLivre = expedicaoService.buscarPrimeiraPosicaoLivre();
-        pedido.setExpedicao(proximaLivre);
-        expedicaoService.atribuirOrdemDeProducao(proximaLivre.getPosicaoFisica(), pedido.getOrdemDeProducao());
-        // Salva o pedido primeiro para ter ID
-        Pedido pedidoSalvo = pedidoRepository.save(pedido);
-
-        // Salva os blocos vinculados ao pedido já persistido
-        for (Bloco bloco : requestDTO.blocos()) {
-            bloco.setPedido(pedidoSalvo);
-            blocoService.create(bloco);
-        }
-
-        return mapDto(pedidoRepository.findById(pedidoSalvo.getId()).get());
+        Pedido saved = saveWithExpedition(pedido);
+        createBlocks(saved, requestDTO.blocos());
+        return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
     }
 
-    private void validarAndaresDuplicados(List<Bloco> blocos) {
-        Map<AndarBloco, Long> contagemPorAndar = blocos.stream()
+    private void validatePedido(PedidoRequestDTO requestDTO) {
+        validateRequiredFields(requestDTO);
+        validateBusinessRules(requestDTO);
+    }
+
+    private void validateRequiredFields(PedidoRequestDTO requestDTO) {
+        if (requestDTO == null) 
+            throw new RequiredFieldException("PedidoRequestDTO");
+        if (requestDTO.blocos() == null || requestDTO.blocos().isEmpty()) 
+            throw new RequiredFieldException("Blocos");
+        if (requestDTO.status() == null) 
+            throw new RequiredFieldException("Status");
+        if (requestDTO.tipo() == null) 
+            throw new RequiredFieldException("Tipo Pedido");
+        if (requestDTO.corTampa() == null) 
+            throw new RequiredFieldException("Cor da tampa");
+    }
+
+    private void validateBusinessRules(PedidoRequestDTO requestDTO) {
+        if (requestDTO.ordemDeProducao() <= 0) 
+            throw new InvalidOrdemDeProducaoException(requestDTO.ordemDeProducao());
+        if (requestDTO.tipo().getValue() != requestDTO.blocos().size()) 
+            throw new TipoIncompativelComBlocosException(requestDTO.tipo(), requestDTO.blocos().size());
+        validateDuplicateAndar(requestDTO.blocos());
+        validateColorInventory(requestDTO.blocos());
+    }
+
+    private void validateDuplicateAndar(List<Bloco> blocos) {
+        Map<AndarBloco, Long> countByAndar = blocos.stream()
             .collect(Collectors.groupingBy(
                 Bloco::getAndar,
                 Collectors.counting()
             ));
 
-        List<AndarBloco> andaresDuplicados = contagemPorAndar.entrySet()
+        List<AndarBloco> duplicateAndar = countByAndar.entrySet()
             .stream()
             .filter(entry -> entry.getValue() > 1)
             .map(Map.Entry::getKey)
             .toList();
 
-        if (!andaresDuplicados.isEmpty()) {
-            throw new IllegalArgumentException(
-                "Existem blocos com andares duplicados: " + andaresDuplicados
-            );
-        }
+        if (!duplicateAndar.isEmpty())
+            throw new DuplicateAndarException(duplicateAndar);
     }
 
-    private void validarEstoqueParaCores(List<Bloco> blocos) {
-        // Agrupa blocos por cor e conta quantos de cada cor
-        Map<CorBloco, Long> contagemPorCor = blocos.stream()
-            .collect(Collectors.groupingBy(
-                Bloco::getCor,
-                Collectors.counting()
-            ));
-        
-        // Para cada cor distinta, valida se tem estoque suficiente
-        for (Map.Entry<CorBloco, Long> entry : contagemPorCor.entrySet()) {
-            CorBloco cor = entry.getKey();
-            long quantidadeNecessaria = entry.getValue();
-            long quantidadeEmEstoque = estoqueService.countByCorEstoque(CorEstoque.valueOf(cor.name()));
-            
-            if (quantidadeEmEstoque < quantidadeNecessaria) {
-                throw new IllegalArgumentException(
-                    String.format("Estoque insuficiente para a cor %s. Necessário: %d, Disponível: %d",
-                        cor, quantidadeNecessaria, quantidadeEmEstoque)
-                );
+    private void validateColorInventory(List<Bloco> blocos) {
+        for (Bloco bloco : blocos) {
+            Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
+
+        if (estoque.getCorEstoque() == CorEstoque.VAZIO || !estoque.getCorEstoque().getValue().equals(bloco.getCor().getValue())) {
+                throw new CorIncompatibleWithEstoqueException(bloco.getCor(), estoque);
             }
         }
     }
 
-    @Transactional
-    public PedidoResponseDTO findById(Long id) {
-        return mapDto(pedidoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado com id: " + id)));
+    private Pedido saveWithExpedition(Pedido pedido) {
+        Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
+        pedido.setExpedicao(nextFree);
+        expedicaoService.AssignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
+        return pedidoRepository.save(pedido);
     }
 
-    @Transactional
+    private void createBlocks(Pedido pedido, List<Bloco> blocos) {
+        for (Bloco bloco : blocos) {
+            bloco.setPedido(pedido);
+            blocoService.create(bloco);
+            estoqueService.assignBlockColor(bloco.getEstoque().getId(), CorEstoque.VAZIO);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public PedidoResponseDTO findById(Long id) {
+        return PedidoMapper.mapDto(pedidoRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", id)));
+    }
+
+    @Transactional(readOnly = true)
     public List<PedidoResponseDTO> findAll() {
         return pedidoRepository.findAll()
             .stream()
-            .map(p -> mapDto(p))
+            .map(p -> PedidoMapper.mapDto(p))
             .toList();
     }
 
-    public void atualizarStatusParaConcluido(Long id) {
+    @Transactional
+    public void updateStatusAsCompleted(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado com id: " + id));
-        pedido.setStatus(StatusPedido.CONCLUIDO);
-        pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
+        pedido = prepareForCompletion(pedido);
         pedidoRepository.save(pedido);
     }
 
-    private PedidoResponseDTO mapDto(Pedido pedido) {
-        return PedidoResponseDTO.builder()
-            .id(pedido.getId())
-            .ordemDeProducao(pedido.getOrdemDeProducao())
-            .blocos(pedido.getBlocos()) 
-            .status(pedido.getStatus())
-            .tipo(pedido.getTipo())
-            .corTampa(pedido.getCorTampa())
-            .registroCriacao(pedido.getRegistroCriacao())
-            .registroEntradaExpedicao(pedido.getRegistroEntradaExpedicao())
-            .registroSaidaExpedicao(pedido.getRegistroSaidaExpedicao())
-            .build();
-    }
-
-    private Pedido mapEntityByRequestDTO(PedidoRequestDTO requestDTO) {
-        return Pedido.builder()
-            .ordemDeProducao(requestDTO.ordemDeProducao())
-            .blocos(new ArrayList<>()) // Envia vazio pois é responsabilidade do BlocoService salvar os blocos
-            .status(requestDTO.status())
-            .tipo(requestDTO.tipo())
-            .corTampa(requestDTO.corTampa())
-            .build();
+    private Pedido prepareForCompletion(Pedido pedido) {
+        pedido.setStatus(StatusPedido.CONCLUIDO);
+        pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
+        return pedido;
     }
 }       

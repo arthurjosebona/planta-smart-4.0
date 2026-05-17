@@ -1,13 +1,18 @@
 package com.smart.appsa.controller;
 
-import com.smart.appsa.model.Estoque;
-import com.smart.appsa.model.enums.CorEstoque;
-import com.smart.appsa.service.EstoqueService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.smart.appsa.dto.response.EstoqueResponseDTO;
+import com.smart.appsa.service.EstoqueService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/estoque")
@@ -18,32 +23,22 @@ public class EstoqueController {
     private final EstoqueService estoqueService;
 
     @GetMapping("")
-    public ResponseEntity<List<Estoque>> listarTodos() {
-        return ResponseEntity.ok(estoqueService.listarTodos());
-    }
-
-    @GetMapping("/disponivel")
-    public ResponseEntity<List<Estoque>> listarDisponivel() {
-        return ResponseEntity.ok(estoqueService.listarDisponivel());
+    public ResponseEntity<List<EstoqueResponseDTO>> findAll() {
+        return ResponseEntity.ok(estoqueService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Estoque> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(estoqueService.buscarPorId(id));
+    public ResponseEntity<EstoqueResponseDTO> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(estoqueService.findById(id));
     }
 
-    @PostMapping("")
-    public ResponseEntity<Estoque> adicionarBloco(@RequestBody Estoque request) {
-        return ResponseEntity.ok(estoqueService.adicionarBloco(request));
+    @GetMapping("/disponivel")
+    public ResponseEntity<List<EstoqueResponseDTO>> findAvailable() {
+        return ResponseEntity.ok(estoqueService.findAvailable());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Estoque> atualizarBloco(@PathVariable Long id, @RequestBody CorEstoque novaCor) {
-        return ResponseEntity.ok(estoqueService.atualizarBloco(id, novaCor));
-    }
-
-    @DeleteMapping("/{posicaoFisica}")
-    public ResponseEntity<Estoque> removerBloco(@PathVariable int posicaoFisica) {
-        return ResponseEntity.ok(estoqueService.removerBloco(posicaoFisica));
+    @GetMapping("/indisponivel")
+    public ResponseEntity<List<EstoqueResponseDTO>> findUnavailable() {
+        return ResponseEntity.ok(estoqueService.findUnavailable());
     }
 }

@@ -13,7 +13,6 @@ import lombok.Builder;
 public record PedidoRequestDTO(
     int ordemDeProducao,
     List<Bloco> blocos,
-    String ipClp,
     StatusPedido status,
     TipoPedido tipo,
     CorTampa corTampa

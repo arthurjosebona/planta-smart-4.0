@@ -1,11 +1,20 @@
 package com.smart.appsa.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.smart.appsa.exception.DuplicatePosicaoException;
+import com.smart.appsa.exception.LaminasSizeException;
+import com.smart.appsa.exception.RequiredFieldException;
+import com.smart.appsa.exception.ResourceNotFoundException;
 import com.smart.appsa.model.Bloco;
+import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Lamina;
+import com.smart.appsa.model.enums.PosicaoLamina;
 import com.smart.appsa.repository.BlocoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -13,80 +22,92 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BlocoService {
-
     private final BlocoRepository blocoRepository;
     private final LaminaService laminaService;
+    private final EstoqueService estoqueService;
 
-    // ─── READ ────────────────────────────────────────────────────────────────────
-
+    @Transactional(readOnly = true)
     public List<Bloco> findAll() {
         return blocoRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Bloco findById(Long id) {
         return blocoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bloco não encontrado com ID: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Bloco", id));
     }
+    
 
-    // ─── CREATE ──────────────────────────────────────────────────────────────────
-
+    @Transactional
     public Bloco create(Bloco bloco) {
-        if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) {
-            throw new RuntimeException("O bloco deve conter pelo menos uma lâmina");
-        }
-        if (bloco.getLaminas().size() > 3) {
-            throw new RuntimeException("O bloco deve conter no máximo 3 lâminas");
-        }
-
-        // Salva o bloco PRIMEIRO para ter ID
-        Bloco blocoSalvo = blocoRepository.save(bloco);
-
-        // Agora salva as lâminas com o bloco já persistido
-        for (Lamina lamina : bloco.getLaminas()) {
-            lamina.setBloco(blocoSalvo);
-            laminaService.adicionarLamina(lamina);
-        }
-
+        validateRequiredFields(bloco);
+        validateBusinessRules(bloco);
+        Bloco blocoSalvo = createBloco(bloco);
+        createLaminas(bloco.getLaminas(), blocoSalvo);
         return blocoSalvo;
     }
 
-    // ─── UPDATE ──────────────────────────────────────────────────────────────────
 
-    public Bloco atualizarBloco(Long id, Bloco dadosAtualizados) {
-        Bloco blocoExistente = blocoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bloco não encontrado com ID: " + id));
-
-        
-
-        blocoExistente.setCor(dadosAtualizados.getCor());
-        blocoExistente.setEstoque(dadosAtualizados.getEstoque());
-        blocoExistente.setAndar(dadosAtualizados.getAndar());
-
-        return blocoRepository.save(blocoExistente);
+    private void validateRequiredFields(Bloco bloco) {
+        if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) 
+            throw new RequiredFieldException("laminas");
     }
 
-    // ─── DELETE ──────────────────────────────────────────────────────────────────
+    private void validateBusinessRules(Bloco bloco) {
+        if (bloco.getLaminas().size() > 3 || bloco.getLaminas().size() < 0) 
+            throw new LaminasSizeException(bloco.getLaminas().size());
+        validateLaminasPosition(bloco.getLaminas());
+    }
 
-    public void removerBloco(Long id) {
+    private void validateLaminasPosition(List<Lamina> laminas) {
+        Map<PosicaoLamina, Long> countByPosicaoLamina = laminas.stream()
+            .collect(Collectors.groupingBy(
+                Lamina::getPosicao,
+                Collectors.counting()
+            ));
+
+        List<PosicaoLamina> duplicatePosicao = countByPosicaoLamina.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .toList();
+
+        if (!duplicatePosicao.isEmpty()) {
+            throw new DuplicatePosicaoException(duplicatePosicao);
+        }
+    } 
+
+    private Bloco createBloco(Bloco bloco) {
+        Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
+        bloco.setEstoque(estoque);
+        return blocoRepository.save(bloco);
+    }
+
+
+    private void createLaminas(List<Lamina> laminas, Bloco bloco) {
+        for (Lamina lamina : laminas) {
+            lamina.setBloco(bloco);
+            laminaService.create(lamina);
+        }
+    }
+
+    public Bloco update(Long id, Bloco newBlock) {
+        Bloco existentBlock = blocoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Bloco", id));
+        updateBlocoFields(existentBlock, newBlock);
+        return blocoRepository.save(existentBlock);
+    }
+
+    private void updateBlocoFields(Bloco existentBlock, Bloco newBlock) {
+        existentBlock.setCor(newBlock.getCor());
+        existentBlock.setEstoque(newBlock.getEstoque());
+        existentBlock.setAndar(newBlock.getAndar());
+    }
+
+    public void delete(Long id) {
         if (!blocoRepository.existsById(id)) {
-            throw new RuntimeException("Bloco não encontrado com ID: " + id);
+            throw new ResourceNotFoundException("Bloco", id);
         }
         blocoRepository.deleteById(id);
     }
-
-    // ─── VALIDAÇÕES ──────────────────────────────────────────────────────────────
-
-
-    /**
-     * Valida que o bloco não ultrapasse 3 lâminas.
-     * Chamado pelo LaminaService antes de adicionar uma lâmina.
-     */
-    public void validarMaximoLaminas(Bloco bloco) {
-        List<Lamina> laminas = bloco.getLaminas();
-        if (laminas != null && laminas.size() >= 3 && laminas.size() < 0) {
-            throw new RuntimeException(
-                    "Bloco ID " + bloco.getId() + " já possui o máximo de 3 lâminas.");
-        }
-    }
-
 }

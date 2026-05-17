@@ -1,5 +1,11 @@
 package com.smart.appsa.config;
 
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +15,9 @@ import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.repository.EstoqueRepository;
 import com.smart.appsa.repository.ExpedicaoRepository;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 @Component
 public class DataInitializer implements CommandLineRunner {
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     @Autowired
     private EstoqueRepository estoqueRepository;
@@ -24,7 +27,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (estoqueRepository.count() == 0) {
-            System.out.println(">> Estoque está vazio. Inicializando dados.");
+            logger.info(">> Estoque está vazio. Inicializando dados.");
             estoqueRepository.saveAll(List.of(
             Estoque.builder().posicaoFisica(1).corEstoque(CorEstoque.AZUL).build(),
             Estoque.builder().posicaoFisica(2).corEstoque(CorEstoque.AZUL).build(),
@@ -55,13 +58,33 @@ public class DataInitializer implements CommandLineRunner {
             Estoque.builder().posicaoFisica(27).corEstoque(CorEstoque.VAZIO).build(),
             Estoque.builder().posicaoFisica(28).corEstoque(CorEstoque.VAZIO).build()
             ));
-            System.out.println(">> Dados iniciais carregados com sucesso!");
+            logger.info(">> Dados iniciais carregados com sucesso!");
         } else {
-            System.out.println(">> Estoque já contém dados. Pulando inicialização.");
+            logger.debug(">> Resetando estoque para estado inicial.");
+            List<Estoque> estoques = estoqueRepository.findAll();
+            
+            Map<Integer, CorEstoque> coresIniciais = Map.of(
+                1, CorEstoque.AZUL,
+                2, CorEstoque.AZUL,
+                3, CorEstoque.AZUL,
+                4, CorEstoque.AZUL,
+                5, CorEstoque.VERMELHO,
+                6, CorEstoque.VERMELHO,
+                7, CorEstoque.PRETO
+            );
+
+            estoques.forEach(e -> {
+                CorEstoque cor = coresIniciais.getOrDefault(e.getPosicaoFisica(), CorEstoque.VAZIO);
+                e.setCorEstoque(cor);
+                logger.debug("Estoque posição {} resetado para cor {}", e.getPosicaoFisica(), cor);
+            });
+
+            estoqueRepository.saveAll(estoques);
+            logger.info("Estoque resetado com sucesso!");
         }
 
         if (expedicaoRepository.count() == 0) {
-            System.out.println(">> Expedicao está vazia. Inicializando dados.");
+            logger.info(">> Expedicao está vazia. Inicializando dados.");
             expedicaoRepository.saveAll(List.of(
                 Expedicao.builder().ordemDeProducaoAtual(1).posicaoFisica(1).build(),
                 Expedicao.builder().ordemDeProducaoAtual(2).posicaoFisica(2).build(),
@@ -76,9 +99,24 @@ public class DataInitializer implements CommandLineRunner {
                 Expedicao.builder().ordemDeProducaoAtual(0).posicaoFisica(11).build(),
                 Expedicao.builder().ordemDeProducaoAtual(0).posicaoFisica(12).build()
             ));
-            System.out.println(">> Dados iniciais de expedição carregados com sucesso!");
+            logger.info(">> Dados iniciais de expedição carregados com sucesso!");
         } else {
-            System.out.println(">> Expedicao já contém dados. Pulando inicialização.");
+            logger.debug(">> Resetando estoque para estado inicial.");
+            List<Expedicao> expedicoes = expedicaoRepository.findAll();
+
+            Map<Integer, Integer> ordensIniciais = Map.of(
+                1, 1,
+                2, 2,
+                3, 3
+            );
+
+            expedicoes.forEach(e -> {
+                e.setOrdemDeProducaoAtual(ordensIniciais.getOrDefault(e.getPosicaoFisica(), 0));
+                logger.debug("Expedição posição {} resetada com ordem {}", e.getPosicaoFisica(), e.getOrdemDeProducaoAtual());
+            });
+
+            expedicaoRepository.saveAll(expedicoes);
+            logger.info("Expedição resetada com sucesso!");
         }
     }
 }

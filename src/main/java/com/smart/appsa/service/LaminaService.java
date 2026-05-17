@@ -1,86 +1,85 @@
 package com.smart.appsa.service;
 
-import com.smart.appsa.model.Bloco;
-import com.smart.appsa.model.Lamina;
-import com.smart.appsa.repository.BlocoRepository;
-import com.smart.appsa.repository.LaminaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.smart.appsa.exception.LaminaPosicaoOcupadaException;
+import com.smart.appsa.exception.RequiredFieldException;
+import com.smart.appsa.exception.ResourceNotFoundException;
+import com.smart.appsa.model.Lamina;
+import com.smart.appsa.repository.LaminaRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class LaminaService {
-
     private final LaminaRepository laminaRepository;
-    private final BlocoRepository blocoRepository;
 
-    // ─── READ ────────────────────────────────────────────────────────────────────
-
-    public List<Lamina> listarTodas() {
+    @Transactional(readOnly = true)
+    public List<Lamina> findAll() {
         return laminaRepository.findAll();
     }
 
-    public Lamina buscarPorId(Long id) {
+    @Transactional(readOnly = true)
+    public Lamina findById(Long id) {
         return laminaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lâmina não encontrada com ID: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Lamina", id));
     }
 
-    public List<Lamina> listarPorBloco(Long blocoId) {
-        Bloco bloco = blocoRepository.findById(blocoId)
-                .orElseThrow(() -> new RuntimeException("Bloco não encontrado com ID: " + blocoId));
-        return laminaRepository.findByBloco(bloco);
+    @Transactional(readOnly = true)
+    public List<Lamina> findByBlocoId(Long blocoId) {
+        return laminaRepository.findByBlocoId(blocoId);
     }
-
-    // ─── CREATE ──────────────────────────────────────────────────────────────────
-
     
-    public Lamina adicionarLamina(Lamina lamina) {
-        if (lamina.getCor() == null) {
-            throw new IllegalArgumentException("Cor da lâmina não pode ser nula");
-        }
-        if (lamina.getPadrao() == null) {
-            throw new IllegalArgumentException("Padrão da lâmina não pode ser nulo");
-        }
-        if (lamina.getPosicao() == null) {
-            throw new IllegalArgumentException("Posição da lâmina não pode ser nula");
-        }
-        if (lamina.getBloco() == null) {
-            throw new IllegalArgumentException("Bloco não pode ser nulo");
-        }
+    @Transactional
+    public Lamina create(Lamina lamina) {
+        validateRequiredFields(lamina);
         return laminaRepository.save(lamina);
     }
 
-    // ─── UPDATE ──────────────────────────────────────────────────────────────────
+    private void validateRequiredFields(Lamina lamina) {
+        if (lamina.getCor() == null) 
+            throw new RequiredFieldException("CorLamina");
+        if (lamina.getPadrao() == null) 
+            throw new RequiredFieldException("PadraoLamina");
+        if (lamina.getPosicao() == null) 
+            throw new RequiredFieldException("PosicaoLamina");
+        if (lamina.getBloco() == null) 
+            throw new RequiredFieldException("Bloco");
+    }
 
-    public Lamina atualizarLamina(Long id, Lamina dadosAtualizados) {
+    @Transactional
+    public Lamina update(Long id, Lamina laminaAtualizada) {
         Lamina laminaExistente = laminaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lâmina não encontrada com ID: " + id));
-
-        List<Lamina> laminasDoBloco = laminaRepository.findByBloco(laminaExistente.getBloco());
-
-        boolean posicaoOcupada = laminasDoBloco.stream()
-                .anyMatch(l -> !l.getId().equals(id) && l.getPosicao() == dadosAtualizados.getPosicao());
-
-        if (posicaoOcupada) {
-            throw new RuntimeException(
-                    "Já existe uma lâmina na posição " + dadosAtualizados.getPosicao() + " neste bloco.");
-        }
-
-        laminaExistente.setCor(dadosAtualizados.getCor());
-        laminaExistente.setPadrao(dadosAtualizados.getPadrao());
-        laminaExistente.setPosicao(dadosAtualizados.getPosicao());
-
+            .orElseThrow(() -> new ResourceNotFoundException("Lamina", id));
+        validatePosicaoAvailability(laminaExistente, laminaAtualizada);
+        updateLaminaFields(laminaExistente, laminaAtualizada);
         return laminaRepository.save(laminaExistente);
     }
 
-    // ─── DELETE ──────────────────────────────────────────────────────────────────
+    private void validatePosicaoAvailability(Lamina laminaExistente, Lamina laminaNova) {
+        List<Lamina> laminasDoBloco = laminaRepository.findByBloco(laminaExistente.getBloco());
 
-    public void removerLamina(Long id) {
-        if (!laminaRepository.existsById(id)) {
-            throw new RuntimeException("Lâmina não encontrada com ID: " + id);
-        }
+        boolean posicaoOcupada = laminasDoBloco.stream()
+                .anyMatch(l -> !l.getId().equals(laminaExistente.getId()) 
+                    && l.getPosicao() == laminaNova.getPosicao());
+
+        if (posicaoOcupada) throw new LaminaPosicaoOcupadaException(laminaNova.getPosicao());
+    }
+
+    private void updateLaminaFields(Lamina laminaExistente, Lamina laminaAtualizada) {
+        laminaExistente.setCor(laminaAtualizada.getCor());
+        laminaExistente.setPadrao(laminaAtualizada.getPadrao());
+        laminaExistente.setPosicao(laminaAtualizada.getPosicao());
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        if (!laminaRepository.existsById(id)) 
+            throw new ResourceNotFoundException("Lamina", id);
         laminaRepository.deleteById(id);
     }
 }
