@@ -32,6 +32,11 @@ public class EstoqueService {
     }
 
     @Transactional(readOnly = true)
+    public Estoque findByEntityId(Long id) {
+        return estoqueRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Estoque", id));
+    }
+
+    @Transactional(readOnly = true)
     public List<EstoqueResponseDTO> findAvailable() {
         return estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO).stream().map(e -> EstoqueMapper.mapDTO(e)).toList(); 
     }

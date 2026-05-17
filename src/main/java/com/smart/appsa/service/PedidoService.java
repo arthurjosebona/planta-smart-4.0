@@ -10,18 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
+import com.smart.appsa.exception.CorIncompatibleWithEstoqueException;
 import com.smart.appsa.exception.DuplicateAndarException;
-import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.ResourceNotFoundException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
+import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.enums.AndarBloco;
-import com.smart.appsa.model.enums.CorBloco;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.repository.PedidoRepository;
@@ -91,20 +91,12 @@ public class PedidoService {
     }
 
     private void validateColorInventory(List<Bloco> blocos) {
-        Map<CorBloco, Long> contagemPorCor = blocos.stream()
-            .collect(Collectors.groupingBy(
-                Bloco::getCor,
-                Collectors.counting()
-            ));
-    
-        for (Map.Entry<CorBloco, Long> entry : contagemPorCor.entrySet()) {
-            CorBloco cor = entry.getKey();
-            long quantidadeNecessaria = entry.getValue();
-            long quantidadeEmEstoque = estoqueService.countByCorEstoque(CorEstoque.valueOf(cor.name()));
-            
-            if (quantidadeEmEstoque < quantidadeNecessaria) 
-                throw new EstoqueInsuficienteException(cor.toString(), quantidadeNecessaria, quantidadeEmEstoque);
-            
+        for (Bloco bloco : blocos) {
+            Estoque estoque = estoqueService.findByEntityId(bloco.getEstoque().getId());
+
+        if (estoque.getCorEstoque() == CorEstoque.VAZIO || !estoque.getCorEstoque().getValue().equals(bloco.getCor().getValue())) {
+                throw new CorIncompatibleWithEstoqueException(bloco.getCor(), estoque);
+            }
         }
     }
 
@@ -119,6 +111,7 @@ public class PedidoService {
         for (Bloco bloco : blocos) {
             bloco.setPedido(pedido);
             blocoService.create(bloco);
+            estoqueService.assignBlockColor(bloco.getEstoque().getId(), CorEstoque.VAZIO);
         }
     }
 
