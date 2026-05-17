@@ -36,4 +36,9 @@ public class EstoqueController {
     public ResponseEntity<List<EstoqueResponseDTO>> findAvailable() {
         return ResponseEntity.ok(estoqueService.findAvailable());
     }
+
+    @GetMapping("/indisponivel")
+    public ResponseEntity<List<EstoqueResponseDTO>> findUnavailable() {
+        return ResponseEntity.ok(estoqueService.findUnavailable());
+    }
 }
