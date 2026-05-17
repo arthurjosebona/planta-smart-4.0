@@ -12,6 +12,7 @@ import com.smart.appsa.exception.LaminasSizeException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.ResourceNotFoundException;
 import com.smart.appsa.model.Bloco;
+import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Lamina;
 import com.smart.appsa.model.enums.PosicaoLamina;
 import com.smart.appsa.repository.BlocoRepository;
@@ -21,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BlocoService {
-
     private final BlocoRepository blocoRepository;
     private final LaminaService laminaService;
+    private final EstoqueService estoqueService;
 
     @Transactional(readOnly = true)
     public List<Bloco> findAll() {
@@ -35,15 +36,17 @@ public class BlocoService {
         return blocoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bloco", id));
     }
+    
 
     @Transactional
     public Bloco create(Bloco bloco) {
         validateRequiredFields(bloco);
         validateBusinessRules(bloco);
-        Bloco blocoSalvo = blocoRepository.save(bloco);
+        Bloco blocoSalvo = createBloco(bloco);
         createLaminas(bloco.getLaminas(), blocoSalvo);
         return blocoSalvo;
     }
+
 
     private void validateRequiredFields(Bloco bloco) {
         if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) 
@@ -73,6 +76,13 @@ public class BlocoService {
             throw new DuplicatePosicaoException(duplicatePosicao);
         }
     } 
+
+    private Bloco createBloco(Bloco bloco) {
+        Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
+        bloco.setEstoque(estoque);
+        return blocoRepository.save(bloco);
+    }
+
 
     private void createLaminas(List<Lamina> laminas, Bloco bloco) {
         for (Lamina lamina : laminas) {

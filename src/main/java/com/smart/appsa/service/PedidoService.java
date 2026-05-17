@@ -92,7 +92,7 @@ public class PedidoService {
 
     private void validateColorInventory(List<Bloco> blocos) {
         for (Bloco bloco : blocos) {
-            Estoque estoque = estoqueService.findByEntityId(bloco.getEstoque().getId());
+            Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
 
         if (estoque.getCorEstoque() == CorEstoque.VAZIO || !estoque.getCorEstoque().getValue().equals(bloco.getCor().getValue())) {
                 throw new CorIncompatibleWithEstoqueException(bloco.getCor(), estoque);

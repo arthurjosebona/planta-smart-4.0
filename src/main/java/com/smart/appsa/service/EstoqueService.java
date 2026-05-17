@@ -32,7 +32,7 @@ public class EstoqueService {
     }
 
     @Transactional(readOnly = true)
-    public Estoque findByEntityId(Long id) {
+    public Estoque findEntityById(Long id) {
         return estoqueRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Estoque", id));
     }
 
