@@ -6,7 +6,7 @@ public class ResourceNotFoundException extends AppException{
 
     public ResourceNotFoundException(String resource, Long id) {
         super(
-            String.format("%s não encontrado com ID: %l", resource, id), 
+            String.format("%s não encontrado com ID: %d", resource, id), 
             HttpStatus.NOT_FOUND
         );
     }
