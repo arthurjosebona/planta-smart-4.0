@@ -2,112 +2,67 @@ package com.smart.appsa.service;
 
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.repository.ExpedicaoRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import com.smart.appsa.exception.ExpedicaoLotadaException;
+import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
+import com.smart.appsa.exception.OrdemDeProducaoExpedidaException;
+import com.smart.appsa.exception.PosicaoExpedicaoOcupadaException;
+import com.smart.appsa.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
 public class ExpedicaoService {
-
     private final ExpedicaoRepository expedicaoRepository;
 
-    // ─── READ ────────────────────────────────────────────────────────────────────
-
-    public List<Expedicao> listarTodas() {
+    @Transactional(readOnly = true)
+    public List<Expedicao> findAll() {
         return expedicaoRepository.findAll();
     }
 
-    public Expedicao buscarPorId(Long id) {
+    @Transactional(readOnly = true)
+    public Expedicao findById(Long id) {
         return expedicaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expedição não encontrada com ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Expedicao", id));
     }
 
-    public Expedicao buscarPorOrdemDeProducao(int ordemDeProducao) {
+    @Transactional(readOnly = true)
+    public Expedicao findByOrdemDeProducao(int ordemDeProducao) {
         return expedicaoRepository.findByOrdemDeProducaoAtual(ordemDeProducao)
-                .orElseThrow(() -> new RuntimeException(
-                        "Nenhuma expedição encontrada para a ordem: " + ordemDeProducao));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Expedicao", 
+                    "Ordem de produção atual", 
+                    ordemDeProducao
+                ));
     }
 
-    public Expedicao buscarPrimeiraPosicaoLivre() {
-        return encontrarProximaPosicaoLivre();
-    }
-
-    // ─── CREATE ──────────────────────────────────────────────────────────────────
-
-    public Expedicao registrarExpedicao(int ordemDeProducao) {
-        if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) {
-            throw new RuntimeException(
-                    "Ordem de produção " + ordemDeProducao + " já foi expedida.");
-        }
-
-        Expedicao expedicao = encontrarProximaPosicaoLivre();
-        expedicao.setOrdemDeProducaoAtual(ordemDeProducao);
-        return expedicaoRepository.save(expedicao);
-    }
-
-    public Expedicao atribuirOrdemDeProducao(int posicaoFisica, int ordemDeProducao) {
-        if (posicaoFisica < 1 || posicaoFisica > 12) {
-            throw new RuntimeException(
-                    "Posição inválida: " + posicaoFisica + ". A expedição tem 12 posições (1 a 12).");
-        }
-
-        if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) {
-            throw new RuntimeException(
-                    "Ordem de produção " + ordemDeProducao + " já foi expedida.");
-        }
-
-        boolean posicaoOcupada = expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica);
-        if (posicaoOcupada) {
-            throw new RuntimeException("Posição " + posicaoFisica + " já está ocupada na expedição.");
-        }
-
+    @Transactional
+    public void AssignOrdemAtPosicao(int ordemDeProducao, int posicaoFisica) {
+        validateFields(ordemDeProducao, posicaoFisica);
         Expedicao expedicao = expedicaoRepository.findByPosicaoFisica(posicaoFisica)
                 .orElseThrow(() -> new RuntimeException("Posição não encontrada no banco."));
         expedicao.setOrdemDeProducaoAtual(ordemDeProducao);
-        return expedicaoRepository.save(expedicao);
+        expedicaoRepository.save(expedicao);
     }
 
-    // ─── UPDATE ──────────────────────────────────────────────────────────────────
-
-    public Expedicao atualizarPosicao(Long id, int novaPosicao) {
-        if (novaPosicao < 1 || novaPosicao > 12) {
-            throw new RuntimeException(
-                    "Posição inválida: " + novaPosicao + ". A expedição tem 12 posições (1 a 12).");
-        }
-
-        Expedicao expedicao = expedicaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expedição não encontrada com ID: " + id));
-
-        boolean posicaoOcupada = expedicaoRepository.findPosicoesOcupadas().contains(novaPosicao);
-        if (posicaoOcupada) {
-            throw new RuntimeException("Posição " + novaPosicao + " já está ocupada na expedição.");
-        }
-
-        expedicao.setPosicaoFisica(novaPosicao);
-        return expedicaoRepository.save(expedicao);
+    private void validateFields(int ordemDeProducao, int posicaoFisica) {
+        if (posicaoFisica < 1 || posicaoFisica > 12) 
+            throw new InvalidPosicaoExpedicaoException(posicaoFisica);
+        if (expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica)) 
+            throw new PosicaoExpedicaoOcupadaException(posicaoFisica);
+        if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) 
+            throw new OrdemDeProducaoExpedidaException(ordemDeProducao);
     }
 
-    // ─── DELETE ──────────────────────────────────────────────────────────────────
-
-    public void liberarPosicao(Long id) {
-        if (!expedicaoRepository.existsById(id)) {
-            throw new RuntimeException("Expedição não encontrada com ID: " + id);
-        }
-        expedicaoRepository.deleteById(id);
-    }
-
-    // ─── HELPER ──────────────────────────────────────────────────────────────────
-
-    private Expedicao encontrarProximaPosicaoLivre() {
-        List<Integer> posicoesOcupadas = expedicaoRepository.findPosicoesOcupadas();
-        for (int pos = 1; pos <= 12; pos++) {
-            if (!posicoesOcupadas.contains(pos)) {
-                return expedicaoRepository.findByPosicaoFisica(pos)
-                        .orElseThrow(() -> new RuntimeException("Posição não encontrada no banco."));
-            }
-        }
-        throw new RuntimeException("Expedição lotada. Todas as 12 posições estão ocupadas.");
+    @Transactional(readOnly = true)
+    public Expedicao findFirstPosicaoLivre() {
+        return expedicaoRepository.findFirstByOrdemDeProducaoAtualOrderByPosicaoFisicaAsc(0)
+                .orElseThrow(() -> new ExpedicaoLotadaException());
     }
 }
