@@ -12,11 +12,9 @@ import java.util.Optional;
 public interface ExpedicaoRepository extends JpaRepository<Expedicao, Long> {
 
     boolean existsByOrdemDeProducaoAtual(int ordemDeProducaoAtual);
-    
     Optional<Expedicao> findByPosicaoFisica(int posicaoFisica);
-
     Optional<Expedicao> findByOrdemDeProducaoAtual(int ordemDeProducaoAtual);
-
-    @Query("SELECT e.posicaoFisica FROM Expedicao e")
+    Optional<Expedicao> findFirstByOrdemDeProducaoAtualOrderByPosicaoFisicaAsc(Integer ordemDeProducaoAtual);
+    @Query("SELECT e.posicaoFisica FROM Expedicao e WHERE e.vl_op_atual != 0")
     List<Integer> findPosicoesOcupadas();
 }
