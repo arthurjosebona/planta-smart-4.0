@@ -1,5 +1,9 @@
 package com.smart.appsa.config;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -8,10 +12,6 @@ import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.repository.EstoqueRepository;
 import com.smart.appsa.repository.ExpedicaoRepository;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -57,7 +57,25 @@ public class DataInitializer implements CommandLineRunner {
             ));
             System.out.println(">> Dados iniciais carregados com sucesso!");
         } else {
-            System.out.println(">> Estoque já contém dados. Pulando inicialização.");
+            System.out.println(">> Resetando estoque para estado inicial.");
+            List<Estoque> estoques = estoqueRepository.findAll();
+            
+            Map<Integer, CorEstoque> coresIniciais = Map.of(
+                1, CorEstoque.AZUL,
+                2, CorEstoque.AZUL,
+                3, CorEstoque.AZUL,
+                4, CorEstoque.AZUL,
+                5, CorEstoque.VERMELHO,
+                6, CorEstoque.VERMELHO,
+                7, CorEstoque.PRETO
+            );
+
+            estoques.forEach(e -> {
+                CorEstoque cor = coresIniciais.getOrDefault(e.getPosicaoFisica(), CorEstoque.VAZIO);
+                e.setCorEstoque(cor);
+            });
+
+            estoqueRepository.saveAll(estoques);
         }
 
         if (expedicaoRepository.count() == 0) {
@@ -78,7 +96,20 @@ public class DataInitializer implements CommandLineRunner {
             ));
             System.out.println(">> Dados iniciais de expedição carregados com sucesso!");
         } else {
-            System.out.println(">> Expedicao já contém dados. Pulando inicialização.");
+            System.out.println(">> Resetando estoque para estado inicial.");
+            List<Expedicao> expedicoes = expedicaoRepository.findAll();
+
+            Map<Integer, Integer> ordensIniciais = Map.of(
+                1, 1,
+                2, 2,
+                3, 3
+            );
+
+            expedicoes.forEach(e -> {
+                e.setOrdemDeProducaoAtual(ordensIniciais.getOrDefault(e.getPosicaoFisica(), 0));
+            });
+
+            expedicaoRepository.saveAll(expedicoes);
         }
     }
 }
