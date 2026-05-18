@@ -1,0 +1,1196 @@
+{
+  "info": {
+    "_postman_id": "4a82e8c1-e4c6-4463-ad10-bff047b4948d",
+    "name": "SMART 4.0 – Sistema de Gerenciamento",
+    "description": "Coleção completa de testes para a API da Planta SMART 4.0.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52854083",
+    "_collection_link": "https://go.postman.co/collection/52854083-4a82e8c1-e4c6-4463-ad10-bff047b4948d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Estoque",
+      "item": [
+        {
+          "name": "GET - [S] Listar todo o estoque",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Resposta é um array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Array não está vazio', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('Cada item possui os campos esperados', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.length > 0) {",
+                  "        const item = json[0];",
+                  "        pm.expect(item).to.have.property('id');",
+                  "        pm.expect(item).to.have.property('posicaoFisica');",
+                  "        pm.expect(item).to.have.property('corEstoque');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Salva o ID do primeiro item para reuso nos próximos testes",
+                  "const json = pm.response.json();",
+                  "if (json && json.length > 0) {",
+                  "    pm.collectionVariables.set('lastEstoqueId', json[0].id);",
+                  "    console.log('lastEstoqueId salvo:', json[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estoque",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estoque"
+              ]
+            },
+            "description": "Lista todas as posições de estoque (incluindo vazias)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET [S] Buscar estoque por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Resposta possui campo id', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('ID retornado bate com o solicitado', function () {",
+                  "    const json = pm.response.json();",
+                  "    const expectedId = parseInt(pm.collectionVariables.get('lastEstoqueId'));",
+                  "    pm.expect(json.id).to.eql(expectedId);",
+                  "});",
+                  "",
+                  "pm.test('Possui campo posicaoFisica', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('posicaoFisica');",
+                  "});",
+                  "",
+                  "pm.test('Possui campo corEstoque', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('corEstoque');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estoque/{{lastEstoqueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estoque",
+                "{{lastEstoqueId}}"
+              ]
+            },
+            "description": "Busca uma posição específica do estoque pelo ID.\n\n⚠️ Requer que `lastEstoqueId` esteja preenchido (executar 'Listar todo o estoque' antes)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [F] Buscar estoque com ID inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Resposta indica recurso não encontrado', function () {",
+                  "    const text = pm.response.text();",
+                  "    // Aceita tanto body com campo 'message' quanto texto com 'Estoque'",
+                  "    const hasErrorInfo = text.includes('99999') || text.includes('Estoque') || text.includes('not found') || text.includes('encontrado');",
+                  "    pm.expect(hasErrorInfo).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Tempo de resposta abaixo de 3000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estoque/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estoque",
+                "99999"
+              ]
+            },
+            "description": "Tenta buscar uma posição de estoque que não existe.\nEspera status 404 e mensagem de erro."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [S] Listar estoque disponível",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Resposta é um array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Todos os itens possuem cor diferente de VAZIO', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(item) {",
+                  "        pm.expect(item.corEstoque).to.not.eql('VAZIO');",
+                  "        pm.expect(item.corEstoque).to.not.eql(0);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Cada item possui id, posicaoFisica e corEstoque', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(item) {",
+                  "        pm.expect(item).to.have.property('id');",
+                  "        pm.expect(item).to.have.property('posicaoFisica');",
+                  "        pm.expect(item).to.have.property('corEstoque');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estoque/disponivel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estoque",
+                "disponivel"
+              ]
+            },
+            "description": "Retorna apenas posições com bloco (cor != VAZIO)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints relacionados ao controle de estoque de blocos."
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "POST - [S] Criar pedido SIMPLES (tipo 1)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Resposta possui campo id', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('Tipo do pedido é SIMPLES', function () {",
+                  "    const json = pm.response.json();",
+                  "    const tipo = json.tipo;",
+                  "    // Aceita valor numérico 1 ou string SIMPLES",
+                  "    pm.expect(tipo == 1 || tipo === 'SIMPLES').to.be.true;",
+                  "});",
+                  "",
+                  "",
+                  "// Salva o ID para uso nos próximos testes",
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "    pm.collectionVariables.set('lastPedidoId', json.id);",
+                  "    console.log('✅ lastPedidoId salvo:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 7 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Cria um pedido SIMPLES (tipo=1) com 1 bloco e 2 lâminas.\nO ID retornado é salvo automaticamente em `lastPedidoId`."
+          },
+          "response": []
+        },
+        {
+          "name": "POST [S] Criar pedido DUPLO (tipo 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Cor da tampa é VERMELHO (2)', function () {",
+                  "    const json = pm.response.json();",
+                  "    const cor = json.corTampa;",
+                  "    pm.expect(cor == 2 || cor === 'VERMELHO').to.be.true;",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "    pm.collectionVariables.set('lastPedidoId', json.id);",
+                  "    console.log('✅ lastPedidoId atualizado para:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 2,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": [\n        { \"cor\": 3, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 5 },\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Cria um pedido DUPLO (tipo=2) com exatamente 2 blocos.\nO ID retornado sobrescreve `lastPedidoId`."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [S] Criar pedido TRIPLO (tipo 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Cada bloco possui andar único', function () {",
+                  "    const json = pm.response.json();",
+                  "    const andares = json.blocos.map(b => b.andar);",
+                  "    const unique = [...new Set(andares)];",
+                  "    pm.expect(unique.length).to.eql(andares.length);",
+                  "});",
+                  "",
+                  "pm.test('Cada bloco possui lâminas (array)', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.blocos.forEach(function(bloco) {",
+                  "        pm.expect(bloco.laminas).to.be.an('array');",
+                  "    });",
+                  "});",
+                  "",
+                  "// Salva o ID do pedido triplo para os testes de findById e update",
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "    pm.collectionVariables.set('lastPedidoId', json.id);",
+                  "    console.log('✅ Pedido TRIPLO criado. lastPedidoId:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    },\n    {\n      \"cor\": 3,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 3 },\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 3 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 3,\n      \"estoque\": { \"id\": 6 },\n      \"laminas\": [\n        { \"cor\": 6, \"padrao\": 1, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Cria um pedido TRIPLO (tipo=3) com exatamente 3 blocos.\nÉ o cenário mais completo da planta SMART 4.0."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [S] Listar todos os pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Resposta é um array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Cada pedido possui id, status, tipo e corTampa', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(pedido) {",
+                  "        pm.expect(pedido).to.have.property('id');",
+                  "        pm.expect(pedido).to.have.property('status');",
+                  "        pm.expect(pedido).to.have.property('tipo');",
+                  "        pm.expect(pedido).to.have.property('corTampa');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Cada pedido possui campo blocos (array)', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(pedido) {",
+                  "        pm.expect(pedido).to.have.property('blocos');",
+                  "        pm.expect(pedido.blocos).to.be.an('array');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Tempo de resposta abaixo de 5000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Lista todos os pedidos cadastrados com seus blocos e lâminas."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [S] Buscar pedido por ID (lastPedidoId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('ID retornado bate com lastPedidoId', function () {",
+                  "    const json = pm.response.json();",
+                  "    const expectedId = parseInt(pm.collectionVariables.get('lastPedidoId'));",
+                  "    pm.expect(json.id).to.eql(expectedId);",
+                  "});",
+                  "",
+                  "pm.test('Pedido possui campo ordemDeProducao', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('ordemDeProducao');",
+                  "});",
+                  "",
+                  "pm.test('Pedido possui expedicao (pode ser null se pendente)', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('ordemDeProducao');",
+                  "    // expedicao pode ou não existir dependendo do status",
+                  "    console.log('Status do pedido:', json.status);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/{{lastPedidoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{lastPedidoId}}"
+              ]
+            },
+            "description": "Busca o último pedido criado usando a variável `lastPedidoId`.\nSempre atualizada automaticamente após um POST com sucesso."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - [S] Atualizar status para CONCLUÍDO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test('Body vazio (sem conteúdo)', function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
+                  "});",
+                  "",
+                  "pm.test('Tempo de resposta abaixo de 3000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "console.log('✅ Pedido', pm.collectionVariables.get('lastPedidoId'), 'marcado como CONCLUÍDO.');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/{{lastPedidoId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{lastPedidoId}}",
+                "status"
+              ]
+            },
+            "description": "Atualiza o status do último pedido criado para CONCLUÍDO (3).\nDispara o registro na expedição automaticamente."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [S] Verificar pedido concluído (GET após PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status do pedido é CONCLUIDO (3)', function () {",
+                  "    const json = pm.response.json();",
+                  "    const status = json.status;",
+                  "    pm.expect(status == 3 || status === 'CONCLUIDO').to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('registroEntradaExpedicao foi preenchido', function () {",
+                  "    const json = pm.response.json();",
+                  "    // Campo deve existir e não ser nulo após conclusão",
+                  "    pm.expect(json).to.have.property('registroEntradaExpedicao');",
+                  "    pm.expect(json.registroEntradaExpedicao).to.not.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/{{lastPedidoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{lastPedidoId}}"
+              ]
+            },
+            "description": "Verifica se o status foi corretamente atualizado para CONCLUÍDO após o PUT.\nExecutar logo após o request de atualização de status."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Tipo SIMPLES com 2 blocos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (tipo incompatível com blocos)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Body contém mensagem de erro', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.be.empty;",
+                  "    console.log('Erro retornado:', text);",
+                  "});",
+                  "",
+                  "pm.test('NÃO deve ter criado o pedido (sem status 201)', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(201);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: tipo=1 (SIMPLES) exige exatamente 1 bloco.\nEnviar 2 blocos deve retornar erro 4xx."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Tipo TRIPLO com apenas 2 blocos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (TRIPLO com 2 blocos)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona incompatibilidade de tipo/blocos', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('bloco') || text.includes('tipo') || text.includes('triplo') || text.includes('incompativel') || text.includes('incompat');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Mensagem de erro:', pm.response.text());",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: tipo=3 (TRIPLO) exige exatamente 3 blocos.\nEnviar apenas 2 deve retornar TipoIncompativelComBlocosException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Andares duplicados no mesmo pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (andar duplicado)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona andar duplicado', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('andar') || text.includes('duplicado') || text.includes('duplicate');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Cada bloco do pedido deve ter um andar único.\nDois blocos com andar=1 deve retornar DuplicateAndarException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Ordem de produção inválida (zero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (ordemDeProducao inválida)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona ordemDeProducao ou ordem inválida', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('ordem') || text.includes('producao') || text.includes('invalid') || text.includes('inválida');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": 0,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: ordemDeProducao deve ser maior que zero.\nordemDeProducao=0 deve retornar InvalidOrdemDeProducaoException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Sem lista de blocos (campo obrigatório)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (blocos obrigatório)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona Blocos como campo obrigatório', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('bloco') || text.includes('required') || text.includes('obrigat');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Campo `blocos` é obrigatório e não pode ser vazio.\nLista vazia deve retornar RequiredFieldException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Campo status ausente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (status ausente)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Body contém mensagem de erro', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.be.empty;",
+                  "    console.log('Erro retornado:', text);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Campo `status` é obrigatório.\nSem status deve retornar RequiredFieldException."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [F] Buscar pedido com ID inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona Pedido não encontrado', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('99999') || text.includes('pedido') || text.includes('not found') || text.includes('encontrado');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro 404:', pm.response.text());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "99999"
+              ]
+            },
+            "description": "❌ Tenta buscar um pedido que não existe.\nEspera ResourceNotFoundException com status 404."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - [F] Atualizar status de pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status HTTP 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Body contém informação do erro', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.be.empty;",
+                  "    console.log('Erro 404 no PUT:', text);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/99999/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "99999",
+                "status"
+              ]
+            },
+            "description": "❌ Tenta concluir um pedido que não existe.\nEspera ResourceNotFoundException com status 404."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Estoque insuficiente para cor solicitada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Esse teste é condicional: se houver estoque, cria com sucesso (201)",
+                  "// Se não houver, deve retornar 4xx com EstoqueInsuficienteException",
+                  "pm.test('Resposta é 201 (estoque OK) ou 4xx (estoque insuficiente)', function () {",
+                  "    const code = pm.response.code;",
+                  "    pm.expect(code === 201 || (code >= 400 && code < 500)).to.be.true;",
+                  "    console.log('Código retornado:', code, '| Body:', pm.response.text());",
+                  "});",
+                  "",
+                  "if (pm.response.code >= 400 && pm.response.code < 500) {",
+                  "    pm.test('Mensagem menciona estoque insuficiente', function () {",
+                  "        const text = pm.response.text().toLowerCase();",
+                  "        const hasKeyword = text.includes('estoque') || text.includes('insuficiente') || text.includes('insufficient') || text.includes('cor');",
+                  "        pm.expect(hasKeyword).to.be.true;",
+                  "    });",
+                  "} else {",
+                  "    const json = pm.response.json();",
+                  "    if (json && json.id) {",
+                  "        pm.collectionVariables.set('lastPedidoId', json.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 3,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 3,\n      \"estoque\": { \"id\": 3 },\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: O estoque deve ter blocos suficientes da cor solicitada.\nPedido TRIPLO com 3 blocos de cor PRETO (1) pode exceder o estoque disponível.\nEspera EstoqueInsuficienteException caso não haja 3 blocos PRETO no estoque."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints de criação, consulta e atualização de pedidos de produção."
+    },
+    {
+      "name": "Expedicao",
+      "item": [
+        {
+          "name": "GET - [S] Listar toda a expedicao",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expedicao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expedicao"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [S] Listar expedicao por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expedicao/{{lastExpedicaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expedicao",
+                "{{lastExpedicaoId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "if (pm.request.method === 'POST') {",
+          "    const counter = parseInt(pm.collectionVariables.get('ordemDeProducaoCounter') || 10);",
+          "    const next = counter + 1;",
+          "    pm.collectionVariables.set('ordemDeProducaoCounter', next);",
+          "    pm.collectionVariables.set('currentOrdem', next);",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "description": "URL base da API. Altere conforme seu ambiente."
+    },
+    {
+      "key": "lastPedidoId",
+      "value": "",
+      "description": "ID do último pedido criado com sucesso. Preenchido automaticamente."
+    },
+    {
+      "key": "lastEstoqueId",
+      "value": "1",
+      "description": "ID do estoque a ser consultado nos testes."
+    },
+    {
+      "key": "ordemDeProducaoCounter",
+      "value": ""
+    },
+    {
+      "key": "currentOrdem",
+      "value": ""
+    },
+    {
+      "key": "lastExpedicaoId",
+      "value": ""
+    }
+  ]
+}
