@@ -1,20 +1,21 @@
 package com.smart.appsa.service;
 
-import com.smart.appsa.model.Expedicao;
-import com.smart.appsa.repository.ExpedicaoRepository;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
 import com.smart.appsa.exception.OrdemDeProducaoExpedidaException;
 import com.smart.appsa.exception.PosicaoExpedicaoOcupadaException;
 import com.smart.appsa.exception.ResourceNotFoundException;
+import com.smart.appsa.mapper.ExpedicaoMapper;
+import com.smart.appsa.model.Expedicao;
+import com.smart.appsa.repository.ExpedicaoRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -22,14 +23,19 @@ public class ExpedicaoService {
     private final ExpedicaoRepository expedicaoRepository;
 
     @Transactional(readOnly = true)
-    public List<Expedicao> findAll() {
-        return expedicaoRepository.findAll();
+    public List<ExpedicaoResponseDTO> findAll() {
+        return expedicaoRepository.findAll()
+            .stream()
+            .map(e -> ExpedicaoMapper.mapDto(e))
+            .toList();
     }
 
     @Transactional(readOnly = true)
-    public Expedicao findById(Long id) {
-        return expedicaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Expedicao", id));
+    public ExpedicaoResponseDTO findById(Long id) {
+        return ExpedicaoMapper.mapDto(
+            expedicaoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Expedicao", id))
+        );
     }
 
     @Transactional(readOnly = true)
