@@ -30,4 +30,24 @@ public class PedidoMapper {
             .corTampa(requestDTO.corTampa())
             .build();
     }
+
+    public static PedidoRequestDTO mapRequestDto(Pedido pedido) {
+        return PedidoRequestDTO.builder()
+            .ordemDeProducao(pedido.getOrdemDeProducao())
+            .blocos(pedido.getBlocos()) 
+            .status(pedido.getStatus())
+            .tipo(pedido.getTipo())
+            .corTampa(pedido.getCorTampa())
+            .build();
+    }
+
+    public static Pedido mapEntityByResponseDTO(PedidoResponseDTO responseDTO) {
+        return Pedido.builder()
+            .ordemDeProducao(responseDTO.ordemDeProducao())
+            .blocos(new ArrayList<>()) // Envia vazio pois é responsabilidade do BlocoService salvar os blocos
+            .status(responseDTO.status())
+            .tipo(responseDTO.tipo())
+            .corTampa(responseDTO.corTampa())
+            .build();
+    }
 }
