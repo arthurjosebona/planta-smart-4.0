@@ -1,5 +1,7 @@
 package com.smart.appsa.exception;
 
+import com.smart.appsa.exception.core.BusinessException;
+
 public class InvalidOrdemDeProducaoException extends BusinessException{
 
     public InvalidOrdemDeProducaoException(int op) {

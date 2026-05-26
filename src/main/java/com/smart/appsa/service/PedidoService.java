@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
-import com.smart.appsa.exception.CorIncompatibleWithEstoqueException;
 import com.smart.appsa.exception.DuplicateAndarException;
+import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.RequiredFieldException;
-import com.smart.appsa.exception.ResourceNotFoundException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Estoque;
@@ -70,7 +70,6 @@ public class PedidoService {
         if (requestDTO.tipo().getValue() != requestDTO.blocos().size()) 
             throw new TipoIncompativelComBlocosException(requestDTO.tipo(), requestDTO.blocos().size());
         validateDuplicateAndar(requestDTO.blocos());
-        validateColorInventory(requestDTO.blocos());
     }
 
     private void validateDuplicateAndar(List<Bloco> blocos) {
@@ -90,16 +89,6 @@ public class PedidoService {
             throw new DuplicateAndarException(duplicateAndar);
     }
 
-    private void validateColorInventory(List<Bloco> blocos) {
-        for (Bloco bloco : blocos) {
-            Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
-
-        if (estoque.getCorEstoque() == CorEstoque.VAZIO || !estoque.getCorEstoque().getValue().equals(bloco.getCor().getValue())) {
-                throw new CorIncompatibleWithEstoqueException(bloco.getCor(), estoque);
-            }
-        }
-    }
-
     private Pedido saveWithExpedition(Pedido pedido) {
         Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
         pedido.setExpedicao(nextFree);
@@ -110,7 +99,10 @@ public class PedidoService {
     private void createBlocks(Pedido pedido, List<Bloco> blocos) {
         for (Bloco bloco : blocos) {
             bloco.setPedido(pedido);
-            blocoService.create(bloco);
+            List<Estoque> estoques = estoqueService.findByCorEstoque(CorEstoque.fromValue(bloco.getCor().getValue()));
+            if (estoques.isEmpty()) throw new EstoqueInsuficienteException(bloco.getCor().name());
+            bloco.setEstoque(estoques.get(0));
+            blocoService.create(bloco); 
             estoqueService.assignBlockColor(bloco.getEstoque().getId(), CorEstoque.VAZIO);
         }
     }
