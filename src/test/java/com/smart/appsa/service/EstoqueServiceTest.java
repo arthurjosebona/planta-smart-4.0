@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.smart.appsa.dto.response.EstoqueResponseDTO;
 import com.smart.appsa.exception.ResourceNotFoundException;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.enums.CorEstoque;
@@ -41,7 +42,7 @@ public class EstoqueServiceTest {
         when(estoqueRepository.findAll()).thenReturn(List.of(e1, e2));
 
         // Act
-        var result = estoqueService.findAll();
+        List<EstoqueResponseDTO> result = estoqueService.findAll();
 
         // Assert
         assertEquals(2, result.size());
@@ -55,7 +56,7 @@ public class EstoqueServiceTest {
         when(estoqueRepository.findById(1L)).thenReturn(Optional.of(estoque));
 
         // Act
-        var result = estoqueService.findById(1L);
+        EstoqueResponseDTO result = estoqueService.findById(1L);
 
         // Assert
         assertNotNull(result);
@@ -85,7 +86,7 @@ public class EstoqueServiceTest {
         when(estoqueRepository.findByCorEstoqueNot(CorEstoque.VAZIO)).thenReturn(List.of(e1, e2));
 
         // Act
-        var result = estoqueService.findAvailable();
+        List<EstoqueResponseDTO> result = estoqueService.findAvailable();
 
         // Assert
         assertEquals(2, result.size());
@@ -99,7 +100,7 @@ public class EstoqueServiceTest {
         when(estoqueRepository.findByCorEstoque(CorEstoque.VAZIO)).thenReturn(List.of(e1));
 
         // Act
-        var result = estoqueService.findUnavailable();
+        List<EstoqueResponseDTO> result = estoqueService.findUnavailable();
 
         // Assert
         assertEquals(1, result.size());
