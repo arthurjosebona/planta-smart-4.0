@@ -22,6 +22,18 @@ public enum CorEstoque {
         throw new IllegalArgumentException("CorEstoque inválida: " + value);
     }   
 
+    public static CorEstoque fromValue(Integer value) {
+        if (value == null) {
+            throw new IllegalArgumentException("CorEstoque não pode ser nula");
+        }
+        for (CorEstoque cor : values()) {
+            if (cor.value == value) {
+                return cor;
+            }
+        }
+        throw new IllegalArgumentException("CorEstoque inválida: " + value);
+    }
+
     private CorEstoque(Integer value) {
         this.value = value;
     }

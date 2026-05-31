@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.dto.response.EstoqueResponseDTO;
-import com.smart.appsa.exception.ResourceNotFoundException;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.EstoqueMapper;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.enums.CorEstoque;
@@ -49,6 +49,11 @@ public class EstoqueService {
     @Transactional(readOnly = true)
     public Long countByCorEstoque(CorEstoque cor) {
         return estoqueRepository.countByCorEstoque(cor);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Estoque> findByCorEstoque(CorEstoque cor) {
+        return estoqueRepository.findByCorEstoque(cor);
     }
 
     @Transactional

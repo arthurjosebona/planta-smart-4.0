@@ -1,10 +1,11 @@
-package com.smart.appsa.exception;
+package com.smart.appsa.exception.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.smart.appsa.dto.response.ErrorResponseDTO;
+import com.smart.appsa.exception.core.AppException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
