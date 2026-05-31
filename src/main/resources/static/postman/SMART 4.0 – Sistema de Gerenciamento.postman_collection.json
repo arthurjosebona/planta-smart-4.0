@@ -142,7 +142,6 @@
                   "",
                   "pm.test('Resposta indica recurso não encontrado', function () {",
                   "    const text = pm.response.text();",
-                  "    // Aceita tanto body com campo 'message' quanto texto com 'Estoque'",
                   "    const hasErrorInfo = text.includes('99999') || text.includes('Estoque') || text.includes('not found') || text.includes('encontrado');",
                   "    pm.expect(hasErrorInfo).to.be.true;",
                   "});",
@@ -337,7 +336,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -402,7 +401,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 1, \"posicao\": 2 },\n        { \"cor\": 3, \"padrao\": 2, \"posicao\": 3 },\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 1, \"posicao\": 2 },\n        { \"cor\": 3, \"padrao\": 2, \"posicao\": 3 },\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -465,7 +464,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -512,7 +511,6 @@
                   "pm.test('Tipo do pedido é SIMPLES', function () {",
                   "    const json = pm.response.json();",
                   "    const tipo = json.tipo;",
-                  "    // Aceita valor numérico 1 ou string SIMPLES",
                   "    pm.expect(tipo == 1 || tipo === 'SIMPLES').to.be.true;",
                   "});"
                 ],
@@ -598,7 +596,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 2,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": [\n        { \"cor\": 3, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 5 },\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 2,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 3, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -639,7 +637,6 @@
                   "    });",
                   "});",
                   "",
-                  "// Salva o ID do pedido triplo para os testes de findById e update",
                   "const json = pm.response.json();",
                   "if (json && json.id) {",
                   "    pm.collectionVariables.set('lastPedidoId', json.id);",
@@ -662,7 +659,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    },\n    {\n      \"cor\": 3,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 3 },\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 3 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 3,\n      \"estoque\": { \"id\": 6 },\n      \"laminas\": [\n        { \"cor\": 6, \"padrao\": 1, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    },\n    {\n      \"cor\": 3,\n      \"andar\": 2,\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 3 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 3,\n      \"laminas\": [\n        { \"cor\": 6, \"padrao\": 1, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -763,7 +760,6 @@
                   "pm.test('Pedido possui expedicao (pode ser null se pendente)', function () {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json).to.have.property('ordemDeProducao');",
-                  "    // expedicao pode ou não existir dependendo do status",
                   "    console.log('Status do pedido:', json.status);",
                   "});"
                 ]
@@ -811,6 +807,15 @@
                   "console.log('✅ Pedido', pm.collectionVariables.get('lastPedidoId'), 'marcado como CONCLUÍDO.');"
                 ]
               }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
             }
           ],
           "request": {
@@ -852,7 +857,6 @@
                   "",
                   "pm.test('registroEntradaExpedicao foi preenchido', function () {",
                   "    const json = pm.response.json();",
-                  "    // Campo deve existir e não ser nulo após conclusão",
                   "    pm.expect(json).to.have.property('registroEntradaExpedicao');",
                   "    pm.expect(json.registroEntradaExpedicao).to.not.be.null;",
                   "});"
@@ -922,7 +926,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -972,7 +976,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1022,7 +1026,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1072,7 +1076,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": 0,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": 0,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1171,7 +1175,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1212,17 +1216,6 @@
                   "});"
                 ]
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Usa a mesma ordemDeProducao do pedido mais recente para forçar duplicata",
-                  "// Requer que lastPedidoId esteja preenchido (executar criação de pedido antes)"
-                ]
-              }
             }
           ],
           "request": {
@@ -1235,7 +1228,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": 1,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": 1,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1276,16 +1269,6 @@
                   "});"
                 ]
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  ""
-                ]
-              }
             }
           ],
           "request": {
@@ -1298,7 +1281,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": -5,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": -5,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1340,16 +1323,6 @@
                   "});"
                 ]
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  ""
-                ]
-              }
             }
           ],
           "request": {
@@ -1362,7 +1335,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1404,16 +1377,6 @@
                   "});"
                 ]
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  ""
-                ]
-              }
             }
           ],
           "request": {
@@ -1426,7 +1389,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1529,8 +1492,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Esse teste é condicional: se houver estoque, cria com sucesso (201)",
-                  "// Se não houver, deve retornar 4xx com EstoqueInsuficienteException",
                   "pm.test('Resposta é 201 (estoque OK) ou 4xx (estoque insuficiente)', function () {",
                   "    const code = pm.response.code;",
                   "    pm.expect(code === 201 || (code >= 400 && code < 500)).to.be.true;",
@@ -1566,7 +1527,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 3,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 3,\n      \"estoque\": { \"id\": 3 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 3,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 2,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 3,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1595,31 +1556,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status HTTP 200 OK', function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('Resposta é um array', function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.be.an('array');\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('Cada item possui os campos esperados', function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    if (json.length > 0) {\r",
-                  "        const item = json[0];\r",
-                  "        pm.expect(item).to.have.property('id');\r",
-                  "        pm.expect(item).to.have.property('posicaoFisica');\r",
-                  "        pm.expect(item).to.have.property('ordemDeProducaoAtual');\r",
-                  "    }\r",
-                  "});\r",
-                  "\r",
-                  "// Salva o ID do primeiro item para reuso\r",
-                  "const json = pm.response.json();\r",
-                  "if (json && json.length > 0) {\r",
-                  "    pm.collectionVariables.set('lastExpedicaoId', json[0].id);\r",
-                  "    console.log('✅ lastExpedicaoId salvo:', json[0].id);\r",
-                  "}"
+                  "pm.test('Status HTTP 200 OK', function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('Resposta é um array', function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.be.an('array');\r\n});\r\n\r\npm.test('Cada item possui os campos esperados', function () {\r\n    const json = pm.response.json();\r\n    if (json.length > 0) {\r\n        const item = json[0];\r\n        pm.expect(item).to.have.property('id');\r\n        pm.expect(item).to.have.property('posicaoFisica');\r\n        pm.expect(item).to.have.property('ordemDeProducaoAtual');\r\n    }\r\n});\r\n\r\n// Salva o ID do primeiro item para reuso\r\nconst json = pm.response.json();\r\nif (json && json.length > 0) {\r\n    pm.collectionVariables.set('lastExpedicaoId', json[0].id);\r\n    console.log('✅ lastExpedicaoId salvo:', json[0].id);\r\n}"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1650,25 +1587,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status HTTP 200 OK', function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('ID retornado bate com o solicitado', function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    const expectedId = parseInt(pm.collectionVariables.get('lastExpedicaoId'));\r",
-                  "    pm.expect(json.id).to.eql(expectedId);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('Possui campo posicaoFisica', function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property('posicaoFisica');\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('Possui campo ordemDeProducaoAtual', function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property('ordemDeProducaoAtual');\r",
-                  "});"
+                  "pm.test('Status HTTP 200 OK', function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('ID retornado bate com o solicitado', function () {\r\n    const json = pm.response.json();\r\n    const expectedId = parseInt(pm.collectionVariables.get('lastExpedicaoId'));\r\n    pm.expect(json.id).to.eql(expectedId);\r\n});\r\n\r\npm.test('Possui campo posicaoFisica', function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.have.property('posicaoFisica');\r\n});\r\n\r\npm.test('Possui campo ordemDeProducaoAtual', function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.have.property('ordemDeProducaoAtual');\r\n});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1700,19 +1619,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status HTTP 404 Not Found', function () {\r",
-                  "    pm.response.to.have.status(404);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('Resposta indica recurso não encontrado', function () {\r",
-                  "    const text = pm.response.text().toLowerCase();\r",
-                  "    const hasErrorInfo = text.includes('99999') || text.includes('expedi') || text.includes('not found') || text.includes('encontrado');\r",
-                  "    pm.expect(hasErrorInfo).to.be.true;\r",
-                  "});\r",
-                  "\r",
-                  "pm.test('Tempo de resposta abaixo de 3000ms', function () {\r",
-                  "    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
-                  "});"
+                  "pm.test('Status HTTP 404 Not Found', function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test('Resposta indica recurso não encontrado', function () {\r\n    const text = pm.response.text().toLowerCase();\r\n    const hasErrorInfo = text.includes('99999') || text.includes('expedi') || text.includes('not found') || text.includes('encontrado');\r\n    pm.expect(hasErrorInfo).to.be.true;\r\n});\r\n\r\npm.test('Tempo de resposta abaixo de 3000ms', function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(3000);\r\n});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
