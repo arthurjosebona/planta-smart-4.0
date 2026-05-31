@@ -1,20 +1,21 @@
 package com.smart.appsa.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
@@ -25,9 +26,10 @@ import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.repository.ExpedicaoRepository;
 
+@ExtendWith(MockitoExtension.class)
 public class ExpedicaoServiceTest {
 
-        @Mock
+    @Mock
     private ExpedicaoRepository expedicaoRepository;
  
     @InjectMocks

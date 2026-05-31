@@ -1,19 +1,18 @@
 package com.smart.appsa.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.smart.appsa.dto.response.PedidoResponseDTO;
@@ -54,7 +53,7 @@ public class PedidoServiceTest {
             .corEstoque(CorEstoque.AZUL)
             .posicaoFisica(1)
             .build();
-        when(estoqueService.findEntityById(1L)).thenReturn(estoque);
+        when(estoqueService.findByCorEstoque(CorEstoque.AZUL)).thenReturn(List.of(estoque));
         Expedicao expedicao = Expedicao.builder()
             .id(1L)
             .posicaoFisica(4)
