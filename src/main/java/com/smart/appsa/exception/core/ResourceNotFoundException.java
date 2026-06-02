@@ -1,4 +1,4 @@
-package com.smart.appsa.exception;
+package com.smart.appsa.exception.core;
 
 import org.springframework.http.HttpStatus;
 

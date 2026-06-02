@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.exception.LaminaPosicaoOcupadaException;
 import com.smart.appsa.exception.RequiredFieldException;
-import com.smart.appsa.exception.ResourceNotFoundException;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Lamina;
 import com.smart.appsa.repository.LaminaRepository;
 

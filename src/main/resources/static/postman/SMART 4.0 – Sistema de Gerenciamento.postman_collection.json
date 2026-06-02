@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "4a82e8c1-e4c6-4463-ad10-bff047b4948d",
+    "_postman_id": "2474c18d-21b0-47c2-b30d-d6189a365ad4",
     "name": "SMART 4.0 – Sistema de Gerenciamento",
     "description": "Coleção completa de testes para a API da Planta SMART 4.0.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "52854083",
-    "_collection_link": "https://go.postman.co/collection/52854083-4a82e8c1-e4c6-4463-ad10-bff047b4948d?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/52854083-2474c18d-21b0-47c2-b30d-d6189a365ad4?source=collection_link"
   },
   "item": [
     {
@@ -142,7 +142,6 @@
                   "",
                   "pm.test('Resposta indica recurso não encontrado', function () {",
                   "    const text = pm.response.text();",
-                  "    // Aceita tanto body com campo 'message' quanto texto com 'Estoque'",
                   "    const hasErrorInfo = text.includes('99999') || text.includes('Estoque') || text.includes('not found') || text.includes('encontrado');",
                   "    pm.expect(hasErrorInfo).to.be.true;",
                   "});",
@@ -228,6 +227,61 @@
             "description": "Retorna apenas posições com bloco (cor != VAZIO)."
           },
           "response": []
+        },
+        {
+          "name": "GET - [S] Listar estoque indisponível (VAZIO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Resposta é um array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Todos os itens possuem corEstoque VAZIO', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(item) {",
+                  "        pm.expect(item.corEstoque === 'VAZIO' || item.corEstoque === 0).to.be.true;",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Cada item possui id, posicaoFisica e corEstoque', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(item) {",
+                  "        pm.expect(item).to.have.property('id');",
+                  "        pm.expect(item).to.have.property('posicaoFisica');",
+                  "        pm.expect(item).to.have.property('corEstoque');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estoque/indisponivel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estoque",
+                "indisponivel"
+              ]
+            },
+            "description": "Retorna apenas as posições de estoque com corEstoque = VAZIO.\nCorresponde ao método findUnavailable() do EstoqueService."
+          },
+          "response": []
         }
       ],
       "description": "Endpoints relacionados ao controle de estoque de blocos."
@@ -235,6 +289,197 @@
     {
       "name": "Pedidos",
       "item": [
+        {
+          "name": "POST - [F] Bloco com lista de lâminas vazia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (lâminas obrigatórias)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona lâminas como campo obrigatório', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('lamina') || text.includes('required') || text.includes('obrigat');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});",
+                  "",
+                  "pm.test('NÃO deve ter criado o pedido (sem status 201)', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(201);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Um bloco deve ter ao menos 1 lâmina (validateRequiredFields no BlocoService).\nLista de lâminas vazia deve retornar RequiredFieldException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Bloco com 4 lâminas (excede o máximo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (mais de 3 lâminas)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona limite de lâminas excedido', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('lâminas') || text.includes('máximo') || text.includes('inválido') || text.includes('0-3');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});",
+                  "",
+                  "pm.test('NÃO deve ter criado o pedido (sem status 201)', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(201);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 1, \"posicao\": 2 },\n        { \"cor\": 3, \"padrao\": 2, \"posicao\": 3 },\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Um bloco pode ter no máximo 3 lâminas (validateBusinessRules no BlocoService).\nEnviar 4 lâminas deve retornar LaminasSizeException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Lâminas com posição duplicada no bloco",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (posição de lâmina duplicada)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona posição duplicada ou conflito de posição', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('posicao') || text.includes('posição') || text.includes('duplicad') || text.includes('duplicate');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});",
+                  "",
+                  "pm.test('NÃO deve ter criado o pedido (sem status 201)', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(201);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Cada lâmina de um bloco deve ter uma posição única (validateLaminasPosition no BlocoService).\nDuas lâminas com posicao=1 no mesmo bloco deve retornar DuplicatePosicaoException."
+          },
+          "response": []
+        },
         {
           "name": "POST - [S] Criar pedido SIMPLES (tipo 1)",
           "event": [
@@ -266,17 +511,8 @@
                   "pm.test('Tipo do pedido é SIMPLES', function () {",
                   "    const json = pm.response.json();",
                   "    const tipo = json.tipo;",
-                  "    // Aceita valor numérico 1 ou string SIMPLES",
                   "    pm.expect(tipo == 1 || tipo === 'SIMPLES').to.be.true;",
-                  "});",
-                  "",
-                  "",
-                  "// Salva o ID para uso nos próximos testes",
-                  "const json = pm.response.json();",
-                  "if (json && json.id) {",
-                  "    pm.collectionVariables.set('lastPedidoId', json.id);",
-                  "    console.log('✅ lastPedidoId salvo:', json.id);",
-                  "}"
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -294,7 +530,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 7 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -360,7 +596,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 2,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": [\n        { \"cor\": 3, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 5 },\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 2,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 3, \"padrao\": 1, \"posicao\": 1 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -401,7 +637,6 @@
                   "    });",
                   "});",
                   "",
-                  "// Salva o ID do pedido triplo para os testes de findById e update",
                   "const json = pm.response.json();",
                   "if (json && json.id) {",
                   "    pm.collectionVariables.set('lastPedidoId', json.id);",
@@ -424,7 +659,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    },\n    {\n      \"cor\": 3,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 3 },\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 3 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 3,\n      \"estoque\": { \"id\": 6 },\n      \"laminas\": [\n        { \"cor\": 6, \"padrao\": 1, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 3,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 },\n        { \"cor\": 2, \"padrao\": 2, \"posicao\": 2 }\n      ]\n    },\n    {\n      \"cor\": 3,\n      \"andar\": 2,\n      \"laminas\": [\n        { \"cor\": 4, \"padrao\": 3, \"posicao\": 3 }\n      ]\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 3,\n      \"laminas\": [\n        { \"cor\": 6, \"padrao\": 1, \"posicao\": 2 }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -525,7 +760,6 @@
                   "pm.test('Pedido possui expedicao (pode ser null se pendente)', function () {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json).to.have.property('ordemDeProducao');",
-                  "    // expedicao pode ou não existir dependendo do status",
                   "    console.log('Status do pedido:', json.status);",
                   "});"
                 ]
@@ -573,6 +807,15 @@
                   "console.log('✅ Pedido', pm.collectionVariables.get('lastPedidoId'), 'marcado como CONCLUÍDO.');"
                 ]
               }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
             }
           ],
           "request": {
@@ -614,7 +857,6 @@
                   "",
                   "pm.test('registroEntradaExpedicao foi preenchido', function () {",
                   "    const json = pm.response.json();",
-                  "    // Campo deve existir e não ser nulo após conclusão",
                   "    pm.expect(json).to.have.property('registroEntradaExpedicao');",
                   "    pm.expect(json.registroEntradaExpedicao).to.not.be.null;",
                   "});"
@@ -684,7 +926,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -734,7 +976,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 2,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -784,7 +1026,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 2,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 2,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -834,7 +1076,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": 0,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": 0,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -933,7 +1175,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -946,6 +1188,220 @@
               ]
             },
             "description": "❌ REGRA: Campo `status` é obrigatório.\nSem status deve retornar RequiredFieldException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Ordem de produção duplicada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (ordemDeProducao já expedida)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona ordem duplicada ou já existente', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('ordem') || text.includes('duplicada') || text.includes('expedida') || text.includes('já existe') || text.includes('already');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});",
+                  "",
+                  "pm.test('NÃO deve ter criado o pedido (sem status 201)', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": 1,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Cada ordemDeProducao deve ser única na expedição.\nEnviar ordemDeProducao=1 duas vezes deve lançar OrdemDeProducaoExpedidaException.\n⚠️ Ajuste o valor de ordemDeProducao para um que já exista no banco antes de rodar."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Ordem de produção negativa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (ordemDeProducao negativa)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona ordemDeProducao ou valor inválido', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('ordem') || text.includes('producao') || text.includes('invalid') || text.includes('inválida');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "    console.log('Erro retornado:', pm.response.text());",
+                  "});",
+                  "",
+                  "pm.test('NÃO deve ter criado o pedido (sem status 201)', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": -5,\n  \"status\": 1,\n  \"tipo\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: ordemDeProducao deve ser maior que zero.\nA validação cobre <= 0, então valor negativo também deve lançar InvalidOrdemDeProducaoException.\nCompleta o teste de ordemDeProducao=0 já existente."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Campo corTampa ausente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (corTampa ausente)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Body contém mensagem de erro', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.be.empty;",
+                  "    console.log('Erro retornado:', text);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona corTampa como campo obrigatório', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('cortampa') || text.includes('tampa') || text.includes('required') || text.includes('obrigat');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Campo `corTampa` é obrigatório.\nSem corTampa deve retornar RequiredFieldException."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - [F] Campo tipo ausente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Deve retornar erro 4xx (tipo ausente)', function () {",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});",
+                  "",
+                  "pm.test('Body contém mensagem de erro', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.be.empty;",
+                  "    console.log('Erro retornado:', text);",
+                  "});",
+                  "",
+                  "pm.test('Mensagem menciona tipo como campo obrigatório', function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const hasKeyword = text.includes('tipo') || text.includes('required') || text.includes('obrigat');",
+                  "    pm.expect(hasKeyword).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"corTampa\": 1,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": [\n        { \"cor\": 1, \"padrao\": 0, \"posicao\": 1 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "❌ REGRA: Campo `tipo` é obrigatório.\nSem tipo deve retornar RequiredFieldException."
           },
           "response": []
         },
@@ -1036,8 +1492,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Esse teste é condicional: se houver estoque, cria com sucesso (201)",
-                  "// Se não houver, deve retornar 4xx com EstoqueInsuficienteException",
                   "pm.test('Resposta é 201 (estoque OK) ou 4xx (estoque insuficiente)', function () {",
                   "    const code = pm.response.code;",
                   "    pm.expect(code === 201 || (code >= 400 && code < 500)).to.be.true;",
@@ -1073,7 +1527,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 3,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"estoque\": { \"id\": 1 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 2,\n      \"estoque\": { \"id\": 2 },\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 3,\n      \"estoque\": { \"id\": 3 },\n      \"laminas\": []\n    }\n  ]\n}"
+              "raw": "{\n  \"ordemDeProducao\": {{currentOrdem}},\n  \"status\": 1,\n  \"tipo\": 3,\n  \"corTampa\": 3,\n  \"blocos\": [\n    {\n      \"cor\": 1,\n      \"andar\": 1,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 2,\n      \"laminas\": []\n    },\n    {\n      \"cor\": 1,\n      \"andar\": 3,\n      \"laminas\": []\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/pedidos",
@@ -1097,6 +1551,19 @@
       "item": [
         {
           "name": "GET - [S] Listar toda a expedicao",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('Resposta é um array', function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.be.an('array');\r\n});\r\n\r\npm.test('Cada item possui os campos esperados', function () {\r\n    const json = pm.response.json();\r\n    if (json.length > 0) {\r\n        const item = json[0];\r\n        pm.expect(item).to.have.property('id');\r\n        pm.expect(item).to.have.property('posicaoFisica');\r\n        pm.expect(item).to.have.property('ordemDeProducaoAtual');\r\n    }\r\n});\r\n\r\n// Salva o ID do primeiro item para reuso\r\nconst json = pm.response.json();\r\nif (json && json.length > 0) {\r\n    pm.collectionVariables.set('lastExpedicaoId', json[0].id);\r\n    console.log('✅ lastExpedicaoId salvo:', json[0].id);\r\n}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -1115,6 +1582,19 @@
         },
         {
           "name": "GET - [S] Listar expedicao por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 200 OK', function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('ID retornado bate com o solicitado', function () {\r\n    const json = pm.response.json();\r\n    const expectedId = parseInt(pm.collectionVariables.get('lastExpedicaoId'));\r\n    pm.expect(json.id).to.eql(expectedId);\r\n});\r\n\r\npm.test('Possui campo posicaoFisica', function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.have.property('posicaoFisica');\r\n});\r\n\r\npm.test('Possui campo ordemDeProducaoAtual', function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.have.property('ordemDeProducaoAtual');\r\n});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -1129,6 +1609,39 @@
                 "{{lastExpedicaoId}}"
               ]
             }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - [F] Buscar expedicao com ID inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status HTTP 404 Not Found', function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test('Resposta indica recurso não encontrado', function () {\r\n    const text = pm.response.text().toLowerCase();\r\n    const hasErrorInfo = text.includes('99999') || text.includes('expedi') || text.includes('not found') || text.includes('encontrado');\r\n    pm.expect(hasErrorInfo).to.be.true;\r\n});\r\n\r\npm.test('Tempo de resposta abaixo de 3000ms', function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(3000);\r\n});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expedicao/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expedicao",
+                "99999"
+              ]
+            },
+            "description": "Tenta buscar uma expedição que não existe.  \nEspera ResourceNotFoundException com status 404."
           },
           "response": []
         }

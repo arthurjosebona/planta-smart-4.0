@@ -1,5 +1,6 @@
 package com.smart.appsa.exception;
 
+import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.model.enums.PosicaoLamina;
 
 public class LaminaPosicaoOcupadaException extends BusinessException {

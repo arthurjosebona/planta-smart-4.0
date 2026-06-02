@@ -2,6 +2,7 @@ package com.smart.appsa.exception;
 
 import java.util.List;
 
+import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.model.enums.AndarBloco;
 
 public class DuplicateAndarException extends BusinessException{
