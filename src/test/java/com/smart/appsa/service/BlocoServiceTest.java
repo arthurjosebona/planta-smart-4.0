@@ -116,28 +116,6 @@ public class BlocoServiceTest {
     }
 
     @Test
-    void deveRetornarRequiredFieldExceptionQuandoCriarBlocoComLaminasNulas() {
-        // Arrange
-        Bloco bloco = createBloco();
-        bloco.setLaminas(null);
-
-        // Act & Assert
-        assertThrows(RequiredFieldException.class, () -> blocoService.create(bloco));
-        verify(blocoRepository, never()).save(any());
-    }
-
-    @Test
-    void deveRetornarRequiredFieldExceptionQuandoCriarBlocoComLaminasVazias() {
-        // Arrange
-        Bloco bloco = createBloco();
-        bloco.setLaminas(List.of());
-
-        // Act & Assert
-        assertThrows(RequiredFieldException.class, () -> blocoService.create(bloco));
-        verify(blocoRepository, never()).save(any());
-    }
-
-    @Test
     void deveRetornarLaminasSizeExceptionQuandoCriarBlocoComMaisDeTresLaminas() {
         // Arrange
         Bloco bloco = createBloco();

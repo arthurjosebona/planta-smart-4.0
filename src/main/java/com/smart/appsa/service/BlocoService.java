@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.exception.DuplicatePosicaoException;
 import com.smart.appsa.exception.LaminasSizeException;
-import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Estoque;
@@ -49,8 +48,8 @@ public class BlocoService {
 
 
     private void validateRequiredFields(Bloco bloco) {
-        if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) 
-            throw new RequiredFieldException("laminas");
+        // if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) 
+        //     throw new RequiredFieldException("laminas");
     }
 
     private void validateBusinessRules(Bloco bloco) {

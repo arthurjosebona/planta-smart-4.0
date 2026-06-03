@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Novo Pedido – SMART 4.0</title>
+  <link rel="stylesheet" th:href="@{/css/pedido.css}">
+</head>
+
+<body>
+
+  <h2>Novo Pedido de Produção</h2>
+
+  <!-- ===== PEDIDO ===== -->
+  <fieldset>
+    <legend>Dados do Pedido</legend>
+
+    <div>
+      <label for="ordemProducao">Ordem de Produção *</label>
+      <input type="number" id="ordemProducao" min="1" placeholder="Ex: 101" oninput="validarForm()">
+    </div>
+    <br>
+
+    <div>
+      <label for="tipoPedido">Tipo do Pedido *</label>
+      <select id="tipoPedido" onchange="onTipoChange()">
+        <option value="">-- selecione --</option>
+        <option th:each="t : ${tiposPedido}" th:value="${t.value}"
+          th:text="${#strings.capitalize(#strings.toLowerCase(t.name()))}">Simples</option>
+      </select>
+    </div>
+    <br>
+
+    <div>
+      <label for="corTampa">Cor da Tampa *</label>
+      <select id="corTampa" onchange="validarForm()">
+        <option value="">-- selecione --</option>
+        <option th:each="c : ${coresTampa}" th:value="${c.value}"
+          th:text="${#strings.capitalize(#strings.toLowerCase(c.name()))}">Preto</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <!-- ===== BLOCOS (gerados por JS) ===== -->
+  <fieldset>
+    <legend>Blocos</legend>
+    <div id="blocos-container"></div>
+  </fieldset>
+
+  <!-- ===== AÇÕES ===== -->
+  <div>
+    <button id="btn-submit" onclick="submitPedido()" disabled>Gerar JSON do Pedido</button>
+  </div>
+
+  <div id="toast" class="alert-success hidden"></div>
+  <div id="json-output" class="hidden"></div>
+
+  <script th:src="@{/js/pedido.js}"></script>
+
+</body>
+
+</html>

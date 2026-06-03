@@ -64,4 +64,11 @@ public class EstoqueService {
         estoque.setCorEstoque(novaCor);
         return estoqueRepository.save(estoque);
     }
+
+    @Transactional
+    public void updateAllEstoque(List<Estoque> estoque) {
+        for (Estoque e : estoque) {
+            assignBlockColor(e.getId(), e.getCorEstoque());
+        }
+    }
 }
