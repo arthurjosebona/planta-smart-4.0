@@ -13,4 +13,12 @@ public class ExpedicaoMapper {
             .build();
     }
 
+    public static Expedicao mapEntityByResponseDTO(ExpedicaoResponseDTO dto) {
+        return Expedicao.builder()
+            .id(dto.id())
+            .ordemDeProducaoAtual(dto.ordemDeProducaoAtual())
+            .posicaoFisica(dto.posicaoFisica())
+            .build();
+    }
+
 }

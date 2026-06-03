@@ -12,4 +12,12 @@ public class EstoqueMapper {
             .corEstoque(estoque.getCorEstoque())
             .build();
     }
+
+    public static Estoque mapEntityByResponseDTO(EstoqueResponseDTO dto) {
+        return Estoque.builder()
+            .id(dto.id())
+            .posicaoFisica(dto.posicaoFisica())
+            .corEstoque(dto.corEstoque())
+            .build();
+    }
 }
