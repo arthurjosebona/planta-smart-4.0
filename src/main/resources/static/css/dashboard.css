@@ -1,72 +1,167 @@
-* {
+/* ============================================================
+   DASHBOARD.CSS — Smart 4.0 · Dark Edition
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;600;700&display=swap');
+
+/* ── VARIÁVEIS ─────────────────────────────────────────────── */
+:root {
+    --font-sans: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --color-bg:           #0d0d0f;
+    --color-bg-2:         #111114;
+    --color-surface:      #16161a;
+    --color-surface-2:    #1c1c22;
+    --color-border:       #2a2a32;
+    --color-border-bright:#3a3a46;
+    --color-muted:        #5a5a6e;
+    --color-muted-2:      #7a7a90;
+    --color-text:         #e8e8f0;
+    --color-text-dim:     #9898ac;
+    --color-accent:       #6e6af8;
+    --color-accent-dim:   rgba(110,106,248,0.12);
+    --color-accent-hover: #5854e8;
+
+    --color-preto:        #e8e8f0;
+    --color-azul:         #5b8ef8;
+    --color-vermelho:     #f85b5b;
+    --color-vazio:        #2a2a32;
+
+    --sp-1:  4px;
+    --sp-2:  8px;
+    --sp-3:  12px;
+    --sp-4:  16px;
+    --sp-5:  20px;
+    --sp-6:  24px;
+    --sp-8:  32px;
+    --sp-10: 40px;
+
+    --text-xs:  11px;
+    --text-sm:  13px;
+    --text-md:  14px;
+    --text-xl:  22px;
+
+    --radius-sm: 3px;
+    --radius-md: 6px;
+}
+
+/* ── RESET ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* ── BASE ──────────────────────────────────────────────────── */
+html {
+    background: var(--color-bg);
+    scrollbar-color: var(--color-border) var(--color-bg);
+    scrollbar-width: thin;
+}
+
 body {
-    font-family: sans-serif;
-    font-size: 14px;
-    background: #fff;
-    color: #111;
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    line-height: 1.6;
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
 }
 
 a {
-    color: #111;
+    color: var(--color-text);
     text-decoration: none;
 }
 
 button {
     cursor: pointer;
+    font-family: inherit;
+    font-size: var(--text-sm);
 }
 
-/* ===========================
-           LAYOUT
-        =========================== */
-header,
-footer {
-    padding: 12px 16px;
-    border-bottom: 1px solid #ccc;
-}
-
-footer {
-    border-top: 1px solid #ccc;
-    border-bottom: none;
-}
-
+/* ── LAYOUT ────────────────────────────────────────────────── */
 #main-content {
-    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--sp-8) var(--sp-6);
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: var(--sp-6);
 }
 
-/* ===========================
-           SECTION / SUBSECTION
-        =========================== */
+header,
+footer {
+    padding: var(--sp-4) var(--sp-6);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+    color: var(--color-muted-2);
+    letter-spacing: 0.04em;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+}
+
+footer {
+    border-top: 1px solid var(--color-border);
+    border-bottom: none;
+    margin-top: var(--sp-10);
+}
+
+/* ── SECTION ───────────────────────────────────────────────── */
 .section {
-    border: 1px solid #ccc;
-    padding: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--sp-6);
+    border-radius: var(--radius-md);
+    position: relative;
+}
+
+.section::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    opacity: 0.4;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .subsection {
-    border: 1px dashed #ccc;
-    padding: 12px;
-    margin-top: 12px;
+    border: 1px solid var(--color-border);
+    padding: var(--sp-4) var(--sp-5);
+    margin-top: var(--sp-4);
+    background: var(--color-bg-2);
+    border-radius: var(--radius-sm);
 }
 
-.title {
-    font-size: 18px;
-    margin-bottom: 8px;
+.title,
+h1.title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--sp-4);
+    color: var(--color-text);
 }
 
-/* ===========================
-           ESTOQUE GRID
-        =========================== */
+/* ── SECTION LABEL ─────────────────────────────────────────── */
+.section-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: var(--sp-2);
+}
+
+/* ── ESTOQUE GRID ──────────────────────────────────────────── */
 .view-estoque {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--sp-2);
 }
 
 .space {
@@ -74,107 +169,172 @@ footer {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: var(--sp-1);
 }
 
 .space-label {
-    font-size: 10px;
-    color: #666;
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
 }
 
 .block {
-    width: 32px;
-    height: 32px;
-    border: 1px solid #999;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--color-border-bright);
     display: inline-block;
+    border-radius: var(--radius-sm);
+    transition: transform 0.12s, box-shadow 0.12s;
+    cursor: default;
 }
 
-/* color states — customize later */
-/* mapeado ao enum CorEstoque: VAZIO, PRETO, VERMELHO, AZUL */
-.color-VAZIO {
-    background: #fff;
+.block:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(110,106,248,0.25);
 }
 
-.color-PRETO {
-    background: #111;
+.space .block[data-selected="true"] {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
 }
 
-.color-VERMELHO {
-    background: #c00;
-}
+.color-VAZIO    { background: var(--color-vazio); }
+.color-PRETO    { background: var(--color-preto); }
+.color-VERMELHO { background: var(--color-vermelho); }
+.color-AZUL     { background: var(--color-azul); }
 
-.color-AZUL {
-    background: #00c;
-}
-
-/* ===========================
-           EXPEDICAO
-        =========================== */
+/* ── EXPEDIÇÃO ─────────────────────────────────────────────── */
 .view-expedicao {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--sp-2);
 }
 
 .slot {
-    border: 1px solid #999;
-    padding: 6px 10px;
-    min-width: 64px;
-    font-size: 12px;
+    border: 1px solid var(--color-border);
+    padding: var(--sp-2) var(--sp-3);
+    min-width: 72px;
+    font-size: var(--text-xs);
     text-align: center;
+    background: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.12s;
+}
+
+.slot:hover {
+    border-color: var(--color-border-bright);
 }
 
 .slot-label {
-    font-size: 10px;
-    color: #666;
+    font-size: var(--text-xs);
+    color: var(--color-muted);
     display: block;
+    margin-bottom: 3px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
 }
 
 .slot-op {
-    font-size: 13px;
-    font-weight: bold;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--color-text);
 }
 
 .slot-vazio {
-    color: #999;
+    color: var(--color-muted);
 }
 
-/* ===========================
-           BUTTONS & LINKS
-        =========================== */
+/* ── BOTÕES ────────────────────────────────────────────────── */
 .button-box {
-    margin-top: 12px;
+    margin-top: var(--sp-5);
     display: flex;
-    gap: 8px;
+    gap: var(--sp-2);
     align-items: center;
     flex-wrap: wrap;
 }
 
 .color-button-box {
-    margin-top: 8px;
+    margin-top: var(--sp-3);
+    margin-bottom: var(--sp-3);
     display: flex;
-    gap: 6px;
+    gap: var(--sp-2);
     flex-wrap: wrap;
 }
 
 button,
-.edit,
-.cancel,
-.save,
-.clear {
-    padding: 6px 14px;
-    border: 1px solid #999;
-    background: #f4f4f4;
-    font-size: 13px;
+a.main,
+a.edit,
+a.cancel,
+a.save,
+a.clear {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border: 1px solid var(--color-border-bright);
+    background: var(--color-surface-2);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    color: var(--color-text-dim);
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.01em;
+}
+
+button:hover,
+a.edit:hover,
+a.cancel:hover,
+a.clear:hover {
+    background: var(--color-surface);
+    border-color: var(--color-muted);
+    color: var(--color-text);
 }
 
 button.main,
 a.main {
-    background: #111;
+    background: var(--color-accent);
     color: #fff;
-    border-color: #111;
+    border-color: var(--color-accent);
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
-a.cancel {
-    background: #fff;
+button.main:hover,
+a.main:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
 }
+
+button.cancel,
+a.cancel {
+    background: transparent;
+    color: var(--color-muted-2);
+    border-color: var(--color-border);
+}
+
+button.save,
+a.save {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+    font-weight: 600;
+}
+
+button.save:hover,
+a.save:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+}
+
+.color-button-box button {
+    font-size: var(--text-xs);
+    padding: 5px 12px;
+    letter-spacing: 0.04em;
+    font-family: var(--font-mono);
+}
+
+.color-button-box button:nth-child(1) { border-color: var(--color-preto); color: var(--color-preto); }
+.color-button-box button:nth-child(2) { border-color: var(--color-azul); color: var(--color-azul); }
+.color-button-box button:nth-child(3) { border-color: var(--color-vermelho); color: var(--color-vermelho); }
+.color-button-box button:nth-child(4) { border-color: var(--color-muted); color: var(--color-muted); }

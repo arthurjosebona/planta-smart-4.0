@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos – SMART 4.0</title>
+    <link rel="stylesheet" th:href="@{/css/list-pedido.css}">
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+    <main id="main-content">
+
+        <section class="section">
+            <h1 class="title">Pedidos de Produção</h1>
+
+            <div class="subsection">
+                <p th:if="${#lists.isEmpty(pedidos)}" class="empty-msg">Nenhum pedido encontrado.</p>
+
+                <table th:if="${!#lists.isEmpty(pedidos)}" class="tabela-pedidos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ordem de Produção</th>
+                            <th>Status</th>
+                            <th>Tipo</th>
+                            <th>Cor da Tampa</th>
+                            <th>Blocos</th>
+                            <th>Registro Criação</th>
+                            <th>Entrada Expedição</th>
+                            <th>Saída Expedição</th>
+                            <th>Expedição</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="pedido : ${pedidos}" th:data-id="${pedido.id}" th:data-status="${pedido.status.name()}">
+                            <td th:text="${pedido.id}"></td>
+                            <td th:text="${pedido.ordemDeProducao}"></td>
+                            <td>
+                                <span th:class="'badge badge-' + ${#strings.toLowerCase(pedido.status.name())}"
+                                      th:text="${#strings.capitalize(#strings.toLowerCase(pedido.status.name()))}">
+                                </span>
+                            </td>
+                            <td th:text="${#strings.capitalize(#strings.toLowerCase(pedido.tipo.name()))}"></td>
+                            <td>
+                                <span th:class="'cor-tampa cor-' + ${#strings.toLowerCase(pedido.corTampa.name())}"></span>
+                                <span th:text="${#strings.capitalize(#strings.toLowerCase(pedido.corTampa.name()))}"></span>
+                            </td>
+                            <td th:text="${#lists.size(pedido.blocos)}"></td>
+                            <td th:text="${#temporals.format(pedido.registroCriacao, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${pedido.registroEntradaExpedicao != null} ? ${#temporals.format(pedido.registroEntradaExpedicao, 'dd/MM/yyyy HH:mm')} : '—'"></td>
+                            <td th:text="${pedido.registroSaidaExpedicao != null} ? ${#temporals.format(pedido.registroSaidaExpedicao, 'dd/MM/yyyy HH:mm')} : '—'"></td>
+                            <td th:text="${pedido.expedicao != null} ? ${pedido.expedicao.id} : '—'"></td>
+                            <td class="td-acoes"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="button-box">
+                <a href="/pedidos/novo" class="main">Novo Pedido</a>
+            </div>
+        </section>
+
+    </main>
+
+    <script th:src="@{/js/list-pedido.js}"></script>
+
+</body>
+</html>

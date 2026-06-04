@@ -22,6 +22,7 @@ import com.smart.appsa.model.enums.PosicaoLamina;
 import com.smart.appsa.model.enums.TipoPedido;
 import com.smart.appsa.service.EstoqueService;
 import com.smart.appsa.service.ExpedicaoService;
+import com.smart.appsa.service.PedidoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,7 @@ public class PageController {
 
     private final EstoqueService estoqueService;
     private final ExpedicaoService expedicaoService;
+    private final PedidoService pedidoService;
 
     // home
 
@@ -79,6 +81,15 @@ public class PageController {
         estoqueService.updateAllEstoque(estoque);
         return "redirect:/dashboard";
     }
+
+    @GetMapping("/pedidos/listar")
+    public String listarPedidos(Model model) {
+        model.addAttribute("pedidos", pedidoService.findAll());
+        model.addAttribute("tiposPedido", TipoPedido.values());
+        model.addAttribute("coresTampa", CorTampa.values());
+        return "list-pedido";
+    }
+    
 
 
     private void popularDashboard(Model model, boolean editMode) {

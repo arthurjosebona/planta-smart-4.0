@@ -26,6 +26,8 @@ const POSICOES_LAMINA = [
     { value: 3, descricao: 'Direita' }
 ];
 
+const MAX_LAMINAS = 3; // ← limite centralizado
+
 // ─── helpers ──────────────────────────────────────────────────────────────────
 function opt(arr, selectedVal, placeholder) {
   let html = placeholder ? `<option value="">${placeholder}</option>` : '';
@@ -44,7 +46,7 @@ let numBlocos = 0;
 // ─── tipo muda → reconstrói blocos ────────────────────────────────────────────
 function onTipoChange() {
   const tipo = parseInt(getVal('tipoPedido')) || 0;
-  numBlocos = tipo; // 1=simples, 2=duplo, 3=triplo
+  numBlocos = tipo;
   renderBlocos();
   validarForm();
 }
@@ -79,19 +81,29 @@ function addBlocoDOM(idx) {
     <br>
 
     <div>
-      <strong style="font-size:13px;">Lâminas (máx. 3)</strong>
+      <strong style="font-size:13px;">Lâminas (máx. ${MAX_LAMINAS})</strong>
       <div id="laminas-${idx}"></div>
-      <button class="add-btn" onclick="addLamina(${idx})">+ Adicionar Lâmina</button>
+      <button class="add-btn" id="btn-add-lamina-${idx}" onclick="addLamina(${idx})">+ Adicionar Lâmina</button>
     </div>
   `;
   container.appendChild(div);
+}
+
+// ─── atualiza estado visual do botão de adicionar lâmina ──────────────────────
+function atualizarBtnAddLamina(blocoIdx) {
+  const btn = document.getElementById(`btn-add-lamina-${blocoIdx}`);
+  if (!btn) return;
+  const total = document.querySelectorAll(`#laminas-${blocoIdx} .lamina-row`).length;
+  const atingiuLimite = total >= MAX_LAMINAS;
+  btn.disabled = atingiuLimite;
+  btn.title = atingiuLimite ? `Limite de ${MAX_LAMINAS} lâminas atingido` : '';
 }
 
 // ─── lâminas ──────────────────────────────────────────────────────────────────
 function addLamina(blocoIdx) {
   const container = document.getElementById(`laminas-${blocoIdx}`);
   const atual = container.querySelectorAll('.lamina-row').length;
-  if (atual >= 3) { alert('Máximo de 3 lâminas por bloco.'); return; }
+  if (atual >= MAX_LAMINAS) return; // segurança extra (botão já estará desabilitado)
 
   const lIdx = atual;
   const div = document.createElement('div');
@@ -118,15 +130,16 @@ function addLamina(blocoIdx) {
     </select>
   `;
   container.appendChild(div);
+  atualizarBtnAddLamina(blocoIdx); // ← atualiza botão após adicionar
   validarForm();
 }
 
 function removeLamina(blocoIdx, lIdx) {
   document.getElementById(`lamina-${blocoIdx}-${lIdx}`)?.remove();
-  // reindexar labels visuais
   document.querySelectorAll(`#laminas-${blocoIdx} .lamina-row`).forEach((r, i) => {
     r.querySelector('.lamina-title').childNodes[0].textContent = `Lâmina ${i + 1} `;
   });
+  atualizarBtnAddLamina(blocoIdx); // ← reativa botão após remover
   validarForm();
 }
 
@@ -139,7 +152,7 @@ function validarForm() {
   if (!getVal('corTampa'))      ok = false;
 
   for (let i = 0; i < numBlocos && ok; i++) {
-    if (!getVal(`bloco-${i}-cor`))     { ok = false; break; }
+    if (!getVal(`bloco-${i}-cor`)) { ok = false; break; }
 
     document.querySelectorAll(`#laminas-${i} .lamina-row`).forEach(row => {
       const [, b, l] = row.id.split('-');
