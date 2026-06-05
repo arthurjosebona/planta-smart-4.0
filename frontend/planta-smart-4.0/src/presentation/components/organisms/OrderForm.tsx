@@ -1,184 +1,71 @@
 import React from 'react';
-import type {
-  ConfiguradorState,
-  ConfigBloco,
-  CorBloco,
-  CorLamina,
-  CorTampa,
-  Padrao,
-  Face,
-} from '../types/bloco';
-
-interface BlockFormProps {
-  state: ConfiguradorState;
-  onChange: (state: ConfiguradorState) => void;
-}
+import { StoreModel } from '../../pages/Store/StoreModel';
+import { CorTampa } from '../../../domain/enums/CorTampa';
+import { CorBloco } from '../../../domain/enums/CorBloco';
+import { CorLamina } from '../../../domain/enums/CorLamina';
+import { PadraoLamina } from '../../../domain/enums/PadraoLamina';
+import { PosicaoLamina } from '../../../domain/enums/PosicaoLamina';
+import { ConfigBloco } from '../../../domain/entities/ConfigBloco';
+import Divider from '../atoms/Divider';
+import Section from '../molecules/Section';
+import ColorSwatch from '../atoms/ColorWatch';
 
 // ─── Color palettes ───────────────────────────────────────────────────────────
 
 const COR_BLOCO: Record<CorBloco, string> = {
-  preto: '#1a1a1a',
-  vermelho: '#cc2222',
-  azul: '#1a55cc',
+  [CorBloco.Preto]: '#1a1a1a',
+  [CorBloco.Vermelho]: '#cc2222',
+  [CorBloco.Azul]: '#1a55cc',
 };
 
 const COR_LAMINA: Record<CorLamina, string> = {
-  vermelho: '#cc2222',
-  azul: '#1a55cc',
-  amarelo: '#e6b800',
-  verde: '#229944',
-  preto: '#1a1a1a',
-  branco: '#f0f0ee',
+  [CorLamina.Vermelho]: '#cc2222',
+  [CorLamina.Azul]: '#1a55cc',
+  [CorLamina.Amarelo]: '#e6b800',
+  [CorLamina.Verde]: '#229944',
+  [CorLamina.Preto]: '#1a1a1a',
+  [CorLamina.Branco]: '#f0f0ee',
 };
 
 const COR_TAMPA: Record<CorTampa, string> = {
-  preto: '#1a1a1a',
-  vermelho: '#cc2222',
-  azul: '#1a55cc',
+  [CorTampa.Preto]: '#1a1a1a',
+  [CorTampa.Vermelho]: '#cc2222',
+  [CorTampa.Azul]: '#1a55cc',
 };
 
-const PADROES: Padrao[] = ['casa', 'estrela', 'navio'];
-const FACES: Face[] = ['frente', 'esquerda', 'direita'];
-const FACE_LABELS: Record<Face, string> = {
-  frente: 'Frente',
-  esquerda: 'Esquerda',
-  direita: 'Direita',
+const FACE_LABELS: Record<PosicaoLamina, string> = {
+  [PosicaoLamina.Frente]: 'Frente',
+  [PosicaoLamina.Esquerda]: 'Esquerda',
+  [PosicaoLamina.Direita]: 'Direita',
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeDefaultBloco(cor: CorBloco = 'azul'): ConfigBloco {
-  return {
-    cor,
-    laminas: {
-      frente: { cor: null, padrao: null },
-      esquerda: { cor: null, padrao: null },
-      direita: { cor: null, padrao: null },
-    },
-  };
+
+interface OrderFormProps {
+  state: StoreModel;
+  setNumBlocos: (n: 1 | 2 | 3) => void;
+  setCorTampa: (cor: CorTampa) => void;
+  setBlocoField: (idx: number, updates: Partial<ConfigBloco>) => void;
+  setBlocoColor: (idx: number, cor: CorBloco) => void;
+  setLaminaCor: (idx: number, posicao: PosicaoLamina, cor: CorLamina | null) => void;
+  setLaminaPadrao: (idx: number, posicao: PosicaoLamina, padrao: PadraoLamina | null) => void;
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+const FACES = Object.values(PosicaoLamina) as PosicaoLamina[];
+const PADROES = Object.values(PadraoLamina) as PadraoLamina[];
+const CORES_TAMPA = Object.values(CorTampa) as CorTampa[];
+const CORES_BLOCO = Object.values(CorBloco) as CorBloco[];
+const CORES_LAMINA = Object.values(CorLamina) as CorLamina[];
 
-function ColorSwatch({
-  color,
-  selected,
-  onClick,
-  title,
-  size = 28,
-}: {
-  color: string;
-  selected: boolean;
-  onClick: () => void;
-  title: string;
-  size?: number;
-}) {
-  return (
-    <button
-      title={title}
-      onClick={onClick}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: 4,
-        border: selected ? '2px solid #333' : '2px solid transparent',
-        outline: selected ? '2px solid #fff' : 'none',
-        outlineOffset: -3,
-        background: color,
-        cursor: 'pointer',
-        padding: 0,
-        flexShrink: 0,
-        boxShadow: selected ? '0 0 0 3px #333' : '0 1px 3px rgba(0,0,0,0.25)',
-        transition: 'box-shadow 0.1s',
-      }}
-    />
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          color: '#888',
-          marginBottom: 8,
-        }}
-      >
-        {title}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function Divider() {
-  return <hr style={{ border: 'none', borderTop: '1px solid #e8e8e8', margin: '16px 0' }} />;
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
-
-export function BlockForm({ state, onChange }: BlockFormProps) {
-  // ── helpers that produce a new state immutably ──────────────────────────────
-
-  function setNumBlocos(n: 1 | 2 | 3) {
-    onChange({ ...state, numBlocos: n });
-  }
-
-  function setCorTampa(cor: CorTampa) {
-    onChange({ ...state, corTampa: cor });
-  }
-
-  function setBlocoField(idx: number, updates: Partial<ConfigBloco>) {
-    const blocos = [...state.blocos] as typeof state.blocos;
-    blocos[idx] = { ...blocos[idx], ...updates };
-    onChange({ ...state, blocos });
-  }
-
-  function setBlocoColor(idx: number, cor: CorBloco) {
-    setBlocoField(idx, { cor });
-  }
-
-  function setLaminaCor(idx: number, face: Face, cor: CorLamina | null) {
-    const blocos = [...state.blocos] as typeof state.blocos;
-    const laminas = { ...blocos[idx].laminas };
-    laminas[face] = { cor, padrao: cor === null ? null : laminas[face].padrao };
-    blocos[idx] = { ...blocos[idx], laminas };
-    onChange({ ...state, blocos });
-  }
-
-  function setLaminaPadrao(idx: number, face: Face, padrao: Padrao | null) {
-    const blocos = [...state.blocos] as typeof state.blocos;
-    const laminas = { ...blocos[idx].laminas };
-    laminas[face] = { ...laminas[face], padrao };
-    blocos[idx] = { ...blocos[idx], laminas };
-    onChange({ ...state, blocos });
-  }
-
-  // ── summary ────────────────────────────────────────────────────────────────
-
-  function buildSummary() {
-    const lines: string[] = [];
-    lines.push(`${state.numBlocos} bloco(s) · tampa ${state.corTampa}`);
-    for (let i = 0; i < state.numBlocos; i++) {
-      const b = state.blocos[i];
-      const laminaTexts = FACES.map((f) => {
-        const l = b.laminas[f];
-        if (!l.cor) return null;
-        return `${FACE_LABELS[f].toLowerCase()}: ${l.cor}${l.padrao ? ` (${l.padrao})` : ''}`;
-      }).filter(Boolean);
-      lines.push(
-        `Bloco ${i + 1}: ${b.cor}${laminaTexts.length ? ' · ' + laminaTexts.join(', ') : ''}`
-      );
-    }
-    return lines;
-  }
-
-  // ── render ─────────────────────────────────────────────────────────────────
-
+export function OrderForm({
+  state,
+  setNumBlocos,
+  setCorTampa,
+  setBlocoField,
+  setBlocoColor,
+  setLaminaCor,
+  setLaminaPadrao,
+}: OrderFormProps) {
   return (
     <div
       style={{
@@ -225,7 +112,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
       {/* ── Cor da tampa ── */}
       <Section title="Cor da tampa">
         <div style={{ display: 'flex', gap: 8 }}>
-          {(Object.keys(COR_TAMPA) as CorTampa[]).map((cor) => (
+          {CORES_TAMPA.map((cor) => (
             <ColorSwatch
               key={cor}
               color={COR_TAMPA[cor]}
@@ -251,13 +138,13 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
               <div style={{ marginBottom: 12 }}>
                 <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Cor do bloco</div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  {(Object.keys(COR_BLOCO) as CorBloco[]).map((cor) => (
+                  {CORES_BLOCO.map((cor) => (
                     <ColorSwatch
                       key={cor}
                       color={COR_BLOCO[cor]}
                       selected={bloco.cor === cor}
                       onClick={() => setBlocoColor(i, cor)}
-                      title={cor}
+                      title={cor as string}
                       size={30}
                     />
                   ))}
@@ -305,7 +192,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
                       >
                         ✕
                       </button>
-                      {(Object.keys(COR_LAMINA) as CorLamina[]).map((cor) => (
+                      {CORES_LAMINA.map((cor) => (
                         <ColorSwatch
                           key={cor}
                           color={COR_LAMINA[cor]}
@@ -365,28 +252,6 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
           </div>
         );
       })}
-
-      <Divider />
-
-      {/* ── Resumo ── */}
-      <Section title="Resumo">
-        <div
-          style={{
-            background: '#efefef',
-            borderRadius: 8,
-            padding: '10px 12px',
-            fontSize: 12,
-            lineHeight: 1.7,
-            color: '#444',
-          }}
-        >
-          {buildSummary().map((line, i) => (
-            <div key={i}>{line}</div>
-          ))}
-        </div>
-      </Section>
     </div>
   );
 }
-
-export { makeDefaultBloco };

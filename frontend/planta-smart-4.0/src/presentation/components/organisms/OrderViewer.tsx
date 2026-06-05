@@ -1,8 +1,11 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, RoundedBoxGeometry, Line } from '@react-three/drei';
 import * as THREE from 'three';
-import type { ConfiguradorState, ConfigBloco, Face, Padrao } from '../types/bloco';
+import { PadraoLamina } from '../../../domain/enums/PadraoLamina';
+import { PosicaoLamina } from '../../../domain/enums/PosicaoLamina';
+import { ConfigBloco } from '../../../domain/entities/ConfigBloco';
+import { StoreModel } from '../../pages/Store/StoreModel';
 
 // ─── Dimension constants ──────────────────────────────────────────────────────
 
@@ -55,8 +58,9 @@ function circlePath(cx: number, cy: number, r: number, steps = 20): Point2D[] {
   return pts;
 }
 
-const PATTERN_PATHS: Record<Padrao, Point2D[][]> = {
-  estrela: [
+const PATTERN_PATHS: Record<PadraoLamina, Point2D[][]> = {
+  [PadraoLamina.Nenhum]: [],
+  [PadraoLamina.Estrela]: [
     [
       [0, 0.56],
       [0.12, 0.18],
@@ -71,7 +75,7 @@ const PATTERN_PATHS: Record<Padrao, Point2D[][]> = {
       [0, 0.56],
     ],
   ],
-  casa: [
+  [PadraoLamina.Casa]: [
     [
       [-0.5, -0.44],
       [0.5, -0.44],
@@ -106,7 +110,7 @@ const PATTERN_PATHS: Record<Padrao, Point2D[][]> = {
       [0.22, 0.13],
     ],
   ],
-  navio: [
+  [PadraoLamina.Navio]: [
     [
       [-0.72, -0.34],
       [0.55, -0.34],
@@ -163,8 +167,8 @@ function pathBounds(paths: Point2D[][]): {
 // ─── Convert 2D pattern paths → 3D points for a given face ───────────────────
 
 function patternTo3D(
-  padrao: Padrao,
-  face: Face,
+  padrao: PadraoLamina,
+  face: PosicaoLamina,
   bladeX: number,
   bladeZ: number,
   bladeY: number, // center Y of blade
@@ -181,15 +185,15 @@ function patternTo3D(
   const scale = Math.min(safeW / boundsW, safeH / boundsH);
 
   // center of the pattern in object-space (normalized coords are centered ~0)
-  const cx = face === 'frente' ? 0 : bladeX;
+  const cx = face === PosicaoLamina.Frente ? 0 : bladeX;
   const cy = bladeY;
-  const cz = face === 'frente' ? bladeZ : bladeZ;
+  const cz = face === PosicaoLamina.Frente ? bladeZ : bladeZ;
 
   return paths.map((path) =>
     path.map(([u, v]) => {
-      if (face === 'frente') {
+      if (face === PosicaoLamina.Frente) {
         return new THREE.Vector3(cx + u * scale, cy + v * scale, bladeZ + BLADE_T / 2 + 0.004);
-      } else if (face === 'esquerda') {
+      } else if (face === PosicaoLamina.Esquerda) {
         return new THREE.Vector3(bladeX - BLADE_T / 2 - 0.004, cy + v * scale, cz + u * scale);
       } else {
         // direita
@@ -208,9 +212,9 @@ function PlasticMat({ color }: { color: string }) {
 // ─── Single blade ─────────────────────────────────────────────────────────────
 
 interface BladeProps {
-  face: Face;
+  face: PosicaoLamina;
   cor: string;
-  padrao: Padrao | null;
+  padrao: PadraoLamina | null;
   blockY: number; // Y base of the block (bottom of base)
 }
 
@@ -222,7 +226,7 @@ function Blade({ face, cor, padrao, blockY }: BladeProps) {
   let bW: number, bH: number, bD: number;
   let px: number, py: number, pz: number;
 
-  if (face === 'frente') {
+  if (face === PosicaoLamina.Frente) {
     bW = BLOCK_W - 2 * COL_W;
     bH = bodyH;
     bD = BLADE_T;
@@ -239,7 +243,7 @@ function Blade({ face, cor, padrao, blockY }: BladeProps) {
     const centerZ = 0;
 
     px =
-      face === 'esquerda'
+      face === PosicaoLamina.Esquerda
         ? -BLOCK_W / 2 + COL_W + BLADE_RECESS + BLADE_T / 2
         : BLOCK_W / 2 - COL_W - BLADE_RECESS - BLADE_T / 2;
     py = blockY + BASE_T + bodyH / 2;
@@ -254,7 +258,7 @@ function Blade({ face, cor, padrao, blockY }: BladeProps) {
     // For patterns: determine the "blade width" (U axis) and center point in world space
     let bladeWidth: number, bladeX: number, bladeZ: number;
 
-    if (face === 'frente') {
+    if (face === PosicaoLamina.Frente) {
       bladeWidth = bW;
       bladeX = 0; // not used for frente
       bladeZ = pz;
@@ -295,7 +299,7 @@ function Block({ config, blockY }: BlockProps) {
     <group>
       {/* Peça 1 — Base */}
       <mesh position={[0, blockY + BASE_T / 2, 0]}>
-        <RoundedBoxGeometry args={[BLOCK_W, BASE_T, BLOCK_D, 4, COL_RADIUS * 0.6]} />
+        <RoundedBoxGeometry args={[BLOCK_W, BASE_T, BLOCK_D]} />
         <PlasticMat color={hex} />
       </mesh>
 
@@ -303,7 +307,7 @@ function Block({ config, blockY }: BlockProps) {
       <mesh
         position={[-BLOCK_W / 2 + COL_W / 2, blockY + BASE_T + bodyH / 2, -BLOCK_D / 2 + COL_W / 2]}
       >
-        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
+        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W]} />
         <PlasticMat color={hex} />
       </mesh>
 
@@ -311,7 +315,7 @@ function Block({ config, blockY }: BlockProps) {
       <mesh
         position={[BLOCK_W / 2 - COL_W / 2, blockY + BASE_T + bodyH / 2, -BLOCK_D / 2 + COL_W / 2]}
       >
-        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
+        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W]} />
         <PlasticMat color={hex} />
       </mesh>
 
@@ -324,7 +328,7 @@ function Block({ config, blockY }: BlockProps) {
       <mesh
         position={[-BLOCK_W / 2 + COL_W / 2, blockY + BASE_T + bodyH / 2, BLOCK_D / 2 - COL_W / 2]}
       >
-        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
+        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W]} />
         <PlasticMat color={hex} />
       </mesh>
 
@@ -332,12 +336,12 @@ function Block({ config, blockY }: BlockProps) {
       <mesh
         position={[BLOCK_W / 2 - COL_W / 2, blockY + BASE_T + bodyH / 2, BLOCK_D / 2 - COL_W / 2]}
       >
-        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
+        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W]} />
         <PlasticMat color={hex} />
       </mesh>
 
       {/* Lâminas */}
-      {(['frente', 'esquerda', 'direita'] as Face[]).map((face) => {
+      {(['frente', 'esquerda', 'direita'] as PosicaoLamina[]).map((face) => {
         const lamina = config.laminas[face];
         if (!lamina.cor) return null;
         return (
@@ -359,7 +363,7 @@ function Block({ config, blockY }: BlockProps) {
 function Tampa({ color, y }: { color: string; y: number }) {
   return (
     <mesh position={[0, y + LID_H / 2, 0]}>
-      <RoundedBoxGeometry args={[BLOCK_W, LID_H, BLOCK_D, 6, LID_RADIUS]} />
+      <RoundedBoxGeometry args={[BLOCK_W, LID_H, BLOCK_D]} />
       <PlasticMat color={color} />
     </mesh>
   );
@@ -368,7 +372,7 @@ function Tampa({ color, y }: { color: string; y: number }) {
 // ─── Scene — stacks N blocks + lid ───────────────────────────────────────────
 
 interface BlockSceneProps {
-  state: ConfiguradorState;
+  state: StoreModel;
 }
 
 function BlockScene({ state }: BlockSceneProps) {
@@ -403,10 +407,10 @@ function BlockScene({ state }: BlockSceneProps) {
 // ─── Public component ─────────────────────────────────────────────────────────
 
 interface BlockViewerProps {
-  state: ConfiguradorState;
+  state: StoreModel;
 }
 
-export function BlockViewer({ state }: BlockViewerProps) {
+export function OrderViewer({ state }: BlockViewerProps) {
   return (
     <Canvas camera={{ position: [0, 1.0, 8], fov: 38 }} style={{ background: '#f2f1ef', flex: 1 }}>
       <ambientLight intensity={0.75} />

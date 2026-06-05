@@ -1,0 +1,13 @@
+.root {
+  min-height: 100vh;
+  background: var(--bg-base);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px 80px;
+}
+
+.container {
+  width: 100%;
+  max-width: 560px;
+}
