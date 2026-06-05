@@ -1,0 +1,22 @@
+# Dependências
+node_modules
+
+# Build e cobertura
+build
+dist
+coverage
+
+# Arquivos gerados
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Arquivos estáticos que não devem ser formatados
+**/*.html
+
+# Assets compilados
+public/build
+
+# Arquivos minificados
+*.min.js
+*.min.css

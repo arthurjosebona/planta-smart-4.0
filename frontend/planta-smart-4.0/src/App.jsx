@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { BlockConfigurator } from './components/BlockConfigurator'
+import React, { useState } from 'react';
+import { BlockConfigurator } from './components/BlockConfigurator';
 
 export default function App() {
-  const [config, setConfig] = useState(null)
+  const [config, setConfig] = useState(null);
 
   return (
     <div
@@ -18,8 +18,8 @@ export default function App() {
 
       <BlockConfigurator
         onChange={(state) => {
-          setConfig(state)
-          console.log('Nova configuração:', state)
+          setConfig(state);
+          console.log('Nova configuração:', state);
         }}
       />
 
@@ -36,5 +36,5 @@ export default function App() {
         {JSON.stringify(config, null, 2)}
       </pre>
     </div>
-  )
+  );
 }

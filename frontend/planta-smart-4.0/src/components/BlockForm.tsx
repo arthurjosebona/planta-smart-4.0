@@ -1,9 +1,17 @@
-import React from 'react'
-import type { ConfiguradorState, ConfigBloco, CorBloco, CorLamina, CorTampa, Padrao, Face } from '../types/bloco'
+import React from 'react';
+import type {
+  ConfiguradorState,
+  ConfigBloco,
+  CorBloco,
+  CorLamina,
+  CorTampa,
+  Padrao,
+  Face,
+} from '../types/bloco';
 
 interface BlockFormProps {
-  state: ConfiguradorState
-  onChange: (state: ConfiguradorState) => void
+  state: ConfiguradorState;
+  onChange: (state: ConfiguradorState) => void;
 }
 
 // ─── Color palettes ───────────────────────────────────────────────────────────
@@ -12,7 +20,7 @@ const COR_BLOCO: Record<CorBloco, string> = {
   preto: '#1a1a1a',
   vermelho: '#cc2222',
   azul: '#1a55cc',
-}
+};
 
 const COR_LAMINA: Record<CorLamina, string> = {
   vermelho: '#cc2222',
@@ -21,21 +29,21 @@ const COR_LAMINA: Record<CorLamina, string> = {
   verde: '#229944',
   preto: '#1a1a1a',
   branco: '#f0f0ee',
-}
+};
 
 const COR_TAMPA: Record<CorTampa, string> = {
   preto: '#1a1a1a',
   vermelho: '#cc2222',
   azul: '#1a55cc',
-}
+};
 
-const PADROES: Padrao[] = ['casa', 'estrela', 'navio']
-const FACES: Face[] = ['frente', 'esquerda', 'direita']
+const PADROES: Padrao[] = ['casa', 'estrela', 'navio'];
+const FACES: Face[] = ['frente', 'esquerda', 'direita'];
 const FACE_LABELS: Record<Face, string> = {
   frente: 'Frente',
   esquerda: 'Esquerda',
   direita: 'Direita',
-}
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -47,7 +55,7 @@ function makeDefaultBloco(cor: CorBloco = 'azul'): ConfigBloco {
       esquerda: { cor: null, padrao: null },
       direita: { cor: null, padrao: null },
     },
-  }
+  };
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -59,11 +67,11 @@ function ColorSwatch({
   title,
   size = 28,
 }: {
-  color: string
-  selected: boolean
-  onClick: () => void
-  title: string
-  size?: number
+  color: string;
+  selected: boolean;
+  onClick: () => void;
+  title: string;
+  size?: number;
 }) {
   return (
     <button
@@ -84,7 +92,7 @@ function ColorSwatch({
         transition: 'box-shadow 0.1s',
       }}
     />
-  )
+  );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -104,11 +112,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       </div>
       {children}
     </div>
-  )
+  );
 }
 
 function Divider() {
-  return <hr style={{ border: 'none', borderTop: '1px solid #e8e8e8', margin: '16px 0' }} />
+  return <hr style={{ border: 'none', borderTop: '1px solid #e8e8e8', margin: '16px 0' }} />;
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -117,56 +125,56 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
   // ── helpers that produce a new state immutably ──────────────────────────────
 
   function setNumBlocos(n: 1 | 2 | 3) {
-    onChange({ ...state, numBlocos: n })
+    onChange({ ...state, numBlocos: n });
   }
 
   function setCorTampa(cor: CorTampa) {
-    onChange({ ...state, corTampa: cor })
+    onChange({ ...state, corTampa: cor });
   }
 
   function setBlocoField(idx: number, updates: Partial<ConfigBloco>) {
-    const blocos = [...state.blocos] as typeof state.blocos
-    blocos[idx] = { ...blocos[idx], ...updates }
-    onChange({ ...state, blocos })
+    const blocos = [...state.blocos] as typeof state.blocos;
+    blocos[idx] = { ...blocos[idx], ...updates };
+    onChange({ ...state, blocos });
   }
 
   function setBlocoColor(idx: number, cor: CorBloco) {
-    setBlocoField(idx, { cor })
+    setBlocoField(idx, { cor });
   }
 
   function setLaminaCor(idx: number, face: Face, cor: CorLamina | null) {
-    const blocos = [...state.blocos] as typeof state.blocos
-    const laminas = { ...blocos[idx].laminas }
-    laminas[face] = { cor, padrao: cor === null ? null : laminas[face].padrao }
-    blocos[idx] = { ...blocos[idx], laminas }
-    onChange({ ...state, blocos })
+    const blocos = [...state.blocos] as typeof state.blocos;
+    const laminas = { ...blocos[idx].laminas };
+    laminas[face] = { cor, padrao: cor === null ? null : laminas[face].padrao };
+    blocos[idx] = { ...blocos[idx], laminas };
+    onChange({ ...state, blocos });
   }
 
   function setLaminaPadrao(idx: number, face: Face, padrao: Padrao | null) {
-    const blocos = [...state.blocos] as typeof state.blocos
-    const laminas = { ...blocos[idx].laminas }
-    laminas[face] = { ...laminas[face], padrao }
-    blocos[idx] = { ...blocos[idx], laminas }
-    onChange({ ...state, blocos })
+    const blocos = [...state.blocos] as typeof state.blocos;
+    const laminas = { ...blocos[idx].laminas };
+    laminas[face] = { ...laminas[face], padrao };
+    blocos[idx] = { ...blocos[idx], laminas };
+    onChange({ ...state, blocos });
   }
 
   // ── summary ────────────────────────────────────────────────────────────────
 
   function buildSummary() {
-    const lines: string[] = []
-    lines.push(`${state.numBlocos} bloco(s) · tampa ${state.corTampa}`)
+    const lines: string[] = [];
+    lines.push(`${state.numBlocos} bloco(s) · tampa ${state.corTampa}`);
     for (let i = 0; i < state.numBlocos; i++) {
-      const b = state.blocos[i]
+      const b = state.blocos[i];
       const laminaTexts = FACES.map((f) => {
-        const l = b.laminas[f]
-        if (!l.cor) return null
-        return `${FACE_LABELS[f].toLowerCase()}: ${l.cor}${l.padrao ? ` (${l.padrao})` : ''}`
-      }).filter(Boolean)
+        const l = b.laminas[f];
+        if (!l.cor) return null;
+        return `${FACE_LABELS[f].toLowerCase()}: ${l.cor}${l.padrao ? ` (${l.padrao})` : ''}`;
+      }).filter(Boolean);
       lines.push(
         `Bloco ${i + 1}: ${b.cor}${laminaTexts.length ? ' · ' + laminaTexts.join(', ') : ''}`
-      )
+      );
     }
-    return lines
+    return lines;
   }
 
   // ── render ─────────────────────────────────────────────────────────────────
@@ -234,7 +242,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
 
       {/* ── Configuração de cada bloco ── */}
       {Array.from({ length: state.numBlocos }, (_, i) => {
-        const bloco = state.blocos[i]
+        const bloco = state.blocos[i];
         return (
           <div key={i}>
             {i > 0 && <Divider />}
@@ -258,7 +266,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
 
               {/* Lâminas */}
               {FACES.map((face) => {
-                const lamina = bloco.laminas[face]
+                const lamina = bloco.laminas[face];
                 return (
                   <div
                     key={face}
@@ -283,8 +291,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
                           width: 26,
                           height: 26,
                           borderRadius: 4,
-                          border:
-                            lamina.cor === null ? '2px solid #333' : '1px solid #bbb',
+                          border: lamina.cor === null ? '2px solid #333' : '1px solid #bbb',
                           background: '#fff',
                           cursor: 'pointer',
                           fontSize: 13,
@@ -322,8 +329,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
                               padding: '3px 8px',
                               fontSize: 11,
                               borderRadius: 4,
-                              border:
-                                lamina.padrao === null ? '2px solid #333' : '1px solid #bbb',
+                              border: lamina.padrao === null ? '2px solid #333' : '1px solid #bbb',
                               background: lamina.padrao === null ? '#333' : '#fff',
                               color: lamina.padrao === null ? '#fff' : '#555',
                               cursor: 'pointer',
@@ -339,8 +345,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
                                 padding: '3px 8px',
                                 fontSize: 11,
                                 borderRadius: 4,
-                                border:
-                                  lamina.padrao === p ? '2px solid #333' : '1px solid #bbb',
+                                border: lamina.padrao === p ? '2px solid #333' : '1px solid #bbb',
                                 background: lamina.padrao === p ? '#333' : '#fff',
                                 color: lamina.padrao === p ? '#fff' : '#555',
                                 cursor: 'pointer',
@@ -354,11 +359,11 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
                       </div>
                     )}
                   </div>
-                )
+                );
               })}
             </Section>
           </div>
-        )
+        );
       })}
 
       <Divider />
@@ -381,7 +386,7 @@ export function BlockForm({ state, onChange }: BlockFormProps) {
         </div>
       </Section>
     </div>
-  )
+  );
 }
 
-export { makeDefaultBloco }
+export { makeDefaultBloco };

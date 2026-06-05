@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { BlockForm, makeDefaultBloco } from './BlockForm'
-import { BlockViewer } from './BlockViewer'
-import type { ConfiguradorState } from '../types/bloco'
+import React, { useState, useEffect } from 'react';
+import { BlockForm, makeDefaultBloco } from './BlockForm';
+import { BlockViewer } from './BlockViewer';
+import type { ConfiguradorState } from '../types/bloco';
 
 // ─── Default state factory ─────────────────────────────────────────────────
 
@@ -9,28 +9,24 @@ function makeDefaultState(): ConfiguradorState {
   return {
     numBlocos: 1,
     corTampa: 'preto',
-    blocos: [
-      makeDefaultBloco('azul'),
-      makeDefaultBloco('preto'),
-      makeDefaultBloco('vermelho'),
-    ],
-  }
+    blocos: [makeDefaultBloco('azul'), makeDefaultBloco('preto'), makeDefaultBloco('vermelho')],
+  };
 }
 
 // ─── Props ─────────────────────────────────────────────────────────────────
 
 interface BlockConfiguratorProps {
-  onChange?: (state: ConfiguradorState) => void
+  onChange?: (state: ConfiguradorState) => void;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function BlockConfigurator({ onChange }: BlockConfiguratorProps) {
-  const [state, setState] = useState<ConfiguradorState>(makeDefaultState)
+  const [state, setState] = useState<ConfiguradorState>(makeDefaultState);
 
   useEffect(() => {
-    onChange?.(state)
-  }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
+    onChange?.(state);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -47,5 +43,5 @@ export function BlockConfigurator({ onChange }: BlockConfiguratorProps) {
       <BlockForm state={state} onChange={setState} />
       <BlockViewer state={state} />
     </div>
-  )
+  );
 }
