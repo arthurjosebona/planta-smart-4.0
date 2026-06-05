@@ -9,6 +9,7 @@ import type { ConfiguradorState, ConfigBloco, Face, Padrao } from '../types/bloc
 const BLOCK_W      = 1.7
 const BLOCK_D      = 1.7
 const BLOCK_H      = 0.71
+const BASE_T       = 0.1
 const WALL_T       = 0.28
 const COL_W        = 0.22
 const COL_RADIUS   = 0.045
@@ -20,23 +21,23 @@ const LID_RADIUS   = 0.10
 // ─── Color maps ───────────────────────────────────────────────────────────────
 
 const COR_BLOCO_HEX: Record<string, string> = {
-  preto: '#464444',
-  vermelho: '#cc2222',
-  azul: '#1a55cc',
+  preto: '#484848',
+  vermelho: '#e6463f',
+  azul: '#0065d7',
 }
 
 const COR_LAMINA_HEX: Record<string, string> = {
-  vermelho: '#cc2222',
+  vermelho: '#e6463f',
   azul: '#1a55cc',
   amarelo: '#e6b800',
   verde: '#229944',
-  preto: '#1a1a1a',
+  preto: '#484848',
   branco: '#f0f0ee',
 }
 
 const COR_TAMPA_HEX: Record<string, string> = {
-  preto: '#1a1a1a',
-  vermelho: '#cc2222',
+  preto: '#484848',
+  vermelho: '#e6463f',
   azul: '#1a55cc',
 }
 
@@ -228,7 +229,7 @@ function Blade({ face, cor, padrao, blockY }: BladeProps) {
 
       {patternLines &&
         patternLines.map((pts, i) => (
-          <Line key={i} points={pts} color="#050505" lineWidth={1} />
+          <Line key={i} points={pts} color="#050505" lineWidth={2.7} />
         ))}
     </group>
   )
@@ -257,11 +258,11 @@ function Block({ config, blockY }: BlockProps) {
     <mesh
     position={[
         -BLOCK_W / 2 + COL_W / 2,
-        blockY + BASE_T + bodyH / 2 - COL_RADIUS,
+        blockY + BASE_T + bodyH / 2,
         -BLOCK_D / 2 + COL_W / 2,
     ]}
     >
-    <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 2, COL_W, 4, COL_RADIUS]} />
+    <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
     <PlasticMat color={hex} />
     </mesh>
 
@@ -269,11 +270,11 @@ function Block({ config, blockY }: BlockProps) {
     <mesh
     position={[
         BLOCK_W / 2 - COL_W / 2,
-        blockY + BASE_T + bodyH / 2 - COL_RADIUS,
+        blockY + BASE_T + bodyH / 2,
         -BLOCK_D / 2 + COL_W / 2,
     ]}
     >
-    <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 2, COL_W, 4, COL_RADIUS]} />
+    <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
     <PlasticMat color={hex} />
     </mesh>
 
@@ -282,7 +283,7 @@ function Block({ config, blockY }: BlockProps) {
     position={[
         0,
         blockY + BASE_T + bodyH / 2,
-        -BLOCK_D / 2 + BLADE_T / 2,
+        -BLOCK_D / 2 + BLADE_T / 1.08,
     ]}
     >
     <boxGeometry args={[BLOCK_W - 2 * COL_W, bodyH, BLADE_T]} />
@@ -292,11 +293,11 @@ function Block({ config, blockY }: BlockProps) {
       <mesh
         position={[
           -BLOCK_W / 2 + COL_W / 2,
-          blockY + BASE_T + bodyH / 2 - COL_RADIUS,
+          blockY + BASE_T + bodyH / 2,
           BLOCK_D / 2 - COL_W / 2,
         ]}
       >
-        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 2, COL_W, 4, COL_RADIUS]} />
+        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
         <PlasticMat color={hex} />
       </mesh>
 
@@ -304,11 +305,11 @@ function Block({ config, blockY }: BlockProps) {
       <mesh
         position={[
           BLOCK_W / 2 - COL_W / 2,
-          blockY + BASE_T + bodyH / 2 - COL_RADIUS,
+          blockY + BASE_T + bodyH / 2,
           BLOCK_D / 2 - COL_W / 2,
         ]}
       >
-        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 2, COL_W, 4, COL_RADIUS]} />
+        <RoundedBoxGeometry args={[COL_W, bodyH + COL_RADIUS * 4, COL_W, 4, COL_RADIUS]} />
         <PlasticMat color={hex} />
       </mesh>
 
