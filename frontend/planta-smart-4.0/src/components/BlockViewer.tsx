@@ -138,14 +138,14 @@ function patternTo3D(
         return new THREE.Vector3(
           bladeX - BLADE_T / 2 - 0.004,
           cy + v * scale,
-          cz - u * scale,
+          cz + u * scale,
         )
       } else {
         // direita
         return new THREE.Vector3(
           bladeX + BLADE_T / 2 + 0.004,
           cy + v * scale,
-          cz + u * scale,
+          cz - u * scale,
         )
       }
     })
