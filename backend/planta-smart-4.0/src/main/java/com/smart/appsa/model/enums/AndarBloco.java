@@ -7,7 +7,7 @@ import jakarta.persistence.EnumeratedValue;
 public enum AndarBloco {
     PRIMEIRO(1),
     SEGUNDO(2),
-    TERCEITO(3);
+    TERCEIRO(3);
 
     @EnumeratedValue
     int value;

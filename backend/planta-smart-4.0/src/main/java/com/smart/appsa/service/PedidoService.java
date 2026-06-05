@@ -41,6 +41,7 @@ public class PedidoService {
         validatePedido(requestDTO);
         Pedido pedido = PedidoMapper.mapEntityByRequestDTO(requestDTO);
         pedido.setRegistroCriacao(LocalDateTime.now());
+        pedido.setStatus(StatusPedido.PENDENTE);
         Pedido saved = saveWithExpedition(pedido);
         createBlocks(saved, requestDTO.blocos());
         return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
@@ -56,8 +57,6 @@ public class PedidoService {
             throw new RequiredFieldException("PedidoRequestDTO");
         if (requestDTO.blocos() == null || requestDTO.blocos().isEmpty()) 
             throw new RequiredFieldException("Blocos");
-        if (requestDTO.status() == null) 
-            throw new RequiredFieldException("Status");
         if (requestDTO.tipo() == null) 
             throw new RequiredFieldException("Tipo Pedido");
         if (requestDTO.corTampa() == null) 

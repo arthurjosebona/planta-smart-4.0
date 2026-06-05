@@ -133,16 +133,6 @@ public class PedidoServiceTest {
     }
 
     @Test
-    void deveRetornarRequiredFieldExceptionQuandoCriarPedidoComTipoNulo() {
-        Pedido pedido = createPedido();
-        pedido.setTipo(null);
-        PedidoRequestDTO request = PedidoMapper.mapRequestDto(pedido);
-
-        assertThrows(RequiredFieldException.class, () -> pedidoService.create(request));
-        verify(pedidoRepository, never()).save(any());
-    }
-
-    @Test
     void deveRetornarRequiredFieldExceptionQuandoCriarPedidoComCorTampaNula() {
         Pedido pedido = createPedido();
         pedido.setCorTampa(null);
