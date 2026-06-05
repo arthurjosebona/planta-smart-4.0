@@ -1,7 +1,7 @@
-import { LaminaCreateRequestDTO } from "./LaminaCreateRequestDTO";
+import { LaminaCreateRequestDTO } from './LaminaCreateRequestDTO';
 
 export interface BlocoCreateRequestDTO {
-    cor: number,
-    andar: number,
-    laminas: LaminaCreateRequestDTO
+  cor: number;
+  andar: number;
+  laminas: LaminaCreateRequestDTO;
 }

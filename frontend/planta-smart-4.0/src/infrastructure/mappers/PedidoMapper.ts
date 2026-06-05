@@ -7,10 +7,10 @@ import { BlocoMapper } from './BlocoMapper';
 export const PedidoMapper = {
   mapToCreateRequestDTO(entity: Pedido): PedidoCreateRequestDTO {
     return {
-        ordemDeProducao: entity.ordemDeProducao,
-        tipo: TipoPedidoToInt[entity.tipo],
-        corTampa: CorTampaToInt[entity.corTampa],
-        blocos: BlocoMapper.mapBlocosToCreateRequestsDTO(entity.blocos)
+      ordemDeProducao: entity.ordemDeProducao,
+      tipo: TipoPedidoToInt[entity.tipo],
+      corTampa: CorTampaToInt[entity.corTampa],
+      blocos: BlocoMapper.mapBlocosToCreateRequestsDTO(entity.blocos),
     };
   },
 };
