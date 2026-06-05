@@ -1,7 +1,7 @@
-import { CorBloco } from '../../../domain/enums/CorBloco';
-import { PosicaoLamina } from '../../../domain/enums/PosicaoLamina';
-import { CorTampa } from '../../../domain/enums/CorTampa';
-import { ConfigBloco } from '../../../domain/entities/ConfigBloco';
+import { CorBloco } from '@enums/CorBloco';
+import { PosicaoLamina } from '@enums/PosicaoLamina';
+import { CorTampa } from '@enums/CorTampa';
+import { ConfigBloco } from 'src/domain/valueObjects/ConfigBloco';
 
 export interface StoreModel {
   numBlocos: 1 | 2 | 3;

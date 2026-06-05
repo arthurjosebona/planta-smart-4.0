@@ -1,5 +1,5 @@
-import { OrderForm } from '../../components/organisms/OrderForm';
-import { OrderViewer } from '../../components/organisms/OrderViewer';
+import { OrderForm } from '@components/organisms/OrderForm';
+import { OrderViewer } from '@components/organisms/OrderViewer';
 import { useStoreViewModel } from './useStoreViewModel';
 
 export default function StoreView() {

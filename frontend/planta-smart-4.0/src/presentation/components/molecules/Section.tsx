@@ -1,4 +1,4 @@
-import Title from '../atoms/Title';
+import Title from '@components/atoms/Title';
 
 interface SectionProps {
   title: string;

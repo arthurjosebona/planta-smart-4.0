@@ -1,14 +1,14 @@
 import React from 'react';
-import { StoreModel } from '../../pages/Store/StoreModel';
-import { CorTampa } from '../../../domain/enums/CorTampa';
-import { CorBloco } from '../../../domain/enums/CorBloco';
-import { CorLamina } from '../../../domain/enums/CorLamina';
-import { PadraoLamina } from '../../../domain/enums/PadraoLamina';
-import { PosicaoLamina } from '../../../domain/enums/PosicaoLamina';
-import { ConfigBloco } from '../../../domain/entities/ConfigBloco';
-import Divider from '../atoms/Divider';
-import Section from '../molecules/Section';
-import ColorSwatch from '../atoms/ColorWatch';
+import { StoreModel } from '@pages/Store/StoreModel';
+import { CorTampa } from '@enums/CorTampa';
+import { CorBloco } from '@enums/CorBloco';
+import { CorLamina } from '@enums/CorLamina';
+import { PadraoLamina } from '@enums/PadraoLamina';
+import { PosicaoLamina } from '@enums/PosicaoLamina';
+import { ConfigBloco } from '@valueObjects/ConfigBloco';
+import Divider from '@components/atoms/Divider';
+import Section from '@components/molecules/Section';
+import ColorSwatch from '@components/atoms/ColorWatch';
 
 // ─── Color palettes ───────────────────────────────────────────────────────────
 
@@ -38,8 +38,6 @@ const FACE_LABELS: Record<PosicaoLamina, string> = {
   [PosicaoLamina.Esquerda]: 'Esquerda',
   [PosicaoLamina.Direita]: 'Direita',
 };
-
-
 
 interface OrderFormProps {
   state: StoreModel;

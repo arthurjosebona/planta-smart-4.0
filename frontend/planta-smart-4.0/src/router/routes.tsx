@@ -1,4 +1,4 @@
-import StoreView from '../presentation/pages/Store/StoreView';
+import StoreView from '@pages/Store/StoreView';
 import { Navigate } from 'react-router-dom';
 
 export const routes = [

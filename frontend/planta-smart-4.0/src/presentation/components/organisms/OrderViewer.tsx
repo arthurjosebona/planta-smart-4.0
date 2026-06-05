@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, RoundedBoxGeometry, Line } from '@react-three/drei';
 import * as THREE from 'three';
-import { PadraoLamina } from '../../../domain/enums/PadraoLamina';
-import { PosicaoLamina } from '../../../domain/enums/PosicaoLamina';
-import { ConfigBloco } from '../../../domain/entities/ConfigBloco';
-import { StoreModel } from '../../pages/Store/StoreModel';
+import { PadraoLamina } from '@enums/PadraoLamina';
+import { PosicaoLamina } from '@enums/PosicaoLamina';
+import { ConfigBloco } from '@valueObjects/ConfigBloco';
+import { StoreModel } from '@pages/Store/StoreModel';
 
 // ─── Dimension constants ──────────────────────────────────────────────────────
 

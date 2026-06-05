@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { StoreModel, StoreModelInitial } from './StoreModel';
-import { CorTampa } from '../../../domain/enums/CorTampa';
-import { CorBloco } from '../../../domain/enums/CorBloco';
-import { PosicaoLamina } from '../../../domain/enums/PosicaoLamina';
-import { CorLamina } from '../../../domain/enums/CorLamina';
-import { PadraoLamina } from '../../../domain/enums/PadraoLamina';
-import { ConfigBloco } from '../../../domain/entities/ConfigBloco';
+import { CorTampa } from '@enums/CorTampa';
+import { CorBloco } from '@enums/CorBloco';
+import { PosicaoLamina } from '@enums/PosicaoLamina';
+import { CorLamina } from '@enums/CorLamina';
+import { PadraoLamina } from '@enums/PadraoLamina';
+import { ConfigBloco } from 'src/domain/valueObjects/ConfigBloco';
 
 export function useStoreViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);

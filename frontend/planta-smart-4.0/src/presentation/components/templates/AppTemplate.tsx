@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './AppTemplate.module.css';
+import styles from '@components/templates/AppTemplate.module.css';
 
 export interface AppTemplateProps {
   children: React.ReactNode;
