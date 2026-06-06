@@ -1,0 +1,62 @@
+.color-button-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Base de todos os botões de cor */
+
+.color-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+
+  padding: 5px var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.color-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Variante AZUL */
+
+.color-btn--azul:hover:not(:disabled) {
+  color: #7aaeff;
+  border-color: var(--cor-azul);
+  background-color: var(--cor-azul-dim);
+}
+
+/* Variante VERMELHO */
+
+.color-btn--vermelho:hover:not(:disabled) {
+  color: #ff8f8f;
+  border-color: var(--cor-vermelho);
+  background-color: var(--cor-vermelho-dim);
+}
+
+/* Variante PRETO */
+
+.color-btn--preto:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: #555557;
+  background-color: rgba(37, 37, 39, 0.5);
+}
+
+/* Variante VAZIO */
+
+.color-btn--vazio:hover:not(:disabled) {
+  color: var(--text-secondary);
+  border-color: var(--border-hover);
+  background-color: var(--bg-raised);
+}

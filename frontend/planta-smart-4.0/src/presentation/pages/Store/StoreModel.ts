@@ -11,7 +11,7 @@ export interface StoreModel {
   blocos: [ConfigBloco, ConfigBloco, ConfigBloco]; // sempre 3, numBlocos decide quantos renderizar
   loading: boolean;
   erro: string | null;
-  sucesso: boolean;   
+  sucesso: boolean;
   pedidoCriado: Pedido | null;
 }
 

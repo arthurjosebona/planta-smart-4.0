@@ -106,7 +106,6 @@ export function OrderForm({
 
       <Divider />
 
-
       {/* ── Número de blocos ── */}
       <Section title="Número de blocos">
         <div style={{ display: 'flex', gap: 8 }}>
@@ -299,7 +298,15 @@ export function OrderForm({
           lineHeight: 1.7,
         }}
       >
-        <div style={{ color: '#888', marginBottom: 4, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>
+        <div
+          style={{
+            color: '#888',
+            marginBottom: 4,
+            fontSize: 10,
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+          }}
+        >
           debug
         </div>
         <div>
@@ -310,15 +317,11 @@ export function OrderForm({
         </div>
         <div>
           sucesso:{' '}
-          <span style={{ color: state.sucesso ? '#a0e080' : '#888' }}>
-            {String(state.sucesso)}
-          </span>
+          <span style={{ color: state.sucesso ? '#a0e080' : '#888' }}>{String(state.sucesso)}</span>
         </div>
         <div>
           erro:{' '}
-          <span style={{ color: state.erro ? '#ff6b6b' : '#888' }}>
-            {state.erro ?? 'null'}
-          </span>
+          <span style={{ color: state.erro ? '#ff6b6b' : '#888' }}>{state.erro ?? 'null'}</span>
         </div>
         <div>
           pedidoCriado:{' '}

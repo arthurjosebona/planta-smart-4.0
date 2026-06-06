@@ -13,8 +13,11 @@ export class PedidoRepository implements IPedidoRepository {
 
   async createPedido(pedido: Pedido): Promise<Pedido> {
     const body = PedidoMapper.mapToCreateRequestDTO(pedido);
-    console.log("Enviando para a API: " + JSON.stringify(body))
-    const data: PedidoCreateResponseDTO = await this.httpClient.post<PedidoCreateResponseDTO>('/api/pedidos', body);
+    console.log('Enviando para a API: ' + JSON.stringify(body));
+    const data: PedidoCreateResponseDTO = await this.httpClient.post<PedidoCreateResponseDTO>(
+      '/api/pedidos',
+      body
+    );
     return PedidoMapper.mapToEntity(data);
   }
 }

@@ -27,6 +27,6 @@ export const PedidoMapper = {
       registroEntradaExpedicao: null,
       registroSaidaExpedicao: null,
       blocos: [],
-    }
+    };
   },
 };

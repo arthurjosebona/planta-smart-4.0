@@ -1,0 +1,57 @@
+/* ─────────────────────────────────────────────
+   PAGE — DashboardPage
+   Layout e header da página de dashboard.
+───────────────────────────────────────────── */
+
+/* ── Header ── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.header__logo {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.header__tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px var(--space-2);
+  border-radius: 99px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+/* ── Layout das seções ── */
+
+#main-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Estado de carregamento inicial ── */
+
+.loading-msg {
+  text-align: center;
+  padding: 64px 0;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}

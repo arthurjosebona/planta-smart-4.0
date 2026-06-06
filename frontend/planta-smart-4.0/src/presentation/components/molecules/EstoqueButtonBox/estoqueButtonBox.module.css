@@ -1,0 +1,118 @@
+.button-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.button-box__group {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Base compartilhada de botões ── */
+
+.edit,
+.save,
+.clear,
+.cancel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 7px var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.edit:disabled,
+.save:disabled,
+.clear:disabled,
+.cancel:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.edit {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.edit:hover:not(:disabled) {
+  background: #6aa0ff;
+  border-color: #6aa0ff;
+}
+
+.save {
+  background: var(--success);
+  border-color: var(--success);
+  color: #0a1f14;
+}
+
+.save:hover:not(:disabled) {
+  background: #5dc48e;
+  border-color: #5dc48e;
+}
+
+/* ── Botão secundário (clear) ── */
+
+.clear {
+  background: transparent;
+  border-color: rgba(232, 160, 69, 0.25);
+  color: var(--warning);
+}
+
+.clear:hover:not(:disabled) {
+  background: rgba(232, 160, 69, 0.08);
+  border-color: var(--warning);
+}
+
+/* ── Botão neutro (cancel) ── */
+
+.cancel {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.cancel:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+
+@media (max-width: 600px) {
+  #main-content {
+    padding: var(--space-4) var(--space-3);
+    gap: var(--space-4);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .button-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-box__group {
+    justify-content: stretch;
+  }
+
+  .edit,
+  .save,
+  .clear,
+  .cancel {
+    width: 100%;
+    text-align: center;
+  }
+}

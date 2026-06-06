@@ -1,0 +1,28 @@
+.block {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+/* Variantes de cor */
+
+.color-AZUL {
+  background-color: var(--cor-azul);
+}
+
+.color-VERMELHO {
+  background-color: var(--cor-vermelho);
+}
+
+.color-PRETO {
+  background-color: var(--cor-preto);
+  border: 1px solid var(--cor-preto-border);
+}
+
+.color-VAZIO {
+  background-color: var(--cor-vazio);
+  border: 1px dashed var(--cor-vazio-border);
+}

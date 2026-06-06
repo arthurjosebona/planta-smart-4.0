@@ -1,0 +1,88 @@
+.space {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+
+  padding: 10px var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+/* Modo edição: cursor e hover */
+
+.space--editable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.space--editable:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-raised);
+}
+
+.space--editable:hover .block {
+  transform: scale(1.1);
+}
+
+/* Selecionado */
+
+.space--selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* Indicador de seleção no canto superior direito */
+
+.space__check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.space--selected .space__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Label da posição */
+
+.space-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* Foco via teclado */
+
+.space--editable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -1,4 +1,4 @@
-import { HttpError } from "@error/HttpError";
+import { HttpError } from '@error/HttpError';
 
 export class HttpClient {
   private readonly baseURL: string;

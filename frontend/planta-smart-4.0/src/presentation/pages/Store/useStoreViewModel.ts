@@ -38,11 +38,7 @@ export function useStoreViewModel() {
 
     laminas[posicao] = {
       cor,
-      padrao: cor === null
-        ? null
-        : eraSemCor
-          ? PadraoLamina.Nenhum
-          : laminas[posicao].padrao,
+      padrao: cor === null ? null : eraSemCor ? PadraoLamina.Nenhum : laminas[posicao].padrao,
     };
 
     blocos[idx] = { ...blocos[idx], laminas };
@@ -58,46 +54,44 @@ export function useStoreViewModel() {
   }
 
   function setOrdemDeProducao(n: number) {
-    setModel((s) => ({ ...s, ordemDeProducao:n }));
+    setModel((s) => ({ ...s, ordemDeProducao: n }));
   }
 
   async function createPedido() {
-    setModel((s) => ({ ...s, loading:true, sucesso:false, erro:null }));
+    setModel((s) => ({ ...s, loading: true, sucesso: false, erro: null }));
     try {
-      console.log("blocos raw:", JSON.stringify(model.blocos.slice(0, model.numBlocos), null, 2));
+      console.log('blocos raw:', JSON.stringify(model.blocos.slice(0, model.numBlocos), null, 2));
       const blocos = model.blocos.slice(0, model.numBlocos).map((bloco) => ({
         ...bloco,
         laminas: Object.fromEntries(
           Object.entries(bloco.laminas)
-          .filter(([, lamina]) => lamina.cor != null)  
-          .map(([posicao, lamina]) => [
-            posicao,
-            {
-              cor: lamina.cor,
-              padrao: lamina.padrao ?? PadraoLamina.Nenhum,
-            },
-          ])
+            .filter(([, lamina]) => lamina.cor != null)
+            .map(([posicao, lamina]) => [
+              posicao,
+              {
+                cor: lamina.cor,
+                padrao: lamina.padrao ?? PadraoLamina.Nenhum,
+              },
+            ])
         ),
       }));
 
-      const blocosCompletos = [
-        ...blocos,
-        ...Array(3 - blocos.length).fill({}),
-      ] as [ConfigBloco, ConfigBloco, ConfigBloco];
+      const blocosCompletos = [...blocos, ...Array(3 - blocos.length).fill({})] as [
+        ConfigBloco,
+        ConfigBloco,
+        ConfigBloco,
+      ];
 
-      const pedido: Pedido = await pedidoService.create({ 
+      const pedido: Pedido = await pedidoService.create({
         ordemDeProducao: model.ordemDeProducao,
         numBlocos: model.numBlocos,
         blocos: blocosCompletos,
-        corTampa: model.corTampa
+        corTampa: model.corTampa,
       });
 
       setModel((s) => ({ ...s, loading: false, sucesso: true, erro: null, pedidoCriado: pedido }));
     } catch (error: unknown) {
-      const mensagem =
-        error instanceof HttpError
-          ? error.message       
-          : 'Erro desconhecido';
+      const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
 
       setModel((s) => ({
         ...s,
@@ -117,6 +111,6 @@ export function useStoreViewModel() {
     setLaminaCor,
     setLaminaPadrao,
     setOrdemDeProducao,
-    createPedido
+    createPedido,
   };
 }
