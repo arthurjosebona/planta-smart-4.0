@@ -4,13 +4,13 @@ import { TipoPedido } from '@enums/TipoPedido';
 import { CorTampa } from '@enums/CorTampa';
 
 export interface Pedido {
-  id: number;
+  id: number | null;
   ordemDeProducao: number;
   blocos: Bloco[];
   status: StatusPedido;
   tipo: TipoPedido;
   corTampa: CorTampa;
-  registroCriacao: string;
-  registroEntradaExpedicao: string;
-  registroSaidaExpedicao: string;
+  registroCriacao: string | null;
+  registroEntradaExpedicao: string | null;
+  registroSaidaExpedicao: string | null;
 }

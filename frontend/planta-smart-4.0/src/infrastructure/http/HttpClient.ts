@@ -1,3 +1,5 @@
+import { HttpError } from "@error/HttpError";
+
 export class HttpClient {
   private readonly baseURL: string;
   private readonly defaultHeaders: Record<string, string>;
@@ -11,9 +13,15 @@ export class HttpClient {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
-      throw { status: response.status, message: response.statusText };
+      const error = await response.json().catch(() => ({
+        message: response.statusText,
+        status: response.status,
+      }));
+      throw new HttpError(error.message, error.status ?? response.status);
     }
-
+    if (response.status === 204) {
+      return undefined as T;
+    }
     return response.json() as Promise<T>;
   }
 

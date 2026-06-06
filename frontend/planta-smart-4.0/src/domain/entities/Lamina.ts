@@ -3,7 +3,7 @@ import { PadraoLamina } from '@enums/PadraoLamina';
 import { PosicaoLamina } from '@enums/PosicaoLamina';
 
 export interface Lamina {
-  id: number;
+  id: number | null;
   cor: CorLamina;
   padrao: PadraoLamina;
   posicao: PosicaoLamina;

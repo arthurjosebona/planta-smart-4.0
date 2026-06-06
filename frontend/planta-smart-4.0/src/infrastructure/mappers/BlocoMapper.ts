@@ -9,7 +9,7 @@ export const BlocoMapper = {
     return {
       cor: CorBlocoToInt[entity.cor],
       andar: AndarBlocoToInt[entity.andar],
-      laminas: LaminaMapper.mapToCreateRequestDTO(entity.laminas[0]),
+      laminas: LaminaMapper.mapLaminasToCreateRequestsDTO(entity.laminas),
     };
   },
 

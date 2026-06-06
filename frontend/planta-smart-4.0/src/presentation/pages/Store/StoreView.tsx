@@ -11,6 +11,8 @@ export default function StoreView() {
     setBlocoColor,
     setLaminaCor,
     setLaminaPadrao,
+    setOrdemDeProducao,
+    createPedido,
   } = useStoreViewModel();
 
   return (
@@ -44,6 +46,8 @@ export default function StoreView() {
           setBlocoColor={setBlocoColor}
           setLaminaCor={setLaminaCor}
           setLaminaPadrao={setLaminaPadrao}
+          setOrdemDeProducao={setOrdemDeProducao}
+          createPedido={createPedido}
         />
         <OrderViewer state={model} />
       </div>

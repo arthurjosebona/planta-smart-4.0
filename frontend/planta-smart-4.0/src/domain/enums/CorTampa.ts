@@ -9,3 +9,9 @@ export const CorTampaToInt: Record<CorTampa, number> = {
   [CorTampa.Vermelho]: 2,
   [CorTampa.Azul]: 3,
 };
+
+export const CorTampaStringToEnum: Record<string, CorTampa> = {
+  PRETO: CorTampa.Preto,
+  VERMELHO: CorTampa.Vermelho,
+  AZUL: CorTampa.Azul,
+};

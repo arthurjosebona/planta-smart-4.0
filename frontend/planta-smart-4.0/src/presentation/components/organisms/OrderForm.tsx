@@ -9,6 +9,7 @@ import { ConfigBloco } from '@valueObjects/ConfigBloco';
 import Divider from '@components/atoms/Divider';
 import Section from '@components/molecules/Section';
 import ColorSwatch from '@components/atoms/ColorWatch';
+import { Pedido } from '@entities/Pedido';
 
 // ─── Color palettes ───────────────────────────────────────────────────────────
 
@@ -47,6 +48,8 @@ interface OrderFormProps {
   setBlocoColor: (idx: number, cor: CorBloco) => void;
   setLaminaCor: (idx: number, posicao: PosicaoLamina, cor: CorLamina | null) => void;
   setLaminaPadrao: (idx: number, posicao: PosicaoLamina, padrao: PadraoLamina | null) => void;
+  setOrdemDeProducao: (n: number) => void;
+  createPedido: () => void;
 }
 
 const FACES = Object.values(PosicaoLamina) as PosicaoLamina[];
@@ -63,6 +66,8 @@ export function OrderForm({
   setBlocoColor,
   setLaminaCor,
   setLaminaPadrao,
+  setOrdemDeProducao,
+  createPedido,
 }: OrderFormProps) {
   return (
     <div
@@ -80,6 +85,28 @@ export function OrderForm({
         color: '#222',
       }}
     >
+      {/* ── Ordem de produção ── */}
+      <Section title="Ordem de produção">
+        <input
+          type="number"
+          min={1}
+          value={state.ordemDeProducao}
+          onChange={(e) => setOrdemDeProducao(Math.max(1, Number(e.target.value)))}
+          style={{
+            width: '100%',
+            padding: '6px 10px',
+            borderRadius: 6,
+            border: '1px solid #ccc',
+            fontSize: 14,
+            boxSizing: 'border-box',
+            outline: 'none',
+          }}
+        />
+      </Section>
+
+      <Divider />
+
+
       {/* ── Número de blocos ── */}
       <Section title="Número de blocos">
         <div style={{ display: 'flex', gap: 8 }}>
@@ -207,21 +234,6 @@ export function OrderForm({
                       <div>
                         <div style={{ fontSize: 11, color: '#777', marginBottom: 4 }}>Padrão</div>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          {/* sem padrão */}
-                          <button
-                            onClick={() => setLaminaPadrao(i, face, null)}
-                            style={{
-                              padding: '3px 8px',
-                              fontSize: 11,
-                              borderRadius: 4,
-                              border: lamina.padrao === null ? '2px solid #333' : '1px solid #bbb',
-                              background: lamina.padrao === null ? '#333' : '#fff',
-                              color: lamina.padrao === null ? '#fff' : '#555',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            —
-                          </button>
                           {PADROES.map((p) => (
                             <button
                               key={p}
@@ -250,6 +262,71 @@ export function OrderForm({
           </div>
         );
       })}
+
+      {/* ── Criar pedido ── */}
+      <Divider />
+      <div style={{ padding: '8px 0' }}>
+        <button
+          onClick={createPedido}
+          disabled={state.loading}
+          style={{
+            width: '100%',
+            padding: '9px 0',
+            borderRadius: 6,
+            border: 'none',
+            background: state.loading ? '#888' : '#1a55cc',
+            color: '#fff',
+            fontWeight: 700,
+            fontSize: 14,
+            cursor: state.loading ? 'not-allowed' : 'pointer',
+            transition: 'background 0.2s',
+          }}
+        >
+          {state.loading ? 'Criando...' : 'Criar pedido'}
+        </button>
+      </div>
+
+      {/* ── Debug panel ── */}
+      <Divider />
+      <div
+        style={{
+          background: '#1a1a1a',
+          color: '#a0e080',
+          borderRadius: 8,
+          padding: '10px 12px',
+          fontSize: 11,
+          fontFamily: 'monospace',
+          lineHeight: 1.7,
+        }}
+      >
+        <div style={{ color: '#888', marginBottom: 4, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>
+          debug
+        </div>
+        <div>
+          loading:{' '}
+          <span style={{ color: state.loading ? '#f0c040' : '#a0e080' }}>
+            {String(state.loading)}
+          </span>
+        </div>
+        <div>
+          sucesso:{' '}
+          <span style={{ color: state.sucesso ? '#a0e080' : '#888' }}>
+            {String(state.sucesso)}
+          </span>
+        </div>
+        <div>
+          erro:{' '}
+          <span style={{ color: state.erro ? '#ff6b6b' : '#888' }}>
+            {state.erro ?? 'null'}
+          </span>
+        </div>
+        <div>
+          pedidoCriado:{' '}
+          <span style={{ color: state.pedidoCriado ? '#a0e080' : '#888' }}>
+            {state.pedidoCriado ? `id ${state.pedidoCriado.id}` : 'null'}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

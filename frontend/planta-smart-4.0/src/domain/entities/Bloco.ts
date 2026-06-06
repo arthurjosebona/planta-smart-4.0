@@ -3,7 +3,7 @@ import { CorBloco } from '@enums/CorBloco';
 import { Lamina } from './Lamina';
 
 export interface Bloco {
-  id: number;
+  id: number | null;
   cor: CorBloco;
   andar: AndarBloco;
   laminas: Lamina[];

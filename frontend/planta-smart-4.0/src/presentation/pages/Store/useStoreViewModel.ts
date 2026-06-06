@@ -5,7 +5,10 @@ import { CorBloco } from '@enums/CorBloco';
 import { PosicaoLamina } from '@enums/PosicaoLamina';
 import { CorLamina } from '@enums/CorLamina';
 import { PadraoLamina } from '@enums/PadraoLamina';
-import { ConfigBloco } from 'src/domain/valueObjects/ConfigBloco';
+import { ConfigBloco } from '@valueObjects/ConfigBloco';
+import { pedidoService } from '@config/diContainer';
+import { Pedido } from '@entities/Pedido';
+import { HttpError } from '@error/HttpError';
 
 export function useStoreViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
@@ -31,7 +34,17 @@ export function useStoreViewModel() {
   function setLaminaCor(idx: number, posicao: PosicaoLamina, cor: CorLamina | null) {
     const blocos = [...model.blocos] as typeof model.blocos;
     const laminas = { ...blocos[idx].laminas };
-    laminas[posicao] = { cor, padrao: cor === null ? null : laminas[posicao].padrao };
+    const eraSemCor = laminas[posicao].cor === null;
+
+    laminas[posicao] = {
+      cor,
+      padrao: cor === null
+        ? null
+        : eraSemCor
+          ? PadraoLamina.Nenhum
+          : laminas[posicao].padrao,
+    };
+
     blocos[idx] = { ...blocos[idx], laminas };
     setModel((s) => ({ ...s, blocos }));
   }
@@ -44,6 +57,57 @@ export function useStoreViewModel() {
     setModel((s) => ({ ...s, blocos }));
   }
 
+  function setOrdemDeProducao(n: number) {
+    setModel((s) => ({ ...s, ordemDeProducao:n }));
+  }
+
+  async function createPedido() {
+    setModel((s) => ({ ...s, loading:true, sucesso:false, erro:null }));
+    try {
+      console.log("blocos raw:", JSON.stringify(model.blocos.slice(0, model.numBlocos), null, 2));
+      const blocos = model.blocos.slice(0, model.numBlocos).map((bloco) => ({
+        ...bloco,
+        laminas: Object.fromEntries(
+          Object.entries(bloco.laminas)
+          .filter(([, lamina]) => lamina.cor != null)  
+          .map(([posicao, lamina]) => [
+            posicao,
+            {
+              cor: lamina.cor,
+              padrao: lamina.padrao ?? PadraoLamina.Nenhum,
+            },
+          ])
+        ),
+      }));
+
+      const blocosCompletos = [
+        ...blocos,
+        ...Array(3 - blocos.length).fill({}),
+      ] as [ConfigBloco, ConfigBloco, ConfigBloco];
+
+      const pedido: Pedido = await pedidoService.create({ 
+        ordemDeProducao: model.ordemDeProducao,
+        numBlocos: model.numBlocos,
+        blocos: blocosCompletos,
+        corTampa: model.corTampa
+      });
+
+      setModel((s) => ({ ...s, loading: false, sucesso: true, erro: null, pedidoCriado: pedido }));
+    } catch (error: unknown) {
+      const mensagem =
+        error instanceof HttpError
+          ? error.message       
+          : 'Erro desconhecido';
+
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        sucesso: false,
+        erro: mensagem,
+      }));
+    }
+  }
+
   return {
     model,
     setNumBlocos,
@@ -52,5 +116,7 @@ export function useStoreViewModel() {
     setBlocoColor,
     setLaminaCor,
     setLaminaPadrao,
+    setOrdemDeProducao,
+    createPedido
   };
 }
