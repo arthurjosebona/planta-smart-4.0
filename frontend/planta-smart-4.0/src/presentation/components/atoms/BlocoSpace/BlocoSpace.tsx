@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ColorBlock } from '../ColorBlock/ColorBlock';
 import { Estoque } from '@entities/Estoque';
-import styles from './blocoSpace.module.css';
+import styles from '@components/atoms/BlocoSpace/blocoSpace.module.css';
 
 interface BlocoSpaceProps {
   bloco: Estoque;

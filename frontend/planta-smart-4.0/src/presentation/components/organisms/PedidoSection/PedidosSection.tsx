@@ -1,7 +1,7 @@
 import React from 'react';
 import { PedidoCard } from '@components/organisms/PedidoCard/PedidoCard';
 import { Pedido } from '@entities/Pedido';
-import styles from './PedidosSection.module.css';
+import styles from '@components/organisms/PedidoSection/pedidosSection.module.css';
 
 interface PedidosSectionProps {
   pedidos: Pedido[];

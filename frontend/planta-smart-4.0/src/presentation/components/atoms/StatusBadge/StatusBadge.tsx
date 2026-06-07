@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusPedido } from '@enums/StatusPedido';
-import styles from './StatusBadge.module.css';
+import styles from '@components/atoms/StatusBadge/statusBadge.module.css';
 
 interface StatusBadgeProps {
   status: StatusPedido;

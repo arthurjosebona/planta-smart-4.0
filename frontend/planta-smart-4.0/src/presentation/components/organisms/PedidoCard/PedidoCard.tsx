@@ -1,7 +1,7 @@
 import { PedidoCardHeader } from '@components/molecules/PedidoCardHeader/PedidoCardHeader';
 import { PedidoCardFields } from '@components/molecules/PedidoCardFields/PedidoCardFields';
 import { Pedido } from '@entities/Pedido';
-import styles from './PedidoCard.module.css';
+import styles from '@components/organisms/PedidoCard/pedidoCard.module.css';
 
 interface PedidoCardProps {
   pedido: Pedido;

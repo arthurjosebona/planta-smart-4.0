@@ -1,5 +1,5 @@
 import { LogoBadge } from '@components/atoms/LogoBadge/LogoBadge';
-import styles from './siteTitle.module.css';
+import styles from '@components/molecules/SiteTitle/siteTitle.module.css';
 
 interface SiteTitleProps {
   title: string;

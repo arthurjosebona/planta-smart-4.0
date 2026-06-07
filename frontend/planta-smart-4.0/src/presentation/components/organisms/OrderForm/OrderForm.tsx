@@ -9,7 +9,7 @@ import { ConfigBloco } from '@valueObjects/ConfigBloco';
 import Divider from '@components/atoms/Divider/Divider';
 import Section from '@components/molecules/Section/Section';
 import ColorSwatch from '@components/atoms/ColorSwatch/ColorSwatch';
-import styles from './OrderForm.module.css';
+import styles from '@components/organisms/OrderForm/orderForm.module.css';
 
 // ─── Color palettes ───────────────────────────────────────────────────────────
 

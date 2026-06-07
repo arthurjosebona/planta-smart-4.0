@@ -1,6 +1,6 @@
 import { BlocoSpace } from '../../atoms/BlocoSpace/BlocoSpace';
 import { Estoque } from '@entities/Estoque';
-import styles from './viewEstoque.module.css';
+import styles from '@components/molecules/ViewEstoque/viewEstoque.module.css';
 
 interface ViewEstoqueProps {
   estoque: Estoque[];

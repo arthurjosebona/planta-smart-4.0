@@ -1,4 +1,4 @@
-import styles from './hamburgerButton.module.css';
+import styles from '@components/atoms/HamburgerButton/hamburgerButton.module.css';
 
 interface HamburgerButtonProps {
   open: boolean;

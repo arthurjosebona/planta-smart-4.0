@@ -1,7 +1,7 @@
 import { StatusBadge } from '@components/atoms/StatusBadge/StatusBadge';
 import { ActionButton } from '@components/atoms/ActionButton/ActionButton';
 import { StatusPedido } from '@enums/StatusPedido';
-import styles from './PedidoCardHeader.module.css';
+import styles from '@components/molecules/PedidoCardHeader/pedidoCardHeader.module.css';
 
 interface PedidoCardHeaderProps {
   id: number;

@@ -1,5 +1,5 @@
 import { RoundedBoxGeometry } from '@react-three/drei';
-import { PlasticMat } from '../PlasticMat/PlasticMat';
+import { PlasticMat } from '@components/atoms/PlasticMat/PlasticMat';
 
 interface TampaProps {
   color: string;

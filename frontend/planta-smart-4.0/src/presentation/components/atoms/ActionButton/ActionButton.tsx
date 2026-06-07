@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './ActionButton.module.css';
+import styles from '@components/atoms/ActionButton/actionButton.module.css';
 
 interface ActionButtonProps {
   label: string;

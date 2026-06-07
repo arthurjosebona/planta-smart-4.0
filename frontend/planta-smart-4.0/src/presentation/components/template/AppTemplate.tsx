@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import styles from '@components/template/AppTemplate.module.css';
+import styles from '@components/template/appTemplate.module.css';
 import { Header } from '@components/organisms/Header/Header';
 
 export interface AppTemplateProps {

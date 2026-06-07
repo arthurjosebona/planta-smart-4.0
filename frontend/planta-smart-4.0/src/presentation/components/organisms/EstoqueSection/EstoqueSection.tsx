@@ -3,7 +3,7 @@ import { Estoque } from '@entities/Estoque';
 import { EstoqueButtonBox } from '@components/molecules/EstoqueButtonBox/EstoqueButtonBox';
 import { ColorButtonGroup } from '@components/molecules/ColorButtonGroup/ColorButtonGroup';
 import { ViewEstoque } from '@components/molecules/ViewEstoque/ViewEstoque';
-import styles from './estoqueSection.module.css';
+import styles from '@components/organisms/EstoqueSection/estoqueSection.module.css';
 
 interface EstoqueSectionProps {
   estoque: Estoque[];

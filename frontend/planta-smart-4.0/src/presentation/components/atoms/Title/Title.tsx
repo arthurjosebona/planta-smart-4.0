@@ -1,4 +1,4 @@
-import styles from './Title.module.css';
+import styles from '@components/atoms/Title/title.module.css';
 
 interface TitleProps {
   title: string;

@@ -1,6 +1,6 @@
 import { Expedicao } from '@entities/Expedicao';
 import { ViewExpedicao } from '@components/molecules/ViewExpedicao/ViewExpedicao';
-import styles from './expedicaoSection.module.css';
+import styles from '@components/organisms/ExpedicaoSection/expedicaoSection.module.css';
 
 interface ExpedicaoSectionProps {
   expedicao: Expedicao[];

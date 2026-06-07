@@ -1,6 +1,6 @@
 import { SlotExpedicao } from '../../atoms/SlotExpedicao/SlotExpedicao';
 import { Expedicao } from '@entities/Expedicao';
-import styles from './viewExpedicao.module.css';
+import styles from '@components/molecules/ViewExpedicao/viewExpedicao.module.css';
 
 interface ViewExpedicaoProps {
   expedicao: Expedicao[];

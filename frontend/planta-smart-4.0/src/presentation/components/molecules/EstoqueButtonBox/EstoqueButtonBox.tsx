@@ -1,4 +1,4 @@
-import styles from './estoqueButtonBox.module.css';
+import styles from '@components/molecules/EstoqueButtonBox/estoqueButtonBox.module.css';
 
 interface EstoqueButtonBoxProps {
   editMode: boolean;

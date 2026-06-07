@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import styles from './navIcon.module.css';
+import styles from '@components/atoms/NavIcon/navIcon.module.css';
 
 interface NavIconProps {
   children: ReactNode;

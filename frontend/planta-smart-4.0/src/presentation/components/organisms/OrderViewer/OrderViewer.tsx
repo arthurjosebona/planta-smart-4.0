@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { StoreModel } from '@pages/Store/StoreModel';
 import { BlockScene } from '@components/organisms/BlockScene/BlockScene';
-import styles from './OrderViewer.module.css';
+import styles from '@components/organisms/OrderViewer/orderViewer.module.css';
 
 interface OrderViewerProps {
   state: StoreModel;

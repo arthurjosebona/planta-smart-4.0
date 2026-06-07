@@ -1,6 +1,6 @@
 import React from 'react';
 import { CorTampa } from '@enums/CorTampa';
-import styles from './CorTampaDot.module.css';
+import styles from '@components/atoms/CorTampaDot/corTampaDot.module.css';
 
 interface CorTampaDotProps {
   cor: CorTampa;

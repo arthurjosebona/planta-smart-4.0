@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { CorEstoque } from '@enums/CorEstoque';
-import styles from './colorBlock.module.css';
+import styles from '@components/atoms/ColorBlock/colorBlock.module.css';
 
 interface ColorBlockProps {
   cor: CorEstoque;

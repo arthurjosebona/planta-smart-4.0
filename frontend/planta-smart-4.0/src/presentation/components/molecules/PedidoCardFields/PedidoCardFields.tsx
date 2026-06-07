@@ -5,7 +5,7 @@ import { CorTampa } from '@enums/CorTampa';
 import { TipoPedido } from '@enums/TipoPedido';
 import { Bloco } from '@entities/Bloco';
 import { BlocoResumo } from '@components/atoms/BlocoResumo/BlocoResumo';
-import styles from './PedidoCardFields.module.css';
+import styles from '@components/molecules/PedidoCardFields/pedidoCardFields.module.css';
 
 interface PedidoCardFieldsProps {
   tipo: TipoPedido;

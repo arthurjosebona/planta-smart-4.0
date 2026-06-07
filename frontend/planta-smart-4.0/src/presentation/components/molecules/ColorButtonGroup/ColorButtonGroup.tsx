@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { CorEstoque } from '@enums/CorEstoque';
-import styles from './colorButtonGroup.module.css';
+import styles from '@components/molecules/ColorButtonGroup/colorButtonGroup.module.css';
 
 interface ColorButtonGroupProps {
   onColorChange: (cor: CorEstoque) => void;

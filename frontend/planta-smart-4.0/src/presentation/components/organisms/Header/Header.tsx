@@ -4,7 +4,7 @@ import { SiteTitle } from '@components/molecules/SiteTitle/SiteTitle';
 import { NavLink } from '@components/molecules/NavLink/NavLink';
 import { NavSeparator } from '@components/atoms/NavSeparator/NavSeparator';
 import { HamburgerButton } from '@components/atoms/HamburgerButton/HamburgerButton';
-import styles from './header.module.css';
+import styles from '@components/organisms/Header/header.module.css';
 
 // ─── Ícones ───────────────────────────────────────────────────────────────────
 

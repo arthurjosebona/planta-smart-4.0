@@ -1,4 +1,4 @@
-import styles from './ColorSwatch.module.css';
+import styles from '@components/atoms/ColorSwatch/colorSwatch.module.css';
 
 export default function ColorSwatch({
   color,

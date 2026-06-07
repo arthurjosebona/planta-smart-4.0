@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Expedicao } from '@entities/Expedicao';
-import styles from './slotExpedicao.module.css';
+import styles from '@components/atoms/SlotExpedicao/slotExpedicao.module.css';
 
 interface SlotExpedicaoProps {
   slot: Expedicao;

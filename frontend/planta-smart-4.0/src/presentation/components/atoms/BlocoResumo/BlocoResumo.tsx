@@ -1,7 +1,7 @@
 import React from 'react';
 import { FieldDisplay } from '@components/atoms/FieldDisplay/FieldDisplay';
 import { Bloco } from '@entities/Bloco';
-import styles from './BlocoResumo.module.css';
+import styles from '@components/atoms/BlocoResumo/blocoResumo.module.css';
 
 interface BlocoResumoProps {
   bloco: Bloco;

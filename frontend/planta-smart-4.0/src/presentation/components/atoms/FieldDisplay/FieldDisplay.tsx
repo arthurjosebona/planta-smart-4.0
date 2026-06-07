@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './FieldDisplay.module.css';
+import styles from '@components/atoms/FieldDisplay/fieldDisplay.module.css';
 
 interface FieldDisplayProps {
   label: string;
