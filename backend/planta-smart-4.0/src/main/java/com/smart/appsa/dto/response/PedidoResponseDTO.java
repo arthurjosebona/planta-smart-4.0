@@ -3,7 +3,6 @@ package com.smart.appsa.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.enums.CorTampa;
 import com.smart.appsa.model.enums.StatusPedido;
@@ -15,7 +14,7 @@ import lombok.Builder;
 public record PedidoResponseDTO(
     Long id,
     int ordemDeProducao,
-    List<Bloco> blocos,
+    List<BlocoResponseDTO> blocos,
     StatusPedido status,
     TipoPedido tipo,
     CorTampa corTampa,

@@ -11,13 +11,14 @@ public class PedidoMapper {
         return PedidoResponseDTO.builder()
             .id(pedido.getId())
             .ordemDeProducao(pedido.getOrdemDeProducao())
-            .blocos(pedido.getBlocos()) 
+            .blocos(pedido.getBlocos().stream().map(b -> BlocoMapper.mapDTO(b)).toList()) 
             .status(pedido.getStatus())
             .tipo(pedido.getTipo())
             .corTampa(pedido.getCorTampa())
             .registroCriacao(pedido.getRegistroCriacao())
             .registroEntradaExpedicao(pedido.getRegistroEntradaExpedicao())
             .registroSaidaExpedicao(pedido.getRegistroSaidaExpedicao())
+            .expedicao(pedido.getExpedicao())
             .build();
     }
 
