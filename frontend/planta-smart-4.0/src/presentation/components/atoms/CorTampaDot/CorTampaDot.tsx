@@ -20,10 +20,7 @@ function capitalize(str: string): string {
 export function CorTampaDot({ cor }: CorTampaDotProps) {
   return (
     <span className={styles.wrapper}>
-      <span
-        className={styles.dot}
-        style={{ background: corMap[cor] ?? '#2a2a32' }}
-      />
+      <span className={styles.dot} style={{ background: corMap[cor] ?? '#2a2a32' }} />
       {capitalize(cor)}
     </span>
   );

@@ -18,7 +18,6 @@ export function PedidoCardHeader({
 }: PedidoCardHeaderProps) {
   return (
     <div className={styles.header}>
-
       <div className={styles.headerLeft}>
         <span className={styles.idTag}>#{id}</span>
         <span className={styles.ordemDeProducao}>{ordemDeProducao}</span>
@@ -30,7 +29,6 @@ export function PedidoCardHeader({
           <ActionButton label="Iniciar Produção" onClick={() => iniciarProducao(id)} />
         )}
       </div>
-
     </div>
   );
 }

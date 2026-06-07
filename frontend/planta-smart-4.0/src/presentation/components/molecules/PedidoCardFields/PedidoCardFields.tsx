@@ -43,7 +43,6 @@ export function PedidoCardFields({
 }: PedidoCardFieldsProps) {
   return (
     <div className={styles.root}>
-
       <div className={styles.fieldsGrid}>
         <FieldDisplay label="Tipo" highlight>
           {capitalize(TipoPedido[tipo])}
@@ -61,9 +60,7 @@ export function PedidoCardFields({
           {expedicaoId ?? '—'}
         </FieldDisplay>
 
-        <FieldDisplay label="Registro Criação">
-          {fmtData(registroCriacao)}
-        </FieldDisplay>
+        <FieldDisplay label="Registro Criação">{fmtData(registroCriacao)}</FieldDisplay>
 
         <FieldDisplay label="Entrada Expedição" empty={registroEntradaExpedicao === null}>
           {fmtData(registroEntradaExpedicao)}
@@ -81,7 +78,6 @@ export function PedidoCardFields({
           ))}
         </div>
       )}
-
     </div>
   );
 }

@@ -11,7 +11,6 @@ interface PedidoCardProps {
 export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
   return (
     <article className={styles.card}>
-
       <div aria-hidden="true" className={styles.accentLine} />
 
       <PedidoCardHeader
@@ -32,7 +31,6 @@ export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
         registroEntradaExpedicao={pedido.registroEntradaExpedicao}
         registroSaidaExpedicao={pedido.registroSaidaExpedicao}
       />
-
     </article>
   );
 }

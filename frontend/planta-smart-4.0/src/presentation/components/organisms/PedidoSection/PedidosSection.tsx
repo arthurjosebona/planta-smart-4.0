@@ -16,7 +16,6 @@ export const PedidosSection: React.FC<PedidosSectionProps> = ({
 }) => {
   return (
     <section className={styles.section} aria-label="Pedidos de Produção">
-
       <div aria-hidden="true" className={styles.accentLine} />
 
       <h1 className={styles.heading}>Pedidos</h1>
@@ -24,9 +23,7 @@ export const PedidosSection: React.FC<PedidosSectionProps> = ({
       {loading && pedidos.length === 0 ? (
         <p className={styles.stateMsg}>Carregando…</p>
       ) : pedidos.length === 0 ? (
-        <p className={`${styles.stateMsg} ${styles.stateMsgEmpty}`}>
-          Nenhum pedido encontrado.
-        </p>
+        <p className={`${styles.stateMsg} ${styles.stateMsgEmpty}`}>Nenhum pedido encontrado.</p>
       ) : (
         <div className={styles.list}>
           {pedidos.map((p) => (
@@ -34,7 +31,6 @@ export const PedidosSection: React.FC<PedidosSectionProps> = ({
           ))}
         </div>
       )}
-
     </section>
   );
 };

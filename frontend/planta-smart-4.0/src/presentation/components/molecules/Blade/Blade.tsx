@@ -24,34 +24,102 @@ const PATTERN_PATHS: Record<PadraoLamina, Point2D[][]> = {
   [PadraoLamina.Nenhum]: [],
   [PadraoLamina.Estrela]: [
     [
-      [0, 0.56], [0.12, 0.18], [0.54, 0.18], [0.2, -0.06], [0.32, -0.47],
-      [0, -0.22], [-0.32, -0.47], [-0.2, -0.06], [-0.54, 0.18], [-0.12, 0.18], [0, 0.56],
+      [0, 0.56],
+      [0.12, 0.18],
+      [0.54, 0.18],
+      [0.2, -0.06],
+      [0.32, -0.47],
+      [0, -0.22],
+      [-0.32, -0.47],
+      [-0.2, -0.06],
+      [-0.54, 0.18],
+      [-0.12, 0.18],
+      [0, 0.56],
     ],
   ],
   [PadraoLamina.Casa]: [
-    [[-0.5, -0.44], [0.5, -0.44], [0.5, 0.22], [0.7, 0.02], [0.0, 0.58], [-0.7, 0.02], [-0.5, 0.22], [-0.5, -0.44]],
-    [[0.38, 0.28], [0.38, 0.5], [0.54, 0.5], [0.54, 0.14]],
-    [[-0.18, -0.44], [-0.18, -0.08], [0.18, -0.08], [0.18, -0.44]],
-    [[-0.22, 0.03], [0.22, 0.03], [0.22, 0.23], [-0.22, 0.23], [-0.22, 0.03]],
-    [[-0.22, 0.13], [0.22, 0.13]],
+    [
+      [-0.5, -0.44],
+      [0.5, -0.44],
+      [0.5, 0.22],
+      [0.7, 0.02],
+      [0.0, 0.58],
+      [-0.7, 0.02],
+      [-0.5, 0.22],
+      [-0.5, -0.44],
+    ],
+    [
+      [0.38, 0.28],
+      [0.38, 0.5],
+      [0.54, 0.5],
+      [0.54, 0.14],
+    ],
+    [
+      [-0.18, -0.44],
+      [-0.18, -0.08],
+      [0.18, -0.08],
+      [0.18, -0.44],
+    ],
+    [
+      [-0.22, 0.03],
+      [0.22, 0.03],
+      [0.22, 0.23],
+      [-0.22, 0.23],
+      [-0.22, 0.03],
+    ],
+    [
+      [-0.22, 0.13],
+      [0.22, 0.13],
+    ],
   ],
   [PadraoLamina.Navio]: [
-    [[-0.72, -0.34], [0.55, -0.34], [0.78, 0.02], [-0.72, 0.02], [-0.72, -0.34]],
-    [[-0.55, 0.02], [-0.55, 0.34], [0.5, 0.34], [0.5, 0.02]],
-    [[-0.35, 0.34], [-0.35, 0.62], [-0.12, 0.62], [-0.12, 0.34]],
-    [[0.02, 0.34], [0.02, 0.62], [0.25, 0.62], [0.25, 0.34]],
+    [
+      [-0.72, -0.34],
+      [0.55, -0.34],
+      [0.78, 0.02],
+      [-0.72, 0.02],
+      [-0.72, -0.34],
+    ],
+    [
+      [-0.55, 0.02],
+      [-0.55, 0.34],
+      [0.5, 0.34],
+      [0.5, 0.02],
+    ],
+    [
+      [-0.35, 0.34],
+      [-0.35, 0.62],
+      [-0.12, 0.62],
+      [-0.12, 0.34],
+    ],
+    [
+      [0.02, 0.34],
+      [0.02, 0.62],
+      [0.25, 0.62],
+      [0.25, 0.34],
+    ],
     circlePath(-0.32, 0.17, 0.07),
     circlePath(-0.02, 0.17, 0.07),
     circlePath(0.28, 0.17, 0.07),
   ],
 };
 
-function pathBounds(paths: Point2D[][]): { minU: number; maxU: number; minV: number; maxV: number } {
-  let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+function pathBounds(paths: Point2D[][]): {
+  minU: number;
+  maxU: number;
+  minV: number;
+  maxV: number;
+} {
+  let minU = Infinity,
+    maxU = -Infinity,
+    minV = Infinity,
+    maxV = -Infinity;
   for (const path of paths)
     for (const [u, v] of path) {
-      if (u < minU) minU = u; if (u > maxU) maxU = u;
-      if (v < minV) minV = v; if (v > maxV) maxV = v;
+      if (u < minU) minU = u;
+      if (u > maxU) maxU = u;
+      if (v < minV) minV = v;
+      if (v > maxV) maxV = v;
     }
   return { minU, maxU, minV, maxV };
 }
@@ -64,7 +132,7 @@ function patternTo3D(
   bladeY: number,
   bladeWidth: number,
   bladeHeight: number,
-  bladeT: number,
+  bladeT: number
 ): THREE.Vector3[][] {
   const paths = PATTERN_PATHS[padrao];
   const { minU, maxU, minV, maxV } = pathBounds(paths);
@@ -131,9 +199,10 @@ export function Blade({
     bW = bladeT;
     bH = bodyH;
     bD = span;
-    px = face === PosicaoLamina.Esquerda
-      ? -blockW / 2 + colW + bladeRecess + bladeT / 2
-      : blockW / 2 - colW - bladeRecess - bladeT / 2;
+    px =
+      face === PosicaoLamina.Esquerda
+        ? -blockW / 2 + colW + bladeRecess + bladeT / 2
+        : blockW / 2 - colW - bladeRecess - bladeT / 2;
     py = blockY + baseT + bodyH / 2;
     pz = 0;
   }

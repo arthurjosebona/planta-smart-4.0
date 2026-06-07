@@ -71,7 +71,6 @@ export function OrderForm({
 }: OrderFormProps) {
   return (
     <div className={styles.root}>
-
       {/* ── Ordem de produção ── */}
       <Section title="Ordem de produção">
         <input
@@ -127,7 +126,6 @@ export function OrderForm({
           <div key={i}>
             {i > 0 && <Divider />}
             <Section title={`Bloco ${i + 1}`}>
-
               {/* Cor do bloco */}
               <div className={styles.corBlocoWrapper}>
                 <div className={styles.fieldLabel}>Cor do bloco</div>
@@ -150,9 +148,7 @@ export function OrderForm({
                 const lamina = bloco.laminas[face];
                 return (
                   <div key={face} className={styles.laminaCard}>
-                    <div className={styles.laminaTitle}>
-                      Lâmina — {FACE_LABELS[face]}
-                    </div>
+                    <div className={styles.laminaTitle}>Lâmina — {FACE_LABELS[face]}</div>
 
                     {/* Cor da lâmina */}
                     <div className={styles.laminaCorRow}>
@@ -195,7 +191,6 @@ export function OrderForm({
                   </div>
                 );
               })}
-
             </Section>
           </div>
         );
@@ -242,7 +237,6 @@ export function OrderForm({
           </span>
         </div>
       </div>
-
     </div>
   );
 }
