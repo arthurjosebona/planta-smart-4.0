@@ -1,0 +1,4 @@
+.tampaWrapper {
+  pointer-events: none;
+  position: absolute;
+}

@@ -1,0 +1,13 @@
+/* BlockScene.module.css */
+/* Reservado para overlays HTML sobre o stack completo (ex: HUD, label de altura). */
+
+.sceneHud {
+  pointer-events: none;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.45);
+  letter-spacing: 0.04em;
+}
