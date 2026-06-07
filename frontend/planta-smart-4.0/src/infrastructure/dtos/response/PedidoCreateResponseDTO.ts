@@ -1,4 +1,4 @@
-import { Bloco } from '@entities/Bloco';
+import { Expedicao } from "@entities/Expedicao";
 
 export interface PedidoCreateResponseDTO {
   id: number;
@@ -7,4 +7,5 @@ export interface PedidoCreateResponseDTO {
   tipo: string;
   corTampa: string;
   registroCriacao: string;
+  expedicao: Expedicao;
 }

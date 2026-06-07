@@ -1,8 +1,10 @@
 import { LaminaCreateRequestDTO } from '@dtos/request/LaminaCreateRequestDTO';
+import { LaminaGetResponseDto } from '@dtos/response/LaminaGetResponseDTO';
 import { Lamina } from '@entities/Lamina';
-import { CorLaminaToInt } from '@enums/CorLamina';
-import { PadraoLaminaToInt } from '@enums/PadraoLamina';
-import { PosicaoLaminaToInt } from '@enums/PosicaoLamina';
+import { CorLamina, CorLaminaStringToEnum, CorLaminaToInt } from '@enums/CorLamina';
+import { PadraoLaminaStringToEnum, PadraoLaminaToInt } from '@enums/PadraoLamina';
+import { PosicaoLaminaStringToEnum, PosicaoLaminaToInt } from '@enums/PosicaoLamina';
+
 
 export const LaminaMapper = {
   mapToCreateRequestDTO(entity: Lamina): LaminaCreateRequestDTO {
@@ -22,4 +24,23 @@ export const LaminaMapper = {
 
     return requests;
   },
+
+  mapLaminaByGetDTO(dto: LaminaGetResponseDto): Lamina {
+    return {
+      id: dto.id,
+      cor: CorLaminaStringToEnum[dto.cor.toUpperCase()],
+      padrao: PadraoLaminaStringToEnum[dto.padrao.toUpperCase()],
+      posicao: PosicaoLaminaStringToEnum[dto.posicao.toUpperCase()],
+    }
+  },
+
+  mapLaminasByGetDTO(dtos: LaminaGetResponseDto[]): Lamina[] {
+    const entities: Lamina[] = [];
+
+    dtos.forEach((dto) => {
+      entities.push(this.mapLaminaByGetDTO(dto));
+    });
+
+    return entities;
+  }
 };

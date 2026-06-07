@@ -5,53 +5,53 @@
 
 :root {
   /* Cores de bloco */
-  --cor-azul:        #3a6fd8;
-  --cor-azul-dim:    rgba(58, 111, 216, 0.12);
-  --cor-vermelho:    #c94040;
-  --cor-vermelho-dim:rgba(201, 64, 64, 0.12);
-  --cor-preto:       #252527;
-  --cor-preto-border:#3a3a3c;
-  --cor-vazio:       #2c2d30;
-  --cor-vazio-border:rgba(255, 255, 255, 0.10);
+  --cor-azul: #3a6fd8;
+  --cor-azul-dim: rgba(58, 111, 216, 0.12);
+  --cor-vermelho: #c94040;
+  --cor-vermelho-dim: rgba(201, 64, 64, 0.12);
+  --cor-preto: #252527;
+  --cor-preto-border: #3a3a3c;
+  --cor-vazio: #2c2d30;
+  --cor-vazio-border: rgba(255, 255, 255, 0.1);
 
   /* Superfícies */
-  --bg-page:    #0e0f11;
+  --bg-page: #0e0f11;
   --bg-surface: #161719;
-  --bg-raised:  #1e2023;
+  --bg-raised: #1e2023;
 
   /* Texto */
-  --text-primary:   #e8e8e6;
+  --text-primary: #e8e8e6;
   --text-secondary: #9a9996;
-  --text-muted:     #5c5b58;
+  --text-muted: #5c5b58;
 
   /* Bordas */
-  --border:       rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.18);
   --border-focus: rgba(255, 255, 255, 0.35);
 
   /* Semânticas */
-  --accent:      #4f8ef7;
-  --accent-dim:  rgba(79, 142, 247, 0.12);
-  --success:     #4caf7d;
-  --warning:     #e8a045;
-  --danger:      #e05b5b;
-  --danger-dim:  rgba(224, 91, 91, 0.10);
+  --accent: #4f8ef7;
+  --accent-dim: rgba(79, 142, 247, 0.12);
+  --success: #4caf7d;
+  --warning: #e8a045;
+  --danger: #e05b5b;
+  --danger-dim: rgba(224, 91, 91, 0.1);
 
   /* Tipografia */
   --font-sans: 'IBM Plex Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
 
   /* Espaçamento */
-  --space-1:  4px;
-  --space-2:  8px;
+  --space-1: 4px;
+  --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
 
   /* Bordas arredondadas */
-  --radius-sm:  4px;
-  --radius-md:  8px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
   --radius-lg: 12px;
 
   /* Transições */

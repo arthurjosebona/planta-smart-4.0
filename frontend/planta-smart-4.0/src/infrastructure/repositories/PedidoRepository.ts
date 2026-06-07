@@ -3,6 +3,7 @@ import { HttpClient } from '@http/HttpClient';
 import { IPedidoRepository } from '@repositories/IPedidoRepository';
 import { PedidoMapper } from '../mappers/PedidoMapper';
 import { PedidoCreateResponseDTO } from '@dtos/response/PedidoCreateResponseDTO';
+import { PedidoGetResponseDTO } from '@dtos/response/PedidoGetResponseDTO';
 
 export class PedidoRepository implements IPedidoRepository {
   private readonly httpClient: HttpClient;
@@ -18,6 +19,11 @@ export class PedidoRepository implements IPedidoRepository {
       '/api/pedidos',
       body
     );
-    return PedidoMapper.mapToEntity(data);
+    return PedidoMapper.mapToEntityByCreateDTO(data);
+  }
+
+  async findAll(): Promise<Pedido[]> {
+    const data: PedidoGetResponseDTO[] = await this.httpClient.get<PedidoGetResponseDTO[]>('/api/pedidos');
+    return PedidoMapper.mapToEntitiesByGetDTOs(data);
   }
 }

@@ -8,24 +8,25 @@ export function useDashboardViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
 
   useEffect(() => {
-    async function fetchAll() {
-      setModel((s) => ({ ...s, loading: true, erro: null }));
-      try {
-        const [estoque, expedicao] = await Promise.all([
-          estoqueService.findAll(),
-          expedicaoService.findAll(),
-        ]);
-        setModel((s) => ({ ...s, estoque, expedicao, loading: false }));
-      } catch {
-        setModel((s) => ({
-          ...s,
-          loading: false,
-          erro: 'Erro ao carregar dados.',
-        }));
-      }
-    }
     fetchAll();
   }, []);
+
+  async function fetchAll() {
+    setModel((s) => ({ ...s, loading: true, erro: null }));
+    try {
+      const [estoque, expedicao] = await Promise.all([
+        estoqueService.findAll(),
+        expedicaoService.findAll(),
+      ]);
+      setModel((s) => ({ ...s, estoque, expedicao, loading: false }));
+    } catch {
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        erro: 'Erro ao carregar dados.',
+      }));
+    }
+  }
 
   // ── Edição de estoque ──────────────────────────────────────────────────────
   function enterEditMode() {
@@ -72,7 +73,7 @@ export function useDashboardViewModel() {
     try {
       await estoqueService.updateAll(model.estoque);
       setModel((s) => ({ ...s, loading: false, editMode: false }));
-    } catch(error: unknown) {
+    } catch (error: unknown) {
       const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
       setModel((s) => ({
         ...s,

@@ -86,7 +86,6 @@
   color: var(--text-primary);
 }
 
-
 @media (max-width: 600px) {
   #main-content {
     padding: var(--space-4) var(--space-3);

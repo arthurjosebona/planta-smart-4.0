@@ -52,7 +52,12 @@ export class PedidoService {
       registroCriacao: null,
       registroEntradaExpedicao: null,
       registroSaidaExpedicao: null,
+      expedicao: null,
     };
     return this.repository.createPedido(pedido);
+  }
+
+  async findAll(): Promise<Pedido[]> {
+    return await this.repository.findAll();
   }
 }
