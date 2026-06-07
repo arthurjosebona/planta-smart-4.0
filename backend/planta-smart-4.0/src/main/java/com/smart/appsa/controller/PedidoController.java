@@ -46,9 +46,8 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatusToConcluido(@PathVariable Long id) {
-        pedidoService.updateStatusAsCompleted(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<PedidoResponseDTO> updateStatusToConcluido(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.updateStatusAsCompleted(id));
     }
     
 }

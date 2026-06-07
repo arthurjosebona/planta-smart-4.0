@@ -121,11 +121,12 @@ public class PedidoService {
     }
 
     @Transactional
-    public void updateStatusAsCompleted(Long id) {
+    public PedidoResponseDTO updateStatusAsCompleted(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
         pedido = prepareForCompletion(pedido);
-        pedidoRepository.save(pedido);
+        Pedido updated = pedidoRepository.save(pedido);
+        return PedidoMapper.mapDto(updated);
     }
 
     private Pedido prepareForCompletion(Pedido pedido) {
