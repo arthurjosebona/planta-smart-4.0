@@ -60,4 +60,8 @@ export class PedidoService {
   async findAll(): Promise<Pedido[]> {
     return await this.repository.findAll();
   }
+
+  async iniciarProducao(id: number): Promise<Pedido> {
+    return await this.repository.iniciarProducao(id);
+  }
 }

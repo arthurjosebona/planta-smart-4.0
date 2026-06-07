@@ -1,12 +1,11 @@
 import React from 'react';
 import { PedidoCard } from '@components/organisms/PedidoCard';
-import { ActionButton } from '@components/atoms/ActionButton';
 import { Pedido } from '@entities/Pedido';
 
 interface PedidosSectionProps {
   pedidos: Pedido[];
   loading: boolean;
-  iniciarProducao?: () => void;
+  iniciarProducao: (id: number) => void;
 }
 
 export const PedidosSection: React.FC<PedidosSectionProps> = ({

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PedidosModel, PedidosModelInitial } from '@pages/Pedidos/PedidosModel';
 import { pedidoService } from '@config/diContainer';
 import { HttpError } from '@error/HttpError';
+import { Pedido } from '@entities/Pedido';
 
 export function usePedidosViewModel() {
   const [model, setModel] = useState<PedidosModel>(PedidosModelInitial);
@@ -21,11 +22,12 @@ export function usePedidosViewModel() {
     }
   }
 
-  async function iniciarProducao() {
+  async function iniciarProducao(id: number) {
     setModel((s) => ({ ...s, loading: true, erro: null }));
     try {
-      // await pedidoService.iniciarProducao();
-      setModel((s) => ({ ...s, loading: false, erro: null }));
+      console.log("Iniciando produção: " + id);
+      const atualizado: Pedido = await pedidoService.iniciarProducao(id);
+      setModel((s) => ({ ...s, loading: false, erro: null, pedidos: s.pedidos.map((p) => (p.id === id ? atualizado : p)), }));
     } catch (error: unknown) {
       const mensagem = error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
       setModel((s) => ({ ...s, loading: false, erro: mensagem }));

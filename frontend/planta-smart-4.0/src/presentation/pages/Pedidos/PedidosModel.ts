@@ -4,12 +4,12 @@ export interface PedidosModel {
   pedidos: Pedido[];
   loading: boolean;
   erro: string | null;
-  iniciarProducao: () => Promise<void>;
+  iniciarProducao: (id: number) => Promise<void>;
 }
 
 export const PedidosModelInitial: PedidosModel = {
   pedidos: [],
   loading: false,
   erro: null,
-  iniciarProducao: async () => {},
+  iniciarProducao: async (id: number) => {},
 };

@@ -4,7 +4,7 @@ import { Pedido } from '@entities/Pedido';
 
 interface PedidoCardProps {
   pedido: Pedido;
-  iniciarProducao?: () => void;
+  iniciarProducao: (id: number) => void;
 }
 
 export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
@@ -60,4 +60,4 @@ export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
       />
     </article>
   );
-};
+}

@@ -27,4 +27,9 @@ export class PedidoRepository implements IPedidoRepository {
       await this.httpClient.get<PedidoGetResponseDTO[]>('/api/pedidos');
     return PedidoMapper.mapToEntitiesByGetDTOs(data);
   }
+
+  async iniciarProducao(id: number): Promise<Pedido> {
+    const data: PedidoGetResponseDTO = await this.httpClient.put('/api/pedidos/' + id + '/status', {});
+    return PedidoMapper.mapToEntityByGetDTO(data);
+  }
 }
