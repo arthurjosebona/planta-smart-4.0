@@ -1,6 +1,6 @@
 export interface LaminaGetResponseDto {
-    id: number,
-    cor: string,
-    padrao: string,
-    posicao: string,
+  id: number;
+  cor: string;
+  padrao: string;
+  posicao: string;
 }

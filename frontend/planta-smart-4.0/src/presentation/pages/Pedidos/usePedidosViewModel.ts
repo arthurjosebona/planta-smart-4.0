@@ -16,8 +16,7 @@ export function usePedidosViewModel() {
       const pedidos = await pedidoService.findAll();
       setModel((s) => ({ ...s, pedidos, loading: false }));
     } catch (error: unknown) {
-      const mensagem =
-        error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
+      const mensagem = error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
       setModel((s) => ({ ...s, loading: false, erro: mensagem }));
     }
   }
@@ -28,8 +27,7 @@ export function usePedidosViewModel() {
       // await pedidoService.iniciarProducao();
       setModel((s) => ({ ...s, loading: false, erro: null }));
     } catch (error: unknown) {
-      const mensagem =
-        error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
+      const mensagem = error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
       setModel((s) => ({ ...s, loading: false, erro: mensagem }));
     }
   }

@@ -7,12 +7,12 @@ interface FieldDisplayProps {
   empty?: boolean;
 }
 
-export const FieldDisplay: React.FC<FieldDisplayProps> = ({
+export function FieldDisplay({
   label,
   children,
   highlight = false,
   empty = false,
-}) => {
+}: FieldDisplayProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <span
@@ -34,8 +34,8 @@ export const FieldDisplay: React.FC<FieldDisplayProps> = ({
           color: empty
             ? 'var(--color-muted)'
             : highlight
-            ? 'var(--color-text)'
-            : 'var(--color-text-dim)',
+              ? 'var(--color-text)'
+              : 'var(--color-text-dim)',
           fontWeight: highlight ? 500 : 400,
         }}
       >
@@ -43,4 +43,4 @@ export const FieldDisplay: React.FC<FieldDisplayProps> = ({
       </span>
     </div>
   );
-};
+}

@@ -23,7 +23,8 @@ export class PedidoRepository implements IPedidoRepository {
   }
 
   async findAll(): Promise<Pedido[]> {
-    const data: PedidoGetResponseDTO[] = await this.httpClient.get<PedidoGetResponseDTO[]>('/api/pedidos');
+    const data: PedidoGetResponseDTO[] =
+      await this.httpClient.get<PedidoGetResponseDTO[]>('/api/pedidos');
     return PedidoMapper.mapToEntitiesByGetDTOs(data);
   }
 }

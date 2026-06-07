@@ -1,4 +1,4 @@
-import { Expedicao } from "@entities/Expedicao";
+import { Expedicao } from '@entities/Expedicao';
 
 export interface PedidoCreateResponseDTO {
   id: number;

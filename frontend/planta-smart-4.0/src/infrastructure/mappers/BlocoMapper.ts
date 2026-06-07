@@ -30,8 +30,8 @@ export const BlocoMapper = {
       cor: CorBlocoStringToEnum[dto.cor.toUpperCase()],
       andar: AndarBlocoStringToEnum[dto.andar.toUpperCase()],
       laminas: LaminaMapper.mapLaminasByGetDTO(dto.laminas),
-    }
-  },  
+    };
+  },
 
   mapToEntitiesByGetDTOs(dtos: BlocoGetPedidoResponseDTO[]): Bloco[] {
     const entities: Bloco[] = [];

@@ -16,7 +16,7 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export const CorTampaDot: React.FC<CorTampaDotProps> = ({ cor }) => {
+export function CorTampaDot({ cor }: CorTampaDotProps) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
       <span
@@ -33,4 +33,4 @@ export const CorTampaDot: React.FC<CorTampaDotProps> = ({ cor }) => {
       {capitalize(cor)}
     </span>
   );
-};
+}

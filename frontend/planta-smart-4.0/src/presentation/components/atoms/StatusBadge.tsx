@@ -29,7 +29,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
       {capitalize(StatusPedido[status])}
     </span>
   );
-};
+}
 
 const badgeStyles: Record<string, React.CSSProperties> = {
   pendente: {

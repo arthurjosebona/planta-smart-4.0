@@ -7,5 +7,5 @@ export const routes = [
   { path: '/', element: <Navigate to="/store/" replace /> },
   { path: '/store', element: <StoreView /> },
   { path: '/dashboard', element: <DashboardView /> },
-  { path: '/pedidos', element: <PedidosView />},
+  { path: '/pedidos', element: <PedidosView /> },
 ];

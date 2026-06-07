@@ -44,7 +44,7 @@ export const PedidoMapper = {
       registroCriacao: dto.registroCriacao,
       registroEntradaExpedicao: dto.registroEntradaExpedicao,
       registroSaidaExpedicao: dto.registroSaidaExpedicao,
-    }
+    };
   },
 
   mapToEntitiesByGetDTOs(dtos: PedidoGetResponseDTO[]): Pedido[] {

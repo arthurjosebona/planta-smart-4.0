@@ -4,8 +4,7 @@ import { PedidosSection } from '@components/organisms/PedidosSection';
 import styles from './pedidosView.module.css';
 
 export default function PedidosView() {
-  const { model, iniciarProducao } =
-    usePedidosViewModel();
+  const { model, iniciarProducao } = usePedidosViewModel();
 
   return (
     <main id="main-content" className={styles.main}>

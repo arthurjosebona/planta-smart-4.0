@@ -10,12 +10,12 @@ interface PedidoCardHeaderProps {
   iniciarProducao?: () => void;
 }
 
-export const PedidoCardHeader: React.FC<PedidoCardHeaderProps> = ({
+export function PedidoCardHeader({
   id,
   ordemDeProducao,
   status,
   iniciarProducao,
-}) => {
+}: PedidoCardHeaderProps) {
   return (
     <div
       style={{

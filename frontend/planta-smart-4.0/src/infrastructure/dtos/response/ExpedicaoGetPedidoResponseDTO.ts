@@ -1,3 +1,1 @@
-export interface ExpedicaoGetPedidoResponseDTO {
-    
-}
+export interface ExpedicaoGetPedidoResponseDTO {}

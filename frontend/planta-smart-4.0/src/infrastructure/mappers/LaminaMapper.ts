@@ -5,7 +5,6 @@ import { CorLamina, CorLaminaStringToEnum, CorLaminaToInt } from '@enums/CorLami
 import { PadraoLaminaStringToEnum, PadraoLaminaToInt } from '@enums/PadraoLamina';
 import { PosicaoLaminaStringToEnum, PosicaoLaminaToInt } from '@enums/PosicaoLamina';
 
-
 export const LaminaMapper = {
   mapToCreateRequestDTO(entity: Lamina): LaminaCreateRequestDTO {
     return {
@@ -31,7 +30,7 @@ export const LaminaMapper = {
       cor: CorLaminaStringToEnum[dto.cor.toUpperCase()],
       padrao: PadraoLaminaStringToEnum[dto.padrao.toUpperCase()],
       posicao: PosicaoLaminaStringToEnum[dto.posicao.toUpperCase()],
-    }
+    };
   },
 
   mapLaminasByGetDTO(dtos: LaminaGetResponseDto[]): Lamina[] {
@@ -42,5 +41,5 @@ export const LaminaMapper = {
     });
 
     return entities;
-  }
+  },
 };

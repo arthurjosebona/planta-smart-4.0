@@ -1,4 +1,3 @@
-import React from 'react';
 import { PedidoCardHeader } from '@components/molecules/PedidoCardHeader';
 import { PedidoCardFields } from '@components/molecules/PedidoCardFields';
 import { Pedido } from '@entities/Pedido';
@@ -8,7 +7,7 @@ interface PedidoCardProps {
   iniciarProducao?: () => void;
 }
 
-export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, iniciarProducao }) => {
+export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
   return (
     <article
       style={{
@@ -53,7 +52,7 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, iniciarProducao 
       <PedidoCardFields
         tipo={pedido.tipo}
         corTampa={pedido.corTampa}
-        numBlocos={pedido.blocos.length}
+        blocos={pedido.blocos}
         expedicaoId={pedido.expedicao?.id ?? null}
         registroCriacao={pedido.registroCriacao!}
         registroEntradaExpedicao={pedido.registroEntradaExpedicao}
