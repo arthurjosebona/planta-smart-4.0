@@ -1,0 +1,14 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #3a3a46;
+  border-radius: 2px;
+  flex-shrink: 0;
+}

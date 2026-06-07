@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePedidosViewModel } from '@pages/Pedidos/usePedidosViewModel';
-import { PedidosSection } from '@components/organisms/PedidosSection';
+import { PedidosSection } from '@components/organisms/PedidoSection/PedidosSection';
 import styles from './pedidosView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 

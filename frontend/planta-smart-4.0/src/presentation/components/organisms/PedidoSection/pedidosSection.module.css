@@ -1,0 +1,48 @@
+.section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.accentLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  opacity: 0.4;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.stateMsg {
+  color: var(--color-muted-2);
+  font-style: italic;
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.stateMsgEmpty {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}

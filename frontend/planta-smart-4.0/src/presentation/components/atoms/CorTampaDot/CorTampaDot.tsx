@@ -1,5 +1,6 @@
 import React from 'react';
 import { CorTampa } from '@enums/CorTampa';
+import styles from './CorTampaDot.module.css';
 
 interface CorTampaDotProps {
   cor: CorTampa;
@@ -18,17 +19,10 @@ function capitalize(str: string): string {
 
 export function CorTampaDot({ cor }: CorTampaDotProps) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+    <span className={styles.wrapper}>
       <span
-        style={{
-          display: 'inline-block',
-          width: 10,
-          height: 10,
-          background: corMap[cor] ?? '#2a2a32',
-          border: '1px solid #3a3a46',
-          borderRadius: 2,
-          flexShrink: 0,
-        }}
+        className={styles.dot}
+        style={{ background: corMap[cor] ?? '#2a2a32' }}
       />
       {capitalize(cor)}
     </span>

@@ -1,10 +1,11 @@
 import React from 'react';
-import { FieldDisplay } from '@components/atoms/FieldDisplay';
-import { CorTampaDot } from '@components/atoms/CorTampaDot';
+import { FieldDisplay } from '@components/atoms/FieldDisplay/FieldDisplay';
+import { CorTampaDot } from '@components/atoms/CorTampaDot/CorTampaDot';
 import { CorTampa } from '@enums/CorTampa';
 import { TipoPedido } from '@enums/TipoPedido';
 import { Bloco } from '@entities/Bloco';
-import { BlocoResumo } from '@components/atoms/BlocoResumo';
+import { BlocoResumo } from '@components/atoms/BlocoResumo/BlocoResumo';
+import styles from './PedidoCardFields.module.css';
 
 interface PedidoCardFieldsProps {
   tipo: TipoPedido;
@@ -41,15 +42,9 @@ export function PedidoCardFields({
   registroSaidaExpedicao,
 }: PedidoCardFieldsProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* campos gerais do pedido */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-          gap: '10px 16px',
-        }}
-      >
+    <div className={styles.root}>
+
+      <div className={styles.fieldsGrid}>
         <FieldDisplay label="Tipo" highlight>
           {capitalize(TipoPedido[tipo])}
         </FieldDisplay>
@@ -66,7 +61,9 @@ export function PedidoCardFields({
           {expedicaoId ?? '—'}
         </FieldDisplay>
 
-        <FieldDisplay label="Registro Criação">{fmtData(registroCriacao)}</FieldDisplay>
+        <FieldDisplay label="Registro Criação">
+          {fmtData(registroCriacao)}
+        </FieldDisplay>
 
         <FieldDisplay label="Entrada Expedição" empty={registroEntradaExpedicao === null}>
           {fmtData(registroEntradaExpedicao)}
@@ -77,14 +74,14 @@ export function PedidoCardFields({
         </FieldDisplay>
       </div>
 
-      {/* resumo de cada bloco */}
       {blocos.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className={styles.blocosList}>
           {blocos.map((bloco, i) => (
             <BlocoResumo key={bloco.id ?? i} bloco={bloco} index={i} />
           ))}
         </div>
       )}
+
     </div>
   );
 }

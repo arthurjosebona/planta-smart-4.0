@@ -25,6 +25,15 @@ const IconEstacoes = (
   </>
 );
 
+const IconDashboard = (
+  <>
+    <rect x="2" y="7" width="6" height="10" rx="1" />
+    <rect x="9" y="3" width="6" height="14" rx="1" />
+    <rect x="16" y="10" width="6" height="7" rx="1" />
+    <line x1="2" y1="21" x2="22" y2="21" />
+  </>
+);
+
 // ─── Rotas ────────────────────────────────────────────────────────────────────
 
 interface NavItem {
@@ -35,9 +44,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: (NavItem | 'separator')[] = [
-  { href: '/pedidos/novo', label: 'Pedidos', icon: IconPedido },
-  { href: '/pedidos/listar', label: 'Listar Pedidos', icon: IconPedido },
+  { href: '/store', label: 'Store', icon: IconPedido },
+  { href: '/pedidos', label: 'Pedidos', icon: IconPedido },
   'separator',
+  { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/estacoes', label: 'Estações', icon: IconEstacoes },
 ];
 
