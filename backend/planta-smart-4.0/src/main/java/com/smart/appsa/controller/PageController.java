@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.smart.appsa.dto.request.EstoqueRequestDTO;
 import com.smart.appsa.mapper.EstoqueMapper;
 import com.smart.appsa.mapper.ExpedicaoMapper;
 import com.smart.appsa.model.Estoque;
@@ -70,13 +71,13 @@ public class PageController {
 
     @PostMapping("/dashboard/editar")
     public String salvarEstoque(@RequestParam List<Long> ids, @RequestParam List<CorEstoque> cores) {
-        List<Estoque> estoque = new ArrayList<>();
+        List<EstoqueRequestDTO> estoque = new ArrayList<>();
 
         for (int i = 0; i < ids.size(); i++) {
             Estoque e = new Estoque();
             e.setId(ids.get(i));
             e.setCorEstoque(cores.get(i));
-            estoque.add(e);
+            estoque.add(EstoqueMapper.mapRequestDTO(e));
         }
         estoqueService.updateAllEstoque(estoque);
         return "redirect:/dashboard";

@@ -6,13 +6,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smart.appsa.dto.request.EstoqueRequestDTO;
 import com.smart.appsa.dto.response.EstoqueResponseDTO;
 import com.smart.appsa.service.EstoqueService;
 
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/estoque")
@@ -40,5 +44,11 @@ public class EstoqueController {
     @GetMapping("/indisponivel")
     public ResponseEntity<List<EstoqueResponseDTO>> findUnavailable() {
         return ResponseEntity.ok(estoqueService.findUnavailable());
+    }
+
+    @PutMapping("")
+    public ResponseEntity<Void> updateAllEstoque(@RequestBody List<EstoqueRequestDTO> estoque) {
+        estoqueService.updateAllEstoque(estoque);
+        return ResponseEntity.noContent().build();
     }
 }

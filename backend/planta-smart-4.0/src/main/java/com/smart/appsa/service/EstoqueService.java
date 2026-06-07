@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smart.appsa.dto.request.EstoqueRequestDTO;
 import com.smart.appsa.dto.response.EstoqueResponseDTO;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.EstoqueMapper;
@@ -66,9 +67,9 @@ public class EstoqueService {
     }
 
     @Transactional
-    public void updateAllEstoque(List<Estoque> estoque) {
-        for (Estoque e : estoque) {
-            assignBlockColor(e.getId(), e.getCorEstoque());
+    public void updateAllEstoque(List<EstoqueRequestDTO> estoque) {
+        for (EstoqueRequestDTO e : estoque) {
+            assignBlockColor(e.id(), e.corEstoque());
         }
     }
 }
