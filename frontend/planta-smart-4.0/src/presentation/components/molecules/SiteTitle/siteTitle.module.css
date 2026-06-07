@@ -1,0 +1,24 @@
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.headerTitle h1 {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.headerTitle h1 span {
+  color: var(--red);
+}
+
+@media (max-width: 900px) {
+  .headerTitle h1 {
+    font-size: 0.85rem;
+  }
+}

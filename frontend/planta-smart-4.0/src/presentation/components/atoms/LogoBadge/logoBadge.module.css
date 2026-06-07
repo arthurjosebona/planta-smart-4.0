@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@900&display=swap');
+
+.logoBox {
+  background: var(--red);
+  border-radius: 7px;
+  padding: 5px 12px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logoWordmark {
+  font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
+  transform: skewX(-8deg);
+  display: inline-block;
+}

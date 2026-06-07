@@ -29,7 +29,10 @@ export class PedidoRepository implements IPedidoRepository {
   }
 
   async iniciarProducao(id: number): Promise<Pedido> {
-    const data: PedidoGetResponseDTO = await this.httpClient.put('/api/pedidos/' + id + '/status', {});
+    const data: PedidoGetResponseDTO = await this.httpClient.put(
+      '/api/pedidos/' + id + '/status',
+      {}
+    );
     return PedidoMapper.mapToEntityByGetDTO(data);
   }
 }

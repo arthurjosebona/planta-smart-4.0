@@ -25,9 +25,14 @@ export function usePedidosViewModel() {
   async function iniciarProducao(id: number) {
     setModel((s) => ({ ...s, loading: true, erro: null }));
     try {
-      console.log("Iniciando produção: " + id);
+      console.log('Iniciando produção: ' + id);
       const atualizado: Pedido = await pedidoService.iniciarProducao(id);
-      setModel((s) => ({ ...s, loading: false, erro: null, pedidos: s.pedidos.map((p) => (p.id === id ? atualizado : p)), }));
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        erro: null,
+        pedidos: s.pedidos.map((p) => (p.id === id ? atualizado : p)),
+      }));
     } catch (error: unknown) {
       const mensagem = error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
       setModel((s) => ({ ...s, loading: false, erro: mensagem }));

@@ -1,0 +1,6 @@
+.navIcon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
