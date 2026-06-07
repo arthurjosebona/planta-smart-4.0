@@ -11,3 +11,10 @@ export const CorEstoqueToInt: Record<CorEstoque, number> = {
   [CorEstoque.Vermelho]: 2,
   [CorEstoque.Azul]: 3,
 };
+
+export const CorEstoqueStringToEnum: Record<string, CorEstoque> = {
+  VAZIO: CorEstoque.Vazio,
+  PRETO: CorEstoque.Preto,
+  VERMELHO: CorEstoque.Vermelho,
+  AZUL: CorEstoque.Azul,
+};

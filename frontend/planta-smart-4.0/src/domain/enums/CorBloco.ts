@@ -9,3 +9,9 @@ export const CorBlocoToInt: Record<CorBloco, number> = {
   [CorBloco.Vermelho]: 2,
   [CorBloco.Azul]: 3,
 };
+
+export const CorBlocoStringToEnum: Record<string, CorBloco> = {
+  PRETO: CorBloco.Preto,
+  VERMELHO: CorBloco.Vermelho,
+  AZUL: CorBloco.Azul,
+};

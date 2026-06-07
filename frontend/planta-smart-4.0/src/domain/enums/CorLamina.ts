@@ -15,3 +15,12 @@ export const CorLaminaToInt: Record<CorLamina, number> = {
   [CorLamina.Preto]: 5,
   [CorLamina.Branco]: 6,
 };
+
+export const CorLaminaStringToEnum: Record<string, CorLamina> = {
+  VERMELHO: CorLamina.Vermelho,
+  AZUL: CorLamina.Azul,
+  AMARELO: CorLamina.Amarelo,
+  VERDE: CorLamina.Verde,
+  PRETO: CorLamina.Preto,
+  BRANCO: CorLamina.Branco,
+};
