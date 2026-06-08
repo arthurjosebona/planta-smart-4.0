@@ -1,88 +1,70 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@reference "@styles/global.css";
 
-/* ── Variáveis globais ─────────────────────────────────────────────────────── */
-/* Declaradas aqui pois são consumidas por todos os filhos via var()           */
 :global(:root) {
-  --red: #e8001d;
-  --red-dim: rgba(232, 0, 29, 0.18);
-  --red-border: rgba(232, 0, 29, 0.4);
-  --nav-height: 110px;
-  --font: 'DM Sans', 'Segoe UI', sans-serif;
+  --header-h: 80px;
 }
 
-/* ── Espaçamento do body ───────────────────────────────────────────────────── */
-:global(body) {
-  padding-top: var(--nav-height);
-  font-family: var(--font);
-  background: #181818;
-}
-
-/* ── Shell do header ───────────────────────────────────────────────────────── */
 .siteHeader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  font-family: var(--font);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+  @apply fixed top-0 left-0 right-0 z-1000;
+  font-family: var(--font-sans);
+  background: var(--color-nav-bg-top);
+  border-bottom: 2px solid var(--color-nav-red);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
-/* ── Barra superior ────────────────────────────────────────────────────────── */
-.headerTop {
-  background: #0f0f0f;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2rem;
-  height: 66px;
+/* ─── Strip único ──────────────────────────────────────── */
+.inner {
+  @apply flex items-center;
+  height: var(--header-h);
+  padding: 0 1.75rem;
+  gap: 0.5rem;
 }
 
-/* ── Barra de navegação ────────────────────────────────────────────────────── */
-.headerNav {
-  background: #141414;
-  border-bottom: 2px solid var(--red);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 2rem;
-  height: 44px;
+/* título empurra o nav para a direita */
+.inner > :first-child {
+  margin-right: auto;
+}
+
+.nav {
+  @apply flex items-center;
   gap: 0.15rem;
 }
 
-/* ── Responsivo ────────────────────────────────────────────────────────────── */
+/* hambúrguer oculto no desktop */
+.menuBtn {
+  @apply hidden;
+}
+
+/* ─── Mobile ───────────────────────────────────────────── */
 @media (max-width: 768px) {
-  :global(:root) {
-    --nav-height: 66px;
+  .menuBtn {
+    @apply flex items-center;
+    margin-left: auto;
   }
 
-  .headerTop {
-    height: 66px;
-  }
-
-  .headerNav {
-    position: absolute;
-    top: 66px;
-    left: 0;
-    right: 0;
-    height: auto;
-    justify-content: flex-start;
-    flex-direction: column;
-    align-items: stretch;
+  .nav {
+    @apply absolute left-0 right-0 flex-col items-stretch;
+    top: var(--header-h);
+    background: var(--color-nav-bg-top);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 2px solid var(--color-nav-red);
     padding: 0.6rem 1.25rem 0.8rem;
     gap: 0.2rem;
+    visibility: hidden;
     transform: translateY(-110%);
     opacity: 0;
     pointer-events: none;
+    will-change: transform, opacity;
     transition:
-      transform 0.25s ease,
-      opacity 0.25s ease;
+      transform var(--ease-slow),
+      opacity var(--ease-slow),
+      visibility var(--ease-slow);
   }
 
-  .headerNav.open {
+  .nav.open {
+    visibility: visible;
     transform: translateY(0);
     opacity: 1;
-    pointer-events: all;
+    pointer-events: auto;
   }
 }

@@ -1,0 +1,43 @@
+@reference "@styles/global.css";
+
+.btnPrimary {
+  @apply inline-flex items-center rounded cursor-pointer font-semibold transition-all;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  background: var(--color-accent);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 2px 8px var(--color-accent-dim);
+  transition:
+    background var(--ease-fast),
+    box-shadow var(--ease-fast),
+    transform var(--ease-fast);
+}
+.btnPrimary:hover {
+  background: #6aa0ff;
+  box-shadow: 0 4px 14px var(--color-accent-glow);
+  transform: translateY(-1px);
+}
+
+.btnGhost {
+  @apply inline-flex items-center rounded cursor-pointer font-medium transition-all;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  border: 1px solid var(--color-border-hover);
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition:
+    background var(--ease-fast),
+    color var(--ease-fast),
+    border-color var(--ease-fast);
+}
+.btnGhost:hover {
+  background: var(--color-bg-raised);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-focus);
+}

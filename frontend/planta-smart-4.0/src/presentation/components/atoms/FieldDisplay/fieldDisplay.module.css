@@ -1,30 +1,27 @@
+@reference "@styles/global.css";
+
 .field {
-  display: flex;
-  flex-direction: column;
+  @apply flex flex-col;
   gap: 3px;
 }
 
 .label {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  font-weight: 500;
+  @apply text-[10px] tracking-[0.10em] uppercase font-medium;
+  color: var(--color-text-muted);
 }
 
 .value {
   font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--color-text-dim);
-  font-weight: 400;
+  @apply text-[12px] font-normal;
+  color: var(--color-text-secondary);
 }
 
 .valueHighlight {
-  color: var(--color-text);
-  font-weight: 500;
+  color: var(--color-text-primary);
+  @apply font-medium;
 }
 
 .valueEmpty {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
 }

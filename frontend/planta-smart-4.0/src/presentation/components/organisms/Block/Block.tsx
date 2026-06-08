@@ -4,30 +4,25 @@ import { ConfigBloco } from '@valueObjects/ConfigBloco';
 import { PlasticMat } from '@components/atoms/PlasticMat/PlasticMat';
 import { Blade } from '@components/molecules/Blade/Blade';
 
-// ─── Mapas de cor ─────────────────────────────────────────────────────────────
-
+// Alinhado com --color-bloco-* e --color-lamina-* do global.css
 const COR_BLOCO_HEX: Record<string, string> = {
-  preto: '#484848',
-  vermelho: '#e6463f',
-  azul: '#0065d7',
+  preto:    '#252527',
+  vermelho: '#CC2222',
+  azul:     '#1A55CC',
 };
 
 const COR_LAMINA_HEX: Record<string, string> = {
-  vermelho: '#e6463f',
-  azul: '#1a55cc',
-  amarelo: '#e6b800',
-  verde: '#229944',
-  preto: '#484848',
-  branco: '#f0f0ee',
+  vermelho: '#E6463F',
+  azul:     '#1A55CC',
+  amarelo:  '#E6B800',
+  verde:    '#229944',
+  preto:    '#484848',
+  branco:   '#F0F0EE',
 };
-
-// ─── Block ────────────────────────────────────────────────────────────────────
-// Organism: base + colunas + lâmina traseira + lâminas coloridas.
 
 interface BlockProps {
   config: ConfigBloco;
   blockY: number;
-  // dimensões recebidas do BlockScene pai
   blockW?: number;
   blockD?: number;
   blockH?: number;
@@ -50,10 +45,8 @@ export function Block({
   bladeT = 0.08,
   bladeRecess = -0.14,
 }: BlockProps) {
-  const hex = COR_BLOCO_HEX[config.cor];
-  const bodyH = blockH - baseT;
-
-  // props de dimensão compartilhadas com os filhos Blade
+  const hex    = COR_BLOCO_HEX[config.cor] ?? '#252527';
+  const bodyH  = blockH - baseT;
   const bladeProps = { blockW, blockD, blockH, baseT, colW, bladeT, bladeRecess };
 
   return (
@@ -102,7 +95,7 @@ export function Block({
           <Blade
             key={face}
             face={face}
-            cor={COR_LAMINA_HEX[lamina.cor]}
+            cor={COR_LAMINA_HEX[lamina.cor] ?? '#F0F0EE'}
             padrao={lamina.padrao}
             blockY={blockY}
             {...bladeProps}

@@ -1,10 +1,6 @@
-/* Blade.module.css */
-/* Reservado para overlays HTML sobre uma lâmina (ex: swatch de cor, label de padrão). */
+@reference "@styles/global.css";
 
 .bladeOverlay {
-  pointer-events: none;
-  position: absolute;
-  font-size: 0.75rem;
-  color: #fff;
+  @apply pointer-events-none absolute text-[0.75rem] text-white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }

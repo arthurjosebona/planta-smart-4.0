@@ -18,7 +18,8 @@
       "@service/*": ["./src/service/*"],
       "@repositoriesImp/*": ["./src/infrastructure/repositories/*"],
       "@config/*": ["./src/config/*"],
-      "@error/*": ["./src/domain/error/*"]
+      "@error/*": ["./src/domain/error/*"],
+      "@styles/*": ["./src/styles/*"]
     }
   },
   "include": ["src", "src/vite-env.d.ts"]

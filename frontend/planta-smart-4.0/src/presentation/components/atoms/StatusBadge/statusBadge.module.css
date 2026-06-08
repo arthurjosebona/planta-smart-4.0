@@ -1,34 +1,42 @@
+@reference "@styles/global.css";
+
 .badge {
-  display: inline-block;
+  font-family: var(--font-mono);
+  @apply inline-block rounded font-medium;
   padding: 3px 9px;
   font-size: 11px;
-  font-family: var(--font-mono);
   letter-spacing: 0.06em;
-  border-radius: var(--radius-sm);
   border: 1px solid transparent;
-  font-weight: 500;
+  transition: box-shadow var(--ease-fast);
 }
 
+/* Pendente */
+.Pendente,
 .pendente {
-  background: rgba(250, 177, 34, 0.12);
-  border-color: rgba(250, 177, 34, 0.3);
-  color: #fab122;
+  background: var(--color-status-pendente-bg);
+  border-color: var(--color-status-pendente-border);
+  color: var(--color-status-pendente-text);
 }
 
+/* Em produção */
+.Producao,
 .em_producao {
-  background: rgba(91, 142, 248, 0.12);
-  border-color: rgba(91, 142, 248, 0.3);
-  color: #5b8ef8;
+  background: var(--color-status-producao-bg);
+  border-color: var(--color-status-producao-border);
+  color: var(--color-status-producao-text);
 }
 
+/* Concluído */
+.Concluido,
 .concluido {
-  background: rgba(52, 211, 153, 0.12);
-  border-color: rgba(52, 211, 153, 0.3);
-  color: #34d399;
+  background: var(--color-status-concluido-bg);
+  border-color: var(--color-status-concluido-border);
+  color: var(--color-status-concluido-text);
 }
 
+/* Cancelado */
 .cancelado {
-  background: rgba(248, 91, 91, 0.12);
-  border-color: rgba(248, 91, 91, 0.3);
-  color: #f85b5b;
+  background: var(--color-danger-dim);
+  border-color: rgba(224, 91, 91, 0.28);
+  color: var(--color-danger);
 }

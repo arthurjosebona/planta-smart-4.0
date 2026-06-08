@@ -17,33 +17,38 @@ export default function DashboardView() {
 
   if (model.loading && model.estoque.length === 0) {
     return (
-      <main id="main-content">
-        <p className={styles['loading-msg']}>Carregando…</p>
-      </main>
+      <AppTemplate>
+        <main id="main-content">
+          <p className={styles['loading-msg']}>Carregando…</p>
+        </main>
+      </AppTemplate>
     );
   }
 
   return (
     <AppTemplate>
-      <main id="main-content">
+      <main id="main-content" className={styles.main}> {/* ← estava sem className */}
         {model.erro && (
           <div className="erro-banner" role="alert">
             {model.erro}
           </div>
         )}
-        <EstoqueSection
-          estoque={model.estoque}
-          editMode={model.editMode}
-          selectedIds={model.selectedIds}
-          loading={model.loading}
-          onEnterEdit={enterEditMode}
-          onCancel={cancelEditMode}
-          onToggleBloco={toggleBlocoSelection}
-          onChangeColor={changeBlockColor}
-          onClean={cleanEstoque}
-          onSave={saveEstoque}
-        />
-        <ExpedicaoSection expedicao={model.expedicao} />
+
+        <div className={styles.sections}> {/* ← wrapper novo */}
+          <EstoqueSection
+            estoque={model.estoque}
+            editMode={model.editMode}
+            selectedIds={model.selectedIds}
+            loading={model.loading}
+            onEnterEdit={enterEditMode}
+            onCancel={cancelEditMode}
+            onToggleBloco={toggleBlocoSelection}
+            onChangeColor={changeBlockColor}
+            onClean={cleanEstoque}
+            onSave={saveEstoque}
+          />
+          <ExpedicaoSection expedicao={model.expedicao} />
+        </div>
       </main>
     </AppTemplate>
   );

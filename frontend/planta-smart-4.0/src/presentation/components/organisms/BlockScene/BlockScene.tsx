@@ -3,12 +3,11 @@ import { StoreModel } from '@pages/Store/StoreModel';
 import { Block } from '../Block/Block';
 import { Tampa } from '@components/atoms/Tampa/Tampa';
 
-// ─── Mapas de cor ─────────────────────────────────────────────────────────────
-
+// Alinhado com --color-nav-red, --color-bloco-azul, --color-bloco-preto
 const COR_TAMPA_HEX: Record<string, string> = {
-  preto: '#484848',
-  vermelho: '#e6463f',
-  azul: '#1a55cc',
+  preto:    '#252527',
+  vermelho: '#CC2222',
+  azul:     '#1A55CC',
 };
 
 interface BlockSceneProps {
@@ -48,10 +47,9 @@ export function BlockScene({
     return offsets;
   }, [numBlocos, blockH]);
 
-  const totalH = blockH * numBlocos;
+  const totalH  = blockH * numBlocos;
   const centerY = -totalH / 2;
 
-  // props de dimensão compartilhadas com Block
   const blockDimProps = { blockW, blockD, blockH, baseT, colW, colRadius, bladeT, bladeRecess };
 
   return (
@@ -60,7 +58,7 @@ export function BlockScene({
         <Block key={i} config={blocos[i]} blockY={blockOffsets[i]} {...blockDimProps} />
       ))}
       <Tampa
-        color={COR_TAMPA_HEX[corTampa]}
+        color={COR_TAMPA_HEX[corTampa] ?? '#252527'}
         y={totalH}
         blockW={blockW}
         blockD={blockD}

@@ -1,17 +1,17 @@
+@reference "@styles/global.css";
+
 .root {
-  display: flex;
-  flex-direction: column;
+  @apply flex flex-col;
   gap: 14px;
 }
 
 .fieldsGrid {
-  display: grid;
+  @apply grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 10px 16px;
 }
 
 .blocosList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  @apply flex flex-col;
+  gap: var(--spacing-2);
 }

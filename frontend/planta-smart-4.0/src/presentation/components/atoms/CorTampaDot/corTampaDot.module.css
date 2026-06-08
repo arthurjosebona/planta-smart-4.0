@@ -1,14 +1,14 @@
+@reference "@styles/global.css";
+
 .wrapper {
-  display: inline-flex;
-  align-items: center;
+  @apply inline-flex items-center;
   gap: 5px;
 }
 
 .dot {
-  display: inline-block;
+  @apply inline-block shrink-0;
   width: 10px;
   height: 10px;
-  border: 1px solid #3a3a46;
+  border: 1px solid var(--color-bloco-preto-border);
   border-radius: 2px;
-  flex-shrink: 0;
 }

@@ -11,34 +11,36 @@ import Section from '@components/molecules/Section/Section';
 import ColorSwatch from '@components/atoms/ColorSwatch/ColorSwatch';
 import styles from '@components/organisms/OrderForm/orderForm.module.css';
 
-// ─── Color palettes ───────────────────────────────────────────────────────────
+// ─── Palettes — alinhadas com @theme do global.css ────────────────────────────
 
-const COR_BLOCO: Record<CorBloco, string> = {
-  [CorBloco.Preto]: '#1a1a1a',
-  [CorBloco.Vermelho]: '#cc2222',
-  [CorBloco.Azul]: '#1a55cc',
+const COR_BLOCO_HEX: Record<CorBloco, string> = {
+  [CorBloco.Preto]:    '#252527',
+  [CorBloco.Vermelho]: '#CC2222',
+  [CorBloco.Azul]:     '#1A55CC',
 };
 
-const COR_LAMINA: Record<CorLamina, string> = {
-  [CorLamina.Vermelho]: '#cc2222',
-  [CorLamina.Azul]: '#1a55cc',
-  [CorLamina.Amarelo]: '#e6b800',
-  [CorLamina.Verde]: '#229944',
-  [CorLamina.Preto]: '#1a1a1a',
-  [CorLamina.Branco]: '#f0f0ee',
+const COR_LAMINA_HEX: Record<CorLamina, string> = {
+  [CorLamina.Vermelho]: '#E6463F',
+  [CorLamina.Azul]:     '#1A55CC',
+  [CorLamina.Amarelo]:  '#E6B800',
+  [CorLamina.Verde]:    '#229944',
+  [CorLamina.Preto]:    '#484848',
+  [CorLamina.Branco]:   '#F0F0EE',
 };
 
-const COR_TAMPA: Record<CorTampa, string> = {
-  [CorTampa.Preto]: '#1a1a1a',
-  [CorTampa.Vermelho]: '#cc2222',
-  [CorTampa.Azul]: '#1a55cc',
+const COR_TAMPA_HEX: Record<CorTampa, string> = {
+  [CorTampa.Preto]:    '#252527',
+  [CorTampa.Vermelho]: '#CC2222',
+  [CorTampa.Azul]:     '#1A55CC',
 };
 
 const FACE_LABELS: Record<PosicaoLamina, string> = {
-  [PosicaoLamina.Frente]: 'Frente',
+  [PosicaoLamina.Frente]:   'Frente',
   [PosicaoLamina.Esquerda]: 'Esquerda',
-  [PosicaoLamina.Direita]: 'Direita',
+  [PosicaoLamina.Direita]:  'Direita',
 };
+
+// ─── Props ────────────────────────────────────────────────────────────────────
 
 interface OrderFormProps {
   state: StoreModel;
@@ -52,11 +54,13 @@ interface OrderFormProps {
   createPedido: () => void;
 }
 
-const FACES = Object.values(PosicaoLamina) as PosicaoLamina[];
-const PADROES = Object.values(PadraoLamina) as PadraoLamina[];
+const FACES       = Object.values(PosicaoLamina) as PosicaoLamina[];
+const PADROES     = Object.values(PadraoLamina) as PadraoLamina[];
 const CORES_TAMPA = Object.values(CorTampa) as CorTampa[];
 const CORES_BLOCO = Object.values(CorBloco) as CorBloco[];
-const CORES_LAMINA = Object.values(CorLamina) as CorLamina[];
+const CORES_LAMINA= Object.values(CorLamina) as CorLamina[];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function OrderForm({
   state,
@@ -71,6 +75,7 @@ export function OrderForm({
 }: OrderFormProps) {
   return (
     <div className={styles.root}>
+
       {/* ── Ordem de produção ── */}
       <Section title="Ordem de produção">
         <input
@@ -107,7 +112,7 @@ export function OrderForm({
           {CORES_TAMPA.map((cor) => (
             <ColorSwatch
               key={cor}
-              color={COR_TAMPA[cor]}
+              color={COR_TAMPA_HEX[cor]}
               selected={state.corTampa === cor}
               onClick={() => setCorTampa(cor)}
               title={cor}
@@ -119,13 +124,14 @@ export function OrderForm({
 
       <Divider />
 
-      {/* ── Configuração de cada bloco ── */}
+      {/* ── Blocos ── */}
       {Array.from({ length: state.numBlocos }, (_, i) => {
         const bloco = state.blocos[i];
         return (
           <div key={i}>
             {i > 0 && <Divider />}
             <Section title={`Bloco ${i + 1}`}>
+
               {/* Cor do bloco */}
               <div className={styles.corBlocoWrapper}>
                 <div className={styles.fieldLabel}>Cor do bloco</div>
@@ -133,7 +139,7 @@ export function OrderForm({
                   {CORES_BLOCO.map((cor) => (
                     <ColorSwatch
                       key={cor}
-                      color={COR_BLOCO[cor]}
+                      color={COR_BLOCO_HEX[cor]}
                       selected={bloco.cor === cor}
                       onClick={() => setBlocoColor(i, cor)}
                       title={cor as string}
@@ -148,7 +154,9 @@ export function OrderForm({
                 const lamina = bloco.laminas[face];
                 return (
                   <div key={face} className={styles.laminaCard}>
-                    <div className={styles.laminaTitle}>Lâmina — {FACE_LABELS[face]}</div>
+                    <div className={styles.laminaTitle}>
+                      Lâmina — {FACE_LABELS[face]}
+                    </div>
 
                     {/* Cor da lâmina */}
                     <div className={styles.laminaCorRow}>
@@ -162,7 +170,7 @@ export function OrderForm({
                       {CORES_LAMINA.map((cor) => (
                         <ColorSwatch
                           key={cor}
-                          color={COR_LAMINA[cor]}
+                          color={COR_LAMINA_HEX[cor]}
                           selected={lamina.cor === cor}
                           onClick={() => setLaminaCor(i, face, cor)}
                           title={cor}
@@ -171,7 +179,7 @@ export function OrderForm({
                       ))}
                     </div>
 
-                    {/* Padrão — apenas se houver cor */}
+                    {/* Padrão */}
                     {lamina.cor !== null && (
                       <div>
                         <div className={styles.padraoLabel}>Padrão</div>
@@ -204,7 +212,7 @@ export function OrderForm({
           disabled={state.loading}
           className={`${styles.submitBtn} ${state.loading ? styles.submitBtnLoading : ''}`}
         >
-          {state.loading ? 'Criando...' : 'Criar pedido'}
+          {state.loading ? 'Criando…' : 'Criar pedido'}
         </button>
       </div>
 
@@ -212,30 +220,10 @@ export function OrderForm({
       <Divider />
       <div className={styles.debug}>
         <div className={styles.debugTitle}>debug</div>
-        <div>
-          loading:{' '}
-          <span className={state.loading ? styles.debugLoading : styles.debugOk}>
-            {String(state.loading)}
-          </span>
-        </div>
-        <div>
-          sucesso:{' '}
-          <span className={state.sucesso ? styles.debugOk : styles.debugMuted}>
-            {String(state.sucesso)}
-          </span>
-        </div>
-        <div>
-          erro:{' '}
-          <span className={state.erro ? styles.debugError : styles.debugMuted}>
-            {state.erro ?? 'null'}
-          </span>
-        </div>
-        <div>
-          pedidoCriado:{' '}
-          <span className={state.pedidoCriado ? styles.debugOk : styles.debugMuted}>
-            {state.pedidoCriado ? `id ${state.pedidoCriado.id}` : 'null'}
-          </span>
-        </div>
+        <div>loading: <span className={state.loading ? styles.debugLoading : styles.debugMuted}>{String(state.loading)}</span></div>
+        <div>sucesso: <span className={state.sucesso ? styles.debugOk : styles.debugMuted}>{String(state.sucesso)}</span></div>
+        <div>erro: <span className={state.erro ? styles.debugError : styles.debugMuted}>{state.erro ?? 'null'}</span></div>
+        <div>pedidoCriado: <span className={state.pedidoCriado ? styles.debugOk : styles.debugMuted}>{state.pedidoCriado ? `id ${state.pedidoCriado.id}` : 'null'}</span></div>
       </div>
     </div>
   );

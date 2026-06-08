@@ -1,37 +1,31 @@
+@reference "@styles/global.css";
+
 .hamburger {
-  display: none;
-  flex-direction: column;
+  @apply hidden flex-col bg-transparent border-none cursor-pointer rounded-md;
   gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
 }
 
 .hamburger span {
-  display: block;
+  @apply block rounded-sm;
   width: 22px;
   height: 2px;
   background: #aaa;
-  border-radius: 2px;
-  transition: all 0.25s ease;
+  transition: all var(--ease-base);
 }
 
 .hamburger.open span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
-
 .hamburger.open span:nth-child(2) {
-  opacity: 0;
+  @apply opacity-0;
 }
-
 .hamburger.open span:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
 
 @media (max-width: 768px) {
   .hamburger {
-    display: flex;
+    @apply flex;
   }
 }

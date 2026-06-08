@@ -1,7 +1,7 @@
 import { OrderForm } from '@components/organisms/OrderForm/OrderForm';
 import { OrderViewer } from '@components/organisms/OrderViewer/OrderViewer';
 import { useStoreViewModel } from './useStoreViewModel';
-import styles from './StoreView.module.css';
+import styles from './storeView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 
 export default function StoreView() {

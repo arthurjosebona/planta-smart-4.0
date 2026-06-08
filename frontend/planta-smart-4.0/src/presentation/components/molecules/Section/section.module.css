@@ -1,0 +1,7 @@
+@reference "@styles/global.css";
+
+.section {
+  @apply flex flex-col;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}

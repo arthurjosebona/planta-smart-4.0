@@ -1,194 +1,215 @@
+@reference "@styles/global.css";
+
 .root {
-  width: 280px;
-  min-width: 280px;
-  height: 100%;
-  overflow-y: auto;
-  padding: 16px 14px;
+  @apply flex flex-col h-full overflow-y-auto;
+  width: 300px;
+  min-width: 300px;
+  padding: var(--spacing-4);
   box-sizing: border-box;
-  background: #fafafa;
-  border-right: 1px solid #e4e4e4;
-  font-family: system-ui, sans-serif;
+  background: var(--color-bg-surface);
+  border-right: 1px solid var(--color-border);
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: #222;
+  color: var(--color-text-primary);
 }
 
 /* ── Ordem de produção ── */
 .input {
-  width: 100%;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  @apply w-full rounded-md border outline-none transition-all;
+  padding: 7px 10px;
   font-size: 14px;
+  font-family: var(--font-mono);
+  background: var(--color-bg-raised);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
   box-sizing: border-box;
-  outline: none;
+  transition:
+    border-color var(--ease-fast),
+    box-shadow var(--ease-fast);
+}
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-dim);
 }
 
 /* ── Número de blocos ── */
 .numBlocosGroup {
-  display: flex;
-  gap: 8px;
+  @apply flex gap-2;
 }
 
 .numBlocoBtn {
-  flex: 1;
-  padding: 6px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: #fff;
-  color: #444;
-  font-weight: 400;
-  cursor: pointer;
+  @apply flex-1 rounded-md border cursor-pointer font-normal transition-all;
+  padding: 7px 0;
   font-size: 14px;
+  font-family: var(--font-mono);
+  background: var(--color-bg-raised);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  transition:
+    background var(--ease-fast),
+    border-color var(--ease-fast),
+    color var(--ease-fast);
 }
-
+.numBlocoBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
 .numBlocoBtnActive {
-  border: 2px solid #333;
-  background: #222;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   color: #fff;
-  font-weight: 700;
+  @apply font-bold;
+  box-shadow: 0 0 0 1px var(--color-accent-glow);
 }
 
-/* ── Cor da tampa / swatches ── */
+/* ── Swatches de cor ── */
 .swatchRow {
-  display: flex;
-  gap: 8px;
+  @apply flex flex-wrap gap-2;
 }
 
 /* ── Cor do bloco ── */
 .corBlocoWrapper {
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-3);
 }
 
 .fieldLabel {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  @apply text-[11px] tracking-[0.08em] uppercase mb-1.5;
+  color: var(--color-text-muted);
 }
 
 /* ── Lâmina ── */
 .laminaCard {
-  margin-bottom: 10px;
+  @apply rounded-lg;
+  margin-bottom: var(--spacing-2);
   padding: 10px 10px 8px;
-  background: #f0f0f0;
-  border-radius: 8px;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
 }
 
 .laminaTitle {
-  font-size: 12px;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  @apply text-[11px] font-semibold tracking-[0.06em] uppercase mb-1.5;
+  color: var(--color-accent);
 }
 
 .laminaCorRow {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
+  @apply flex flex-wrap gap-1.5 mb-1.5;
 }
 
 .laminaSemCor {
+  @apply rounded border cursor-pointer flex items-center justify-center shrink-0 transition-all;
   width: 26px;
   height: 26px;
-  border-radius: 4px;
-  border: 1px solid #bbb;
-  background: #fff;
-  cursor: pointer;
+  border-color: var(--color-border);
+  background: var(--color-bg-surface);
   font-size: 13px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #aaa;
-  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--ease-fast),
+    color var(--ease-fast);
 }
-
+.laminaSemCor:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-secondary);
+}
 .laminaSemCorActive {
-  border: 2px solid #333;
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
 }
 
 .padraoLabel {
-  font-size: 11px;
-  color: #777;
-  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  @apply text-[10px] tracking-[0.06em] uppercase mb-1;
+  color: var(--color-text-muted);
 }
 
 .padraoGroup {
-  display: flex;
-  gap: 6px;
+  @apply flex gap-1.5 flex-wrap;
 }
 
 .padraoBtn {
-  padding: 3px 8px;
+  @apply rounded border cursor-pointer capitalize transition-all;
+  padding: 4px 9px;
   font-size: 11px;
-  border-radius: 4px;
-  border: 1px solid #bbb;
-  background: #fff;
-  color: #555;
-  cursor: pointer;
-  text-transform: capitalize;
+  font-family: var(--font-mono);
+  background: var(--color-bg-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  transition:
+    background var(--ease-fast),
+    border-color var(--ease-fast),
+    color var(--ease-fast);
 }
-
+.padraoBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
 .padraoBtnActive {
-  border: 2px solid #333;
-  background: #333;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   color: #fff;
 }
 
 /* ── Criar pedido ── */
 .submitWrapper {
-  padding: 8px 0;
+  padding: var(--spacing-2) 0;
 }
 
 .submitBtn {
-  width: 100%;
-  padding: 9px 0;
-  border-radius: 6px;
+  @apply w-full rounded-lg font-bold cursor-pointer transition-all;
+  padding: 10px 0;
   border: none;
-  background: #1a55cc;
-  color: #fff;
-  font-weight: 700;
   font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s;
+  font-family: var(--font-sans);
+  background: var(--color-accent);
+  color: #fff;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px var(--color-accent-dim);
+  transition:
+    background var(--ease-fast),
+    box-shadow var(--ease-fast),
+    transform var(--ease-fast);
 }
-
+.submitBtn:hover:not(:disabled) {
+  background: #6aa0ff;
+  box-shadow: 0 4px 16px var(--color-accent-glow);
+  transform: translateY(-1px);
+}
 .submitBtnLoading {
-  background: #888;
-  cursor: not-allowed;
+  background: var(--color-text-muted);
+  @apply cursor-not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* ── Debug panel ── */
 .debug {
-  background: #1a1a1a;
+  @apply rounded-lg;
+  background: #111315;
   color: #a0e080;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
   padding: 10px 12px;
   font-size: 11px;
-  font-family: monospace;
+  font-family: var(--font-mono);
   line-height: 1.7;
 }
 
 .debugTitle {
-  color: #888;
+  @apply text-[10px] tracking-widest uppercase;
+  color: var(--color-text-muted);
   margin-bottom: 4px;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .debugLoading {
   color: #f0c040;
 }
-
 .debugOk {
   color: #a0e080;
 }
-
 .debugMuted {
-  color: #888;
+  color: var(--color-text-muted);
 }
-
 .debugError {
-  color: #ff6b6b;
+  color: var(--color-danger);
 }

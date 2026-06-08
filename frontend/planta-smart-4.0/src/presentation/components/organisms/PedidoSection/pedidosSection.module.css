@@ -1,48 +1,42 @@
+@reference "@styles/global.css";
+
 .section {
-  background: var(--color-surface);
+  @apply relative rounded-xl;
+  background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  padding: 24px;
-  border-radius: var(--radius-md);
-  position: relative;
+  padding: var(--spacing-6);
 }
 
 .accentLine {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  @apply absolute top-0 left-0 right-0 rounded-t-xl;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
-  opacity: 0.4;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  opacity: 0.35;
 }
 
 .heading {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 20px;
-  color: var(--color-text);
   font-family: var(--font-sans);
+  @apply font-bold tracking-tight;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--spacing-5);
+  color: var(--color-text-primary);
 }
 
 .stateMsg {
-  color: var(--color-muted-2);
-  font-style: italic;
-  font-size: 13px;
-  padding: 24px 0;
-  text-align: center;
   font-family: var(--font-mono);
+  @apply text-[13px] italic text-center;
+  color: var(--color-text-muted);
+  padding: var(--spacing-6) 0;
 }
 
 .stateMsgEmpty {
+  @apply rounded-lg;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
 }
 
 .list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  @apply flex flex-col;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-5);
 }

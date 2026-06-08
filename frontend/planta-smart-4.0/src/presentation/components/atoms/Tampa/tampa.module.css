@@ -1,4 +1,5 @@
+@reference "@styles/global.css";
+
 .tampaWrapper {
-  pointer-events: none;
-  position: absolute;
+  @apply pointer-events-none absolute;
 }

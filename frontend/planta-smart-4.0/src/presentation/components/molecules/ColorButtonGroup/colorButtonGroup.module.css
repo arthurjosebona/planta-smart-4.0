@@ -1,62 +1,54 @@
+@reference "@styles/global.css";
+
 .color-button-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  @apply flex flex-wrap;
+  gap: var(--spacing-2);
 }
 
-/* Base de todos os botões de cor */
-
+/* Base */
 .color-btn {
   font-family: var(--font-mono);
+  @apply font-medium rounded transition-all;
   font-size: 11px;
-  font-weight: 500;
   letter-spacing: 0.05em;
-
-  padding: 5px var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-raised);
-  color: var(--text-secondary);
-
+  padding: 5px var(--spacing-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-raised);
+  color: var(--color-text-secondary);
   transition:
-    color var(--transition-fast),
-    border-color var(--transition-fast),
-    background-color var(--transition-fast);
+    color var(--ease-fast),
+    border-color var(--ease-fast),
+    background-color var(--ease-fast);
 }
 
 .color-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+  @apply opacity-35 cursor-not-allowed;
 }
 
-/* Variante AZUL */
-
+/* Azul */
 .color-btn--azul:hover:not(:disabled) {
   color: #7aaeff;
-  border-color: var(--cor-azul);
-  background-color: var(--cor-azul-dim);
+  border-color: var(--color-bloco-azul);
+  background-color: var(--color-bloco-azul-dim);
 }
 
-/* Variante VERMELHO */
-
+/* Vermelho */
 .color-btn--vermelho:hover:not(:disabled) {
   color: #ff8f8f;
-  border-color: var(--cor-vermelho);
-  background-color: var(--cor-vermelho-dim);
+  border-color: var(--color-bloco-vermelho);
+  background-color: var(--color-bloco-vermelho-dim);
 }
 
-/* Variante PRETO */
-
+/* Preto */
 .color-btn--preto:hover:not(:disabled) {
-  color: var(--text-primary);
+  color: var(--color-text-primary);
   border-color: #555557;
   background-color: rgba(37, 37, 39, 0.5);
 }
 
-/* Variante VAZIO */
-
+/* Vazio */
 .color-btn--vazio:hover:not(:disabled) {
-  color: var(--text-secondary);
-  border-color: var(--border-hover);
-  background-color: var(--bg-raised);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-hover);
+  background-color: var(--color-bg-raised);
 }
