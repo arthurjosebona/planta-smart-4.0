@@ -15,6 +15,7 @@ import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
+import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
@@ -42,7 +43,7 @@ public class PedidoService {
         Pedido pedido = PedidoMapper.mapEntityByRequestDTO(requestDTO);
         pedido.setRegistroCriacao(LocalDateTime.now());
         pedido.setStatus(StatusPedido.PENDENTE);
-        Pedido saved = saveWithExpedition(pedido);
+        Pedido saved = pedidoRepository.save(pedido);
         createBlocks(saved, requestDTO.blocos());
         return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
     }
@@ -68,6 +69,8 @@ public class PedidoService {
             throw new InvalidOrdemDeProducaoException(requestDTO.ordemDeProducao());
         if (requestDTO.tipo().getValue() != requestDTO.blocos().size()) 
             throw new TipoIncompativelComBlocosException(requestDTO.tipo(), requestDTO.blocos().size());
+        if (pedidoRepository.existsByOrdemDeProducao(requestDTO.ordemDeProducao()))
+            throw new BusinessException("Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
         validateDuplicateAndar(requestDTO.blocos());
     }
 
@@ -88,12 +91,7 @@ public class PedidoService {
             throw new DuplicateAndarException(duplicateAndar);
     }
 
-    private Pedido saveWithExpedition(Pedido pedido) {
-        Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
-        pedido.setExpedicao(nextFree);
-        expedicaoService.AssignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
-        return pedidoRepository.save(pedido);
-    }
+    
 
     private void createBlocks(Pedido pedido, List<Bloco> blocos) {
         for (Bloco bloco : blocos) {
@@ -124,14 +122,20 @@ public class PedidoService {
     public PedidoResponseDTO updateStatusAsCompleted(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
-        pedido = prepareForCompletion(pedido);
-        Pedido updated = pedidoRepository.save(pedido);
+        prepareForCompletion(pedido);
+        Pedido updated = saveWithExpedition(pedido);
         return PedidoMapper.mapDto(updated);
     }
 
-    private Pedido prepareForCompletion(Pedido pedido) {
+    private void prepareForCompletion(Pedido pedido) {
         pedido.setStatus(StatusPedido.CONCLUIDO);
         pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
-        return pedido;
+    }
+
+    private Pedido saveWithExpedition(Pedido pedido) {
+        Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
+        pedido.setExpedicao(nextFree);
+        expedicaoService.AssignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
+        return pedidoRepository.save(pedido);
     }
 }       
