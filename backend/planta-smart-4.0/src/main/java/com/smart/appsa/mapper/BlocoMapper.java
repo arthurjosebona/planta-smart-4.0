@@ -10,7 +10,7 @@ public class BlocoMapper {
             .id(entity.getId())
             .cor(entity.getCor())
             .andar(entity.getAndar())
-            .laminas(entity.getLaminas().stream().map(l -> LaminaMapper.mapDto(l)).toList())
+            .laminas(entity.getLaminas() != null ? entity.getLaminas().stream().map(l -> LaminaMapper.mapDto(l)).toList() : null)
             .build();
     }
 }

@@ -13,9 +13,9 @@ import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.exception.DuplicateAndarException;
 import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
+import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
-import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
@@ -70,7 +70,7 @@ public class PedidoService {
         if (requestDTO.tipo().getValue() != requestDTO.blocos().size()) 
             throw new TipoIncompativelComBlocosException(requestDTO.tipo(), requestDTO.blocos().size());
         if (pedidoRepository.existsByOrdemDeProducao(requestDTO.ordemDeProducao()))
-            throw new BusinessException("Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
+            throw new OrdemDeProducaoExistenteException(requestDTO.ordemDeProducao());
         validateDuplicateAndar(requestDTO.blocos());
     }
 

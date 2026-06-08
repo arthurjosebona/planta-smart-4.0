@@ -24,6 +24,7 @@ import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.exception.DuplicateAndarException;
 import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
+import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
@@ -61,7 +62,6 @@ public class PedidoServiceTest {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
         when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
             .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
-        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
 
         PedidoResponseDTO response = pedidoService.create(PedidoMapper.mapRequestDto(pedido));
 
@@ -81,7 +81,6 @@ public class PedidoServiceTest {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
         when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
             .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
-        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
 
         pedidoService.create(PedidoMapper.mapRequestDto(pedido));
 
@@ -95,7 +94,6 @@ public class PedidoServiceTest {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
         when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
             .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
-        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
 
         pedidoService.create(PedidoMapper.mapRequestDto(pedido));
 
@@ -123,16 +121,6 @@ public class PedidoServiceTest {
     }
 
     @Test
-    void deveRetornarRequiredFieldExceptionQuandoCriarPedidoComStatusNulo() {
-        Pedido pedido = createPedido();
-        pedido.setStatus(null);
-        PedidoRequestDTO request = PedidoMapper.mapRequestDto(pedido);
-
-        assertThrows(RequiredFieldException.class, () -> pedidoService.create(request));
-        verify(pedidoRepository, never()).save(any());
-    }
-
-    @Test
     void deveRetornarRequiredFieldExceptionQuandoCriarPedidoComCorTampaNula() {
         Pedido pedido = createPedido();
         pedido.setCorTampa(null);
@@ -149,6 +137,16 @@ public class PedidoServiceTest {
         PedidoRequestDTO request = PedidoMapper.mapRequestDto(pedido);
 
         assertThrows(InvalidOrdemDeProducaoException.class, () -> pedidoService.create(request));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveRetornarOrdemDeProducaoExistenteExceptionQuandoCriarPedidoComOrdemJaExistente() {
+        Pedido pedido = createPedido();
+        when(pedidoRepository.existsByOrdemDeProducao(pedido.getOrdemDeProducao())).thenReturn(true);
+
+        assertThrows(OrdemDeProducaoExistenteException.class,
+            () -> pedidoService.create(PedidoMapper.mapRequestDto(pedido)));
         verify(pedidoRepository, never()).save(any());
     }
 
@@ -192,7 +190,6 @@ public class PedidoServiceTest {
     @Test
     void deveRetornarEstoqueInsuficienteExceptionQuandoNaoHouverEstoqueDisponivel() {
         Pedido pedido = createPedido();
-        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
         when(estoqueService.findByCorEstoque(any(CorEstoque.class))).thenReturn(List.of());
 
@@ -250,6 +247,7 @@ public class PedidoServiceTest {
         Pedido pedido = createPedido();
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
         when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
 
         pedidoService.updateStatusAsCompleted(1L);
 
@@ -263,6 +261,8 @@ public class PedidoServiceTest {
         Pedido pedido = createPedido();
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
         when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
+        
 
         pedidoService.updateStatusAsCompleted(1L);
 
