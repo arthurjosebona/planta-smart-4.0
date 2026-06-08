@@ -1,0 +1,54 @@
+@reference "@styles/global.css";
+
+.color-button-box {
+  @apply flex flex-wrap;
+  gap: var(--spacing-2);
+}
+
+/* Base */
+.color-btn {
+  font-family: var(--font-mono);
+  @apply font-medium rounded transition-all;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 5px var(--spacing-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-raised);
+  color: var(--color-text-secondary);
+  transition:
+    color var(--ease-fast),
+    border-color var(--ease-fast),
+    background-color var(--ease-fast);
+}
+
+.color-btn:disabled {
+  @apply opacity-35 cursor-not-allowed;
+}
+
+/* Azul */
+.color-btn--azul:hover:not(:disabled) {
+  color: #7aaeff;
+  border-color: var(--color-bloco-azul);
+  background-color: var(--color-bloco-azul-dim);
+}
+
+/* Vermelho */
+.color-btn--vermelho:hover:not(:disabled) {
+  color: #ff8f8f;
+  border-color: var(--color-bloco-vermelho);
+  background-color: var(--color-bloco-vermelho-dim);
+}
+
+/* Preto */
+.color-btn--preto:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  border-color: #555557;
+  background-color: rgba(37, 37, 39, 0.5);
+}
+
+/* Vazio */
+.color-btn--vazio:hover:not(:disabled) {
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-hover);
+  background-color: var(--color-bg-raised);
+}

@@ -1,0 +1,31 @@
+@reference "@styles/global.css";
+
+.hamburger {
+  @apply hidden flex-col bg-transparent border-none cursor-pointer rounded-md;
+  gap: 5px;
+  padding: 6px;
+}
+
+.hamburger span {
+  @apply block rounded-sm;
+  width: 22px;
+  height: 2px;
+  background: #aaa;
+  transition: all var(--ease-base);
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  @apply opacity-0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    @apply flex;
+  }
+}

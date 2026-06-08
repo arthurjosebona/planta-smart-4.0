@@ -1,0 +1,27 @@
+@reference "@styles/global.css";
+
+.field {
+  @apply flex flex-col;
+  gap: 3px;
+}
+
+.label {
+  font-family: var(--font-mono);
+  @apply text-[10px] tracking-[0.10em] uppercase font-medium;
+  color: var(--color-text-muted);
+}
+
+.value {
+  font-family: var(--font-mono);
+  @apply text-[12px] font-normal;
+  color: var(--color-text-secondary);
+}
+
+.valueHighlight {
+  color: var(--color-text-primary);
+  @apply font-medium;
+}
+
+.valueEmpty {
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,23 @@
+@reference "@styles/global.css";
+
+.headerTitle {
+  @apply flex items-center;
+  gap: 14px;
+}
+
+.headerTitle h1 {
+  @apply text-white font-bold whitespace-nowrap;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.headerTitle h1 span {
+  color: var(--color-nav-red);
+}
+
+@media (max-width: 900px) {
+  .headerTitle h1 {
+    font-size: 0.85rem;
+  }
+}

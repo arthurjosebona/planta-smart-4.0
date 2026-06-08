@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@entities/*": ["./src/domain/entities/*"],
+      "@repositories/*": ["./src/domain/repositories/*"],
+      "@enums/*": ["./src/domain/enums/*"],
+      "@components/*": ["./src/presentation/components/*"],
+      "@pages/*": ["./src/presentation/pages/*"],
+      "@router/*": ["./src/presentation/router/*"],
+      "@valueObjects/*": ["./src/domain/valueObjects/*"],
+      "@http/*": ["./src/infrastructure/http/*"],
+      "@dtos/*": ["./src/infrastructure/dtos/*"],
+      "@service/*": ["./src/service/*"],
+      "@repositoriesImp/*": ["./src/infrastructure/repositories/*"],
+      "@config/*": ["./src/config/*"],
+      "@error/*": ["./src/domain/error/*"],
+      "@styles/*": ["./src/styles/*"]
+    }
+  },
+  "include": ["src", "src/vite-env.d.ts"]
+}

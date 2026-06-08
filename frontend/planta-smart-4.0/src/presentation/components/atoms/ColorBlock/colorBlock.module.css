@@ -1,0 +1,27 @@
+@reference "@styles/global.css";
+
+.block {
+  @apply block flex-shrink-0 rounded;
+  width: 28px;
+  height: 28px;
+  transition: transform var(--ease-fast);
+}
+
+/* Variantes de cor */
+.color-AZUL {
+  background-color: var(--color-bloco-azul);
+}
+
+.color-VERMELHO {
+  background-color: var(--color-bloco-vermelho);
+}
+
+.color-PRETO {
+  background-color: var(--color-bloco-preto);
+  border: 1px solid var(--color-bloco-preto-border);
+}
+
+.color-VAZIO {
+  background-color: var(--color-estoque-vazio);
+  border: 1px dashed var(--color-estoque-vazio-border);
+}

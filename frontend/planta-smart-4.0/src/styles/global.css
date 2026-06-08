@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --color-bloco-azul: #1a55cc;
+  --color-bloco-azul-dim: rgba(26, 85, 204, 0.12);
+  --color-bloco-vermelho: #cc2222;
+  --color-bloco-vermelho-dim: rgba(204, 34, 34, 0.12);
+  --color-bloco-preto: #252527;
+  --color-bloco-preto-border: #3a3a3c;
+
+  --color-lamina-vermelho: #e6463f;
+  --color-lamina-azul: #1a55cc;
+  --color-lamina-amarelo: #e6b800;
+  --color-lamina-verde: #229944;
+  --color-lamina-preto: #484848;
+  --color-lamina-branco: #f0f0ee;
+
+  --color-estoque-vazio: #2c2d30;
+  --color-estoque-vazio-border: rgba(255, 255, 255, 0.1);
+
+  --color-bg-page: #0e0f11;
+  --color-bg-surface: #161719;
+  --color-bg-raised: #1e2023;
+  --color-bg-overlay: rgba(14, 15, 17, 0.85);
+
+  --color-text-primary: #e8e8e6;
+  --color-text-secondary: #9a9996;
+  --color-text-muted: #5c5b58;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.18);
+  --color-border-focus: rgba(255, 255, 255, 0.35);
+
+  --color-accent: #4f8ef7;
+  --color-accent-dim: rgba(79, 142, 247, 0.12);
+  --color-accent-glow: rgba(79, 142, 247, 0.25);
+  --color-success: #4caf7d;
+  --color-warning: #e8a045;
+  --color-danger: #e05b5b;
+  --color-danger-dim: rgba(224, 91, 91, 0.1);
+
+  --color-nav-bg-top: #0f0f0f;
+  --color-nav-bg-bar: #141414;
+  --color-nav-red: #e8001d;
+  --color-nav-red-dim: rgba(232, 0, 29, 0.18);
+  --color-nav-red-border: rgba(232, 0, 29, 0.4);
+  --color-nav-height: 110px;
+
+  --color-status-pendente-bg: rgba(250, 177, 34, 0.1);
+  --color-status-pendente-border: rgba(250, 177, 34, 0.28);
+  --color-status-pendente-text: #fab122;
+  --color-status-producao-bg: rgba(91, 142, 248, 0.1);
+  --color-status-producao-border: rgba(91, 142, 248, 0.28);
+  --color-status-producao-text: #5b8ef8;
+  --color-status-concluido-bg: rgba(52, 211, 153, 0.1);
+  --color-status-concluido-border: rgba(52, 211, 153, 0.28);
+  --color-status-concluido-text: #34d399;
+
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Cascadia Code', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+
+  --ease-fast: 0.12s ease;
+  --ease-base: 0.18s ease;
+  --ease-slow: 0.28s ease;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-accent: 0 0 0 1px var(--color-accent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding-top: var(--color-nav-height);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.main-content {
+  @apply max-w-240 mx-auto flex flex-col gap-10;
+  padding: var(--spacing-6) var(--spacing-5);
+}
+
+.section {
+  @apply flex flex-col;
+  gap: var(--spacing-4);
+}
+
+.title {
+  font-family: var(--font-mono);
+  @apply text-[11px] font-medium tracking-[0.12em] uppercase;
+  color: var(--color-text-muted);
+}
+
+.erro-banner {
+  font-family: var(--font-mono);
+  @apply text-[12px] rounded-lg;
+  background: var(--color-danger-dim);
+  border: 1px solid rgba(224, 91, 91, 0.25);
+  color: var(--color-danger);
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+.loading-msg {
+  font-family: var(--font-mono);
+  @apply text-[12px] text-center;
+  color: var(--color-text-muted);
+  padding: 48px 0;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

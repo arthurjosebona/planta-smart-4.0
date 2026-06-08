@@ -1,0 +1,42 @@
+@reference "@styles/global.css";
+
+.section {
+  @apply relative rounded-xl;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-6);
+}
+
+.accentLine {
+  @apply absolute top-0 left-0 right-0 rounded-t-xl;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  opacity: 0.35;
+}
+
+.heading {
+  font-family: var(--font-sans);
+  @apply font-bold tracking-tight;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--spacing-5);
+  color: var(--color-text-primary);
+}
+
+.stateMsg {
+  font-family: var(--font-mono);
+  @apply text-[13px] italic text-center;
+  color: var(--color-text-muted);
+  padding: var(--spacing-6) 0;
+}
+
+.stateMsgEmpty {
+  @apply rounded-lg;
+  border: 1px solid var(--color-border);
+}
+
+.list {
+  @apply flex flex-col;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-5);
+}

@@ -1,0 +1,12 @@
+@reference "@styles/global.css";
+
+.blockBadge {
+  @apply absolute flex items-center justify-center pointer-events-none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+}

@@ -1,0 +1,7 @@
+@reference "@styles/global.css";
+
+.divider {
+  @apply border-none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--spacing-4) 0;
+}

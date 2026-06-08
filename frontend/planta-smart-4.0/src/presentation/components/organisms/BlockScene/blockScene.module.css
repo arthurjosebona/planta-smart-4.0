@@ -1,0 +1,8 @@
+@reference "@styles/global.css";
+
+.sceneHud {
+  @apply pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.04em;
+}

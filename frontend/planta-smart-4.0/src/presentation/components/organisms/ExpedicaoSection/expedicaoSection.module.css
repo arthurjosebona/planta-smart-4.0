@@ -1,0 +1,9 @@
+@reference "@styles/global.css";
+
+.expedicao {
+  @apply flex flex-col rounded-xl;
+  gap: var(--spacing-4);
+  padding: var(--spacing-5);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+}

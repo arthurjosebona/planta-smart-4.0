@@ -1,0 +1,95 @@
+@reference "@styles/global.css";
+
+.button-box {
+  @apply flex items-center justify-between;
+  gap: var(--spacing-3);
+}
+
+.button-box__group {
+  @apply flex;
+  gap: var(--spacing-2);
+}
+
+.edit,
+.save,
+.clear,
+.cancel {
+  font-family: var(--font-mono);
+  @apply font-medium rounded transition-all;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 7px var(--spacing-4);
+  border: 1px solid transparent;
+  transition:
+    background-color var(--ease-fast),
+    border-color var(--ease-fast),
+    color var(--ease-fast),
+    opacity var(--ease-fast),
+    transform var(--ease-fast);
+}
+
+.edit:disabled,
+.save:disabled,
+.clear:disabled,
+.cancel:disabled {
+  @apply opacity-40 cursor-not-allowed;
+}
+
+.edit {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+.edit:hover:not(:disabled) {
+  background: #6aa0ff;
+  border-color: #6aa0ff;
+  transform: translateY(-1px);
+}
+
+.save {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #0a1f14;
+}
+.save:hover:not(:disabled) {
+  background: #5dc48e;
+  border-color: #5dc48e;
+  transform: translateY(-1px);
+}
+
+.clear {
+  background: transparent;
+  border-color: rgba(232, 160, 69, 0.25);
+  color: var(--color-warning);
+}
+.clear:hover:not(:disabled) {
+  background: rgba(232, 160, 69, 0.08);
+  border-color: var(--color-warning);
+}
+
+.cancel {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+.cancel:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 600px) {
+  .button-box {
+    @apply flex-col items-stretch;
+  }
+
+  .button-box__group {
+    justify-content: stretch;
+  }
+
+  .edit,
+  .save,
+  .clear,
+  .cancel {
+    @apply w-full text-center;
+  }
+}

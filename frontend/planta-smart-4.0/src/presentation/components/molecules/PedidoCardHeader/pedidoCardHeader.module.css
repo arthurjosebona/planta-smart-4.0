@@ -1,0 +1,32 @@
+@reference "@styles/global.css";
+
+.header {
+  @apply flex items-center justify-between flex-wrap;
+  gap: var(--spacing-2);
+}
+
+.headerLeft {
+  @apply flex items-center flex-wrap;
+  gap: 10px;
+}
+
+.idTag {
+  font-family: var(--font-mono);
+  @apply text-[11px] rounded;
+  color: var(--color-text-muted);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  padding: 2px 7px;
+}
+
+.ordemDeProducao {
+  font-family: var(--font-mono);
+  @apply text-[14px] font-semibold;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.actions {
+  @apply flex;
+  gap: 6px;
+}

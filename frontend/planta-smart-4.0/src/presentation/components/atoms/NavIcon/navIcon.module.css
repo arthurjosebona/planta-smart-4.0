@@ -1,0 +1,8 @@
+@reference "@styles/global.css";
+
+.navIcon {
+  @apply shrink-0;
+  width: 15px;
+  height: 15px;
+  transition: transform var(--ease-base);
+}

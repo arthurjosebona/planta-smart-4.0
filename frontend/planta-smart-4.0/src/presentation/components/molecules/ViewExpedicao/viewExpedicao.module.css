@@ -1,0 +1,6 @@
+@reference "@styles/global.css";
+
+.view-expedicao {
+  @apply flex flex-wrap;
+  gap: var(--spacing-2);
+}

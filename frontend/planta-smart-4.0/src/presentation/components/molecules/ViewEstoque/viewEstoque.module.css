@@ -1,0 +1,7 @@
+@reference "@styles/global.css";
+
+.view-estoque {
+  @apply grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: var(--spacing-2);
+}

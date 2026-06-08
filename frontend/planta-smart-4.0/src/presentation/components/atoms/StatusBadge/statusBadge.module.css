@@ -1,0 +1,42 @@
+@reference "@styles/global.css";
+
+.badge {
+  font-family: var(--font-mono);
+  @apply inline-block rounded font-medium;
+  padding: 3px 9px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border: 1px solid transparent;
+  transition: box-shadow var(--ease-fast);
+}
+
+/* Pendente */
+.Pendente,
+.pendente {
+  background: var(--color-status-pendente-bg);
+  border-color: var(--color-status-pendente-border);
+  color: var(--color-status-pendente-text);
+}
+
+/* Em produção */
+.Producao,
+.em_producao {
+  background: var(--color-status-producao-bg);
+  border-color: var(--color-status-producao-border);
+  color: var(--color-status-producao-text);
+}
+
+/* Concluído */
+.Concluido,
+.concluido {
+  background: var(--color-status-concluido-bg);
+  border-color: var(--color-status-concluido-border);
+  color: var(--color-status-concluido-text);
+}
+
+/* Cancelado */
+.cancelado {
+  background: var(--color-danger-dim);
+  border-color: rgba(224, 91, 91, 0.28);
+  color: var(--color-danger);
+}

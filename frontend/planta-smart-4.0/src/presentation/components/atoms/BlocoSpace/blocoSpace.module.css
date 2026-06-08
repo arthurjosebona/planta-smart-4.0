@@ -1,0 +1,72 @@
+@reference "@styles/global.css";
+
+.space {
+  @apply relative flex flex-col items-center rounded-lg;
+  gap: var(--spacing-2);
+  padding: 10px var(--spacing-2);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  transition:
+    border-color var(--ease-base),
+    background var(--ease-base),
+    box-shadow var(--ease-base);
+}
+
+/* Modo edição */
+.space--editable {
+  @apply cursor-pointer select-none;
+}
+
+.space--editable:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-bg-raised);
+}
+
+.space--editable:hover .block {
+  transform: scale(1.1);
+}
+
+/* Selecionado */
+.space--selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-dim);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* Indicador ✓ */
+.space__check {
+  @apply absolute flex items-center justify-center;
+  top: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--ease-fast),
+    transform var(--ease-fast);
+}
+
+.space--selected .space__check {
+  @apply opacity-100;
+  transform: scale(1);
+}
+
+/* Label de posição */
+.space-label {
+  font-family: var(--font-mono);
+  @apply text-[10px] leading-none;
+  color: var(--color-text-muted);
+}
+
+/* Foco via teclado */
+.space--editable:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

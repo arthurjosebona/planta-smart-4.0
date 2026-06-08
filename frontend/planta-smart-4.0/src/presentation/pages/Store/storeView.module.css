@@ -1,0 +1,24 @@
+@reference "@styles/global.css";
+
+.page {
+  @apply w-full min-h-screen;
+  padding: var(--spacing-5);
+  background: var(--color-bg-page);
+  box-sizing: border-box;
+}
+
+.heading {
+  font-family: var(--font-sans);
+  @apply font-bold tracking-tight;
+  font-size: 1.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-5);
+  letter-spacing: -0.02em;
+}
+
+.configurator {
+  @apply flex flex-row w-full overflow-hidden rounded-xl;
+  height: 580px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+}

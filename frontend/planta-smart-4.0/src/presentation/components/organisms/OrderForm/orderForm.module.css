@@ -1,0 +1,215 @@
+@reference "@styles/global.css";
+
+.root {
+  @apply flex flex-col h-full overflow-y-auto;
+  width: 300px;
+  min-width: 300px;
+  padding: var(--spacing-4);
+  box-sizing: border-box;
+  background: var(--color-bg-surface);
+  border-right: 1px solid var(--color-border);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+/* ── Ordem de produção ── */
+.input {
+  @apply w-full rounded-md border outline-none transition-all;
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  background: var(--color-bg-raised);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  transition:
+    border-color var(--ease-fast),
+    box-shadow var(--ease-fast);
+}
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-dim);
+}
+
+/* ── Número de blocos ── */
+.numBlocosGroup {
+  @apply flex gap-2;
+}
+
+.numBlocoBtn {
+  @apply flex-1 rounded-md border cursor-pointer font-normal transition-all;
+  padding: 7px 0;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  background: var(--color-bg-raised);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  transition:
+    background var(--ease-fast),
+    border-color var(--ease-fast),
+    color var(--ease-fast);
+}
+.numBlocoBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+.numBlocoBtnActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  @apply font-bold;
+  box-shadow: 0 0 0 1px var(--color-accent-glow);
+}
+
+/* ── Swatches de cor ── */
+.swatchRow {
+  @apply flex flex-wrap gap-2;
+}
+
+/* ── Cor do bloco ── */
+.corBlocoWrapper {
+  margin-bottom: var(--spacing-3);
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  @apply text-[11px] tracking-[0.08em] uppercase mb-1.5;
+  color: var(--color-text-muted);
+}
+
+/* ── Lâmina ── */
+.laminaCard {
+  @apply rounded-lg;
+  margin-bottom: var(--spacing-2);
+  padding: 10px 10px 8px;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+}
+
+.laminaTitle {
+  font-family: var(--font-mono);
+  @apply text-[11px] font-semibold tracking-[0.06em] uppercase mb-1.5;
+  color: var(--color-accent);
+}
+
+.laminaCorRow {
+  @apply flex flex-wrap gap-1.5 mb-1.5;
+}
+
+.laminaSemCor {
+  @apply rounded border cursor-pointer flex items-center justify-center shrink-0 transition-all;
+  width: 26px;
+  height: 26px;
+  border-color: var(--color-border);
+  background: var(--color-bg-surface);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--ease-fast),
+    color var(--ease-fast);
+}
+.laminaSemCor:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-secondary);
+}
+.laminaSemCorActive {
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
+}
+
+.padraoLabel {
+  font-family: var(--font-mono);
+  @apply text-[10px] tracking-[0.06em] uppercase mb-1;
+  color: var(--color-text-muted);
+}
+
+.padraoGroup {
+  @apply flex gap-1.5 flex-wrap;
+}
+
+.padraoBtn {
+  @apply rounded border cursor-pointer capitalize transition-all;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: var(--color-bg-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  transition:
+    background var(--ease-fast),
+    border-color var(--ease-fast),
+    color var(--ease-fast);
+}
+.padraoBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+.padraoBtnActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* ── Criar pedido ── */
+.submitWrapper {
+  padding: var(--spacing-2) 0;
+}
+
+.submitBtn {
+  @apply w-full rounded-lg font-bold cursor-pointer transition-all;
+  padding: 10px 0;
+  border: none;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  background: var(--color-accent);
+  color: #fff;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px var(--color-accent-dim);
+  transition:
+    background var(--ease-fast),
+    box-shadow var(--ease-fast),
+    transform var(--ease-fast);
+}
+.submitBtn:hover:not(:disabled) {
+  background: #6aa0ff;
+  box-shadow: 0 4px 16px var(--color-accent-glow);
+  transform: translateY(-1px);
+}
+.submitBtnLoading {
+  background: var(--color-text-muted);
+  @apply cursor-not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Debug panel ── */
+.debug {
+  @apply rounded-lg;
+  background: #111315;
+  color: #a0e080;
+  border: 1px solid var(--color-border);
+  padding: 10px 12px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  line-height: 1.7;
+}
+
+.debugTitle {
+  @apply text-[10px] tracking-widest uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.debugLoading {
+  color: #f0c040;
+}
+.debugOk {
+  color: #a0e080;
+}
+.debugMuted {
+  color: var(--color-text-muted);
+}
+.debugError {
+  color: var(--color-danger);
+}

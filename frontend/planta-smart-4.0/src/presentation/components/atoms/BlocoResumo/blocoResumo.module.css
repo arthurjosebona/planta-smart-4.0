@@ -1,0 +1,45 @@
+@reference "@styles/global.css";
+
+.card {
+  @apply flex flex-col rounded-lg;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  padding: 10px 12px;
+  gap: var(--spacing-2);
+}
+
+.cardTitle {
+  font-family: var(--font-mono);
+  @apply text-[10px] font-semibold tracking-[0.12em] uppercase;
+  color: var(--color-accent);
+}
+
+.fieldsGrid {
+  @apply grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 6px 12px;
+}
+
+.laminasList {
+  @apply flex flex-col;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.laminaRow {
+  @apply grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 4px 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border);
+}
+
+.laminaTitle {
+  grid-column: 1 / -1;
+}
+
+.laminaTitleText {
+  font-family: var(--font-mono);
+  @apply text-[10px] font-medium tracking-[0.08em] uppercase;
+  color: var(--color-text-muted);
+}
