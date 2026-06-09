@@ -2,7 +2,8 @@
 
 .page {
   @apply w-full min-h-screen;
-  padding: var(--spacing-5);
+  padding-left: var(--spacing-6);
+  padding-right: var(--spacing-6);
   background: var(--color-bg-page);
   box-sizing: border-box;
 }

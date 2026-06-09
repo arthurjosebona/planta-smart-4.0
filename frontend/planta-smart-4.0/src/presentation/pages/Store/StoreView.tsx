@@ -20,8 +20,6 @@ export default function StoreView() {
   return (
     <AppTemplate>
       <div className={styles.page}>
-        <h1 className={styles.heading}>Configurador 3D de Blocos</h1>
-
         <div className={styles.configurator}>
           <OrderForm
             state={model}

@@ -8,5 +8,4 @@
 .container {
   @apply w-full mx-auto flex-1;
   max-width: 1200px;
-  padding: calc(var(--header-h) + var(--spacing-6)) var(--spacing-5) var(--spacing-6);
 }

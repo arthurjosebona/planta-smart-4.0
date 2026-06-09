@@ -3,7 +3,6 @@
 .main {
   @apply mx-auto flex flex-col;
   max-width: 960px;
-  padding: var(--spacing-6) var(--spacing-5);
   gap: var(--spacing-6);
 }
 
