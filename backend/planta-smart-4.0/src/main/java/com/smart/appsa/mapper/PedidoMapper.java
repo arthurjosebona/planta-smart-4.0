@@ -58,25 +58,21 @@ public class PedidoMapper {
     }
 
     public static PedidoInfoDTO mapToInfoDTOByEntity(Pedido entity) {
-        for (Bloco b : entity.getBlocos()) {
-            System.out.println(b.getAndar().getValue());
-        }
-        
         Bloco bloco1 = entity.getBlocos()
             .stream()
-            .filter(b -> b.getAndar() == AndarBloco.PRIMEIRO)
+            .filter(b -> b.getAndar().getValue() == 1)
             .findFirst()
             .orElseThrow(() -> new BusinessException("Pedido não possui bloco com primeiro andar"));
 
         Bloco bloco2 = entity.getBlocos()
             .stream()
-            .filter(b -> b.getAndar() == AndarBloco.SEGUNDO)   // ← bug corrigido
+            .filter(b -> b.getAndar().getValue() == 2)   
             .findFirst()
             .orElse(null);
 
         Bloco bloco3 = entity.getBlocos()
             .stream()
-            .filter(b -> b.getAndar() == AndarBloco.TERCEIRO)  // ← bug corrigido
+            .filter(b -> b.getAndar().getValue() == 3)  
             .findFirst()
             .orElse(null);
 
