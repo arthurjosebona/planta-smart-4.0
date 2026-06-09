@@ -57,10 +57,13 @@ export function useStoreViewModel() {
     setModel((s) => ({ ...s, ordemDeProducao: n }));
   }
 
+  function dismissFeedback() {
+    setModel((s) => ({ ...s, erro: null, sucesso: false }));
+  }
+
   async function createPedido() {
     setModel((s) => ({ ...s, loading: true, sucesso: false, erro: null }));
     try {
-      console.log('blocos raw:', JSON.stringify(model.blocos.slice(0, model.numBlocos), null, 2));
       const blocos = model.blocos.slice(0, model.numBlocos).map((bloco) => ({
         ...bloco,
         laminas: Object.fromEntries(
@@ -92,7 +95,6 @@ export function useStoreViewModel() {
       setModel((s) => ({ ...s, loading: false, sucesso: true, erro: null, pedidoCriado: pedido }));
     } catch (error: unknown) {
       const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
-
       setModel((s) => ({
         ...s,
         loading: false,
@@ -112,5 +114,6 @@ export function useStoreViewModel() {
     setLaminaPadrao,
     setOrdemDeProducao,
     createPedido,
+    dismissFeedback,
   };
 }

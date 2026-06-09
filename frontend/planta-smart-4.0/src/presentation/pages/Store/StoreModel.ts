@@ -45,3 +45,20 @@ export const StoreModelInitial: StoreModel = {
   sucesso: false,
   pedidoCriado: null,
 };
+
+
+export interface PedidoConfig {
+  ordemDeProducao: number;
+  numBlocos: 1 | 2 | 3;
+  corTampa: CorTampa;
+  blocos: [ConfigBloco, ConfigBloco, ConfigBloco];
+}
+
+export const PEDIDO_CONFIG_CACHE_KEY = 'pedido_config';
+
+export const defaultPedidoConfig: PedidoConfig = { 
+  ordemDeProducao: 1,
+  numBlocos: 1,
+  corTampa: CorTampa.Azul,
+  blocos: [createDefaultBlock(), createDefaultBlock(), createDefaultBlock()],
+};
