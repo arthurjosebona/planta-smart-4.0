@@ -54,13 +54,12 @@ interface OrderFormProps {
   createPedido: () => void;
 }
 
-const FACES       = Object.values(PosicaoLamina) as PosicaoLamina[];
-const PADROES     = Object.values(PadraoLamina) as PadraoLamina[];
-const CORES_TAMPA = Object.values(CorTampa) as CorTampa[];
-const CORES_BLOCO = Object.values(CorBloco) as CorBloco[];
-const CORES_LAMINA= Object.values(CorLamina) as CorLamina[];
+const FACES        = Object.values(PosicaoLamina) as PosicaoLamina[];
+const PADROES      = Object.values(PadraoLamina)  as PadraoLamina[];
+const CORES_TAMPA  = Object.values(CorTampa)      as CorTampa[];
+const CORES_BLOCO  = Object.values(CorBloco)      as CorBloco[];
+const CORES_LAMINA = Object.values(CorLamina)     as CorLamina[];
 
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function OrderForm({
   state,
@@ -124,7 +123,6 @@ export function OrderForm({
 
       <Divider />
 
-      {/* ── Blocos ── */}
       {Array.from({ length: state.numBlocos }, (_, i) => {
         const bloco = state.blocos[i];
         return (
@@ -204,7 +202,6 @@ export function OrderForm({
         );
       })}
 
-      {/* ── Criar pedido ── */}
       <Divider />
       <div className={styles.submitWrapper}>
         <button
@@ -214,16 +211,6 @@ export function OrderForm({
         >
           {state.loading ? 'Criando…' : 'Criar pedido'}
         </button>
-      </div>
-
-      {/* ── Debug panel ── */}
-      <Divider />
-      <div className={styles.debug}>
-        <div className={styles.debugTitle}>debug</div>
-        <div>loading: <span className={state.loading ? styles.debugLoading : styles.debugMuted}>{String(state.loading)}</span></div>
-        <div>sucesso: <span className={state.sucesso ? styles.debugOk : styles.debugMuted}>{String(state.sucesso)}</span></div>
-        <div>erro: <span className={state.erro ? styles.debugError : styles.debugMuted}>{state.erro ?? 'null'}</span></div>
-        <div>pedidoCriado: <span className={state.pedidoCriado ? styles.debugOk : styles.debugMuted}>{state.pedidoCriado ? `id ${state.pedidoCriado.id}` : 'null'}</span></div>
       </div>
     </div>
   );

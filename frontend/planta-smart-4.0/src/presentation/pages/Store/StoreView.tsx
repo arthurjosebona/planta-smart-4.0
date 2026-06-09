@@ -1,5 +1,6 @@
 import { OrderForm } from '@components/organisms/OrderForm/OrderForm';
 import { OrderViewer } from '@components/organisms/OrderViewer/OrderViewer';
+import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
 import { useStoreViewModel } from './useStoreViewModel';
 import styles from './storeView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
@@ -15,11 +16,33 @@ export default function StoreView() {
     setLaminaPadrao,
     setOrdemDeProducao,
     createPedido,
+    dismissFeedback,
   } = useStoreViewModel();
 
   return (
     <AppTemplate>
       <div className={styles.page}>
+        <h1 className={styles.heading}>Configurador 3D de Blocos</h1>
+
+        {model.erro && (
+          <FeedbackBanner
+            variant="error"
+            message={model.erro}
+            onDismiss={dismissFeedback}
+          />
+        )}
+        {model.sucesso && !model.erro && (
+          <FeedbackBanner
+            variant="success"
+            message={
+              model.pedidoCriado
+                ? `Pedido #${model.pedidoCriado.id} criado com sucesso.`
+                : 'Pedido criado com sucesso.'
+            }
+            onDismiss={dismissFeedback}
+          />
+        )}
+
         <div className={styles.configurator}>
           <OrderForm
             state={model}

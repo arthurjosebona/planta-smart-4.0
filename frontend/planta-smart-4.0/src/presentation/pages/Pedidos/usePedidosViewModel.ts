@@ -35,9 +35,13 @@ export function usePedidosViewModel() {
         pedidos: s.pedidos.map((p) => (p.id === id ? atualizado : p)),
       }));
     } catch (error: unknown) {
-      const mensagem = error instanceof HttpError ? error.message : 'Erro ao carregar pedidos.';
+      const mensagem = error instanceof HttpError ? error.message : 'Erro ao iniciar produção.';
       setModel((s) => ({ ...s, loading: false, erro: mensagem }));
     }
+  }
+
+  function dismissErro() {
+    setModel((s) => ({ ...s, erro: null }));
   }
 
   function setStatusPedidoFiltro(tipo: StatusPedido | null) {
@@ -55,6 +59,7 @@ export function usePedidosViewModel() {
   return {
     model,
     iniciarProducao,
+    dismissErro,
     pedidosFiltrados,
     setStatusPedidoFiltro,
   };

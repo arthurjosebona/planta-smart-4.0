@@ -1,6 +1,7 @@
 import { useDashboardViewModel } from '@pages/Dashboard/useDashboardViewModel';
 import { EstoqueSection } from '@components/organisms/EstoqueSection/EstoqueSection';
 import { ExpedicaoSection } from '@components/organisms/ExpedicaoSection/ExpedicaoSection';
+import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
 import styles from './dashboardView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 
@@ -13,6 +14,7 @@ export default function DashboardView() {
     changeBlockColor,
     cleanEstoque,
     saveEstoque,
+    dismissErro,
   } = useDashboardViewModel();
 
   if (model.loading && model.estoque.length === 0) {
@@ -27,14 +29,16 @@ export default function DashboardView() {
 
   return (
     <AppTemplate>
-      <main id="main-content" className={styles.main}> {/* ← estava sem className */}
+      <main id="main-content" className={styles.main}>
         {model.erro && (
-          <div className="erro-banner" role="alert">
-            {model.erro}
-          </div>
+          <FeedbackBanner
+            variant="error"
+            message={model.erro}
+            onDismiss={dismissErro}
+          />
         )}
 
-        <div className={styles.sections}> {/* ← wrapper novo */}
+        <div className={styles.sections}>
           <EstoqueSection
             estoque={model.estoque}
             editMode={model.editMode}

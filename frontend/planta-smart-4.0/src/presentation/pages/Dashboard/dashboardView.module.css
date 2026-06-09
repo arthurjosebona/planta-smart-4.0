@@ -3,10 +3,10 @@
 .main {
   @apply mx-auto flex flex-col;
   max-width: 960px;
-  gap: var(--spacing-6);
+  padding: 0 var(--spacing-5) var(--spacing-6);
+  gap: var(--spacing-4);
 }
 
-/* ─── novo ─── */
 .sections {
   @apply flex flex-row items-start;
   gap: var(--spacing-6);
@@ -14,7 +14,7 @@
 
 .sections > * {
   flex: 1;
-  min-width: 0; /* evita overflow do conteúdo interno */
+  min-width: 0;
 }
 
 @media (max-width: 768px) {
@@ -22,27 +22,7 @@
     flex-direction: column;
   }
 }
-/* ──────────── */
 
-.header {
-  @apply flex items-center justify-between;
-  padding-bottom: var(--spacing-5);
-  margin-bottom: var(--spacing-6);
-  border-bottom: 1px solid var(--color-border);
-}
-.header__logo {
-  font-family: var(--font-mono);
-  @apply text-[12px] font-medium tracking-[0.10em] uppercase;
-  color: var(--color-text-muted);
-}
-.header__tag {
-  font-family: var(--font-mono);
-  @apply text-[10px] font-medium rounded-full;
-  padding: 2px var(--spacing-2);
-  background: var(--color-accent-dim);
-  color: var(--color-accent);
-  letter-spacing: 0.04em;
-}
 .loading-msg {
   @apply text-center;
   padding: 64px 0;

@@ -28,6 +28,10 @@ export function useDashboardViewModel() {
     }
   }
 
+  function dismissErro() {
+    setModel((s) => ({ ...s, erro: null }));
+  }
+
   // ── Edição de estoque ──────────────────────────────────────────────────────
   function enterEditMode() {
     setModel((s) => ({ ...s, editMode: true, selectedIds: [] }));
@@ -53,7 +57,6 @@ export function useDashboardViewModel() {
       estoque: s.estoque.map((bloco) =>
         s.selectedIds.includes(bloco.id) ? { ...bloco, cor: cor } : bloco
       ),
-      // Desseleciona após aplicar a cor
       selectedIds: [],
     }));
   }
@@ -91,5 +94,6 @@ export function useDashboardViewModel() {
     changeBlockColor,
     cleanEstoque,
     saveEstoque,
+    dismissErro,
   };
 }

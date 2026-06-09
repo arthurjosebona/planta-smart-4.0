@@ -1,66 +1,30 @@
-// useStoreViewModel.ts
 import { useState } from 'react';
-import {
-  StoreModel,
-  StoreModelInitial,
-  PedidoConfig,
-  PEDIDO_CONFIG_CACHE_KEY,
-  defaultPedidoConfig,
-} from './StoreModel';
-import { CorTampa }      from '@enums/CorTampa';
-import { CorBloco }      from '@enums/CorBloco';
+import { StoreModel, StoreModelInitial } from './StoreModel';
+import { CorTampa } from '@enums/CorTampa';
+import { CorBloco } from '@enums/CorBloco';
 import { PosicaoLamina } from '@enums/PosicaoLamina';
-import { CorLamina }     from '@enums/CorLamina';
-import { PadraoLamina }  from '@enums/PadraoLamina';
-import { ConfigBloco }   from '@valueObjects/ConfigBloco';
+import { CorLamina } from '@enums/CorLamina';
+import { PadraoLamina } from '@enums/PadraoLamina';
+import { ConfigBloco } from '@valueObjects/ConfigBloco';
 import { pedidoService } from '@config/diContainer';
-import { Pedido }        from '@entities/Pedido';
-import { HttpError }     from '@error/HttpError';
-import { cacheService } from '@config/diContainer';
-
-const PEDIDO_CONFIG_TTL = 1000 * 60 * 15; // 15 min
-
-function loadInitialModel(): StoreModel {
-  const cached = cacheService.get<PedidoConfig>(PEDIDO_CONFIG_CACHE_KEY);
-  return cached
-    ? { ...StoreModelInitial, ...cached }
-    : StoreModelInitial;
-}
-
-function persistConfig(model: StoreModel): void {
-  const { ordemDeProducao, numBlocos, corTampa, blocos } = model;
-  cacheService.set<PedidoConfig>(
-    PEDIDO_CONFIG_CACHE_KEY,
-    { ordemDeProducao, numBlocos, corTampa, blocos },
-    { ttl: PEDIDO_CONFIG_TTL }
-  );
-}
+import { Pedido } from '@entities/Pedido';
+import { HttpError } from '@error/HttpError';
 
 export function useStoreViewModel() {
-  const [model, setModel] = useState<StoreModel>(loadInitialModel);
-
-  function update(updater: (s: StoreModel) => StoreModel) {
-    setModel((s) => {
-      const next = updater(s);
-      persistConfig(next);
-      return next;
-    });
-  }
+  const [model, setModel] = useState<StoreModel>(StoreModelInitial);
 
   function setNumBlocos(n: 1 | 2 | 3) {
-    update((s) => ({ ...s, numBlocos: n }));
+    setModel((s) => ({ ...s, numBlocos: n }));
   }
 
   function setCorTampa(cor: CorTampa) {
-    update((s) => ({ ...s, corTampa: cor }));
+    setModel((s) => ({ ...s, corTampa: cor }));
   }
 
   function setBlocoField(idx: number, updates: Partial<ConfigBloco>) {
-    update((s) => {
-      const blocos = [...s.blocos] as typeof s.blocos;
-      blocos[idx] = { ...blocos[idx], ...updates };
-      return { ...s, blocos };
-    });
+    const blocos = [...model.blocos] as typeof model.blocos;
+    blocos[idx] = { ...blocos[idx], ...updates };
+    setModel((s) => ({ ...s, blocos }));
   }
 
   function setBlocoColor(idx: number, cor: CorBloco) {
@@ -68,33 +32,33 @@ export function useStoreViewModel() {
   }
 
   function setLaminaCor(idx: number, posicao: PosicaoLamina, cor: CorLamina | null) {
-    update((s) => {
-      const blocos = [...s.blocos] as typeof s.blocos;
-      const laminas = { ...blocos[idx].laminas };
-      const eraSemCor = laminas[posicao].cor === null;
+    const blocos = [...model.blocos] as typeof model.blocos;
+    const laminas = { ...blocos[idx].laminas };
+    const eraSemCor = laminas[posicao].cor === null;
 
-      laminas[posicao] = {
-        cor,
-        padrao: cor === null ? null : eraSemCor ? PadraoLamina.Nenhum : laminas[posicao].padrao,
-      };
+    laminas[posicao] = {
+      cor,
+      padrao: cor === null ? null : eraSemCor ? PadraoLamina.Nenhum : laminas[posicao].padrao,
+    };
 
-      blocos[idx] = { ...blocos[idx], laminas };
-      return { ...s, blocos };
-    });
+    blocos[idx] = { ...blocos[idx], laminas };
+    setModel((s) => ({ ...s, blocos }));
   }
 
   function setLaminaPadrao(idx: number, posicao: PosicaoLamina, padrao: PadraoLamina | null) {
-    update((s) => {
-      const blocos = [...s.blocos] as typeof s.blocos;
-      const laminas = { ...blocos[idx].laminas };
-      laminas[posicao] = { ...laminas[posicao], padrao };
-      blocos[idx] = { ...blocos[idx], laminas };
-      return { ...s, blocos };
-    });
+    const blocos = [...model.blocos] as typeof model.blocos;
+    const laminas = { ...blocos[idx].laminas };
+    laminas[posicao] = { ...laminas[posicao], padrao };
+    blocos[idx] = { ...blocos[idx], laminas };
+    setModel((s) => ({ ...s, blocos }));
   }
 
   function setOrdemDeProducao(n: number) {
-    update((s) => ({ ...s, ordemDeProducao: n }));
+    setModel((s) => ({ ...s, ordemDeProducao: n }));
+  }
+
+  function dismissFeedback() {
+    setModel((s) => ({ ...s, erro: null, sucesso: false }));
   }
 
   async function createPedido() {
@@ -107,13 +71,18 @@ export function useStoreViewModel() {
             .filter(([, lamina]) => lamina.cor != null)
             .map(([posicao, lamina]) => [
               posicao,
-              { cor: lamina.cor, padrao: lamina.padrao ?? PadraoLamina.Nenhum },
+              {
+                cor: lamina.cor,
+                padrao: lamina.padrao ?? PadraoLamina.Nenhum,
+              },
             ])
         ),
       }));
 
       const blocosCompletos = [...blocos, ...Array(3 - blocos.length).fill({})] as [
-        ConfigBloco, ConfigBloco, ConfigBloco,
+        ConfigBloco,
+        ConfigBloco,
+        ConfigBloco,
       ];
 
       const pedido: Pedido = await pedidoService.create({
@@ -123,20 +92,15 @@ export function useStoreViewModel() {
         corTampa: model.corTampa,
       });
 
-      // ✅ Sucesso: limpa cache e reseta config para o padrão
-      cacheService.clear(PEDIDO_CONFIG_CACHE_KEY);
-      setModel({
-        ...StoreModelInitial,
-        ...defaultPedidoConfig,
-        loading: false,
-        sucesso: true,
-        erro: null,
-        pedidoCriado: pedido,
-      });
+      setModel((s) => ({ ...s, loading: false, sucesso: true, erro: null, pedidoCriado: pedido }));
     } catch (error: unknown) {
       const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
-      setModel((s) => ({ ...s, loading: false, sucesso: false, erro: mensagem }));
-      // ✅ Falha: cache é mantido — usuário não perde o que configurou
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        sucesso: false,
+        erro: mensagem,
+      }));
     }
   }
 
@@ -150,5 +114,6 @@ export function useStoreViewModel() {
     setLaminaPadrao,
     setOrdemDeProducao,
     createPedido,
+    dismissFeedback,
   };
 }
