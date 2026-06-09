@@ -3,6 +3,7 @@ import { PedidosModel, PedidosModelInitial } from '@pages/Pedidos/PedidosModel';
 import { pedidoService } from '@config/diContainer';
 import { HttpError } from '@error/HttpError';
 import { Pedido } from '@entities/Pedido';
+import { StatusPedido } from '@enums/StatusPedido';
 
 export function usePedidosViewModel() {
   const [model, setModel] = useState<PedidosModel>(PedidosModelInitial);
@@ -39,8 +40,22 @@ export function usePedidosViewModel() {
     }
   }
 
+  function setStatusPedidoFiltro(tipo: StatusPedido | null) {
+    setModel((s) => ({
+      ...s,
+      filtroStatus: s.filtroStatus === tipo ? null : tipo,
+    }));
+  }
+
+  const pedidosFiltrados =
+    model.filtroStatus === null
+      ? model.pedidos
+      : model.pedidos.filter((p) => p.status === model.filtroStatus);
+
   return {
     model,
     iniciarProducao,
+    pedidosFiltrados,
+    setStatusPedidoFiltro,
   };
 }

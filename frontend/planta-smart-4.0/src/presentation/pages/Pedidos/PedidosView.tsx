@@ -5,7 +5,7 @@ import styles from './pedidosView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 
 export default function PedidosView() {
-  const { model, iniciarProducao } = usePedidosViewModel();
+  const { model, pedidosFiltrados, iniciarProducao, setStatusPedidoFiltro } = usePedidosViewModel();
 
   return (
     <AppTemplate>
@@ -16,8 +16,10 @@ export default function PedidosView() {
           </div>
         )}
         <PedidosSection
-          pedidos={model.pedidos}
+          pedidos={pedidosFiltrados}
           loading={model.loading}
+          filtroStatus={model.filtroStatus}
+          onFiltroStatus={setStatusPedidoFiltro}
           iniciarProducao={iniciarProducao}
         />
       </main>
