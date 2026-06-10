@@ -2,6 +2,7 @@ package com.smart.appsa.mapper;
 
 import java.util.ArrayList;
 
+import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
@@ -12,6 +13,8 @@ import com.smart.appsa.model.enums.AndarBloco;
 import com.smart.appsa.model.enums.PosicaoLamina;
 
 public class PedidoMapper {
+    private static final String IP_CLP_1 = "10.74.241.10";
+
     public static PedidoResponseDTO mapDto(Pedido pedido) {
         return PedidoResponseDTO.builder()
             .id(pedido.getId())
@@ -60,25 +63,25 @@ public class PedidoMapper {
     public static PedidoInfoDTO mapToInfoDTOByEntity(Pedido entity) {
         Bloco bloco1 = entity.getBlocos()
             .stream()
-            .filter(b -> b.getAndar().getValue() == 1)
+            .filter(b -> b.getAndar() == AndarBloco.PRIMEIRO)
             .findFirst()
             .orElseThrow(() -> new BusinessException("Pedido não possui bloco com primeiro andar"));
 
         Bloco bloco2 = entity.getBlocos()
             .stream()
-            .filter(b -> b.getAndar().getValue() == 2)   
+            .filter(b -> b.getAndar() == AndarBloco.SEGUNDO)   
             .findFirst()
             .orElse(null);
 
         Bloco bloco3 = entity.getBlocos()
             .stream()
-            .filter(b -> b.getAndar().getValue() == 3)  
+            .filter(b -> b.getAndar() == AndarBloco.TERCEIRO)  
             .findFirst()
             .orElse(null);
 
         return PedidoInfoDTO
             .builder()
-            .corAndar1(bloco1.getAndar().getValue())
+            .corAndar1(bloco1.getCor().getValue())
             .posicaoEstoqueAndar1(bloco1.getEstoque().getPosicaoFisica())
             .corLamina1Andar1(bloco1.getLaminas().stream()
                 .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
@@ -104,8 +107,8 @@ public class PedidoMapper {
                 .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
                 .mapToInt(l -> l.getPadrao().getValue())
                 .findFirst().orElse(0))
-            .corAndar2(bloco2 != null ? bloco2.getAndar().getValue() : 0)
-            .posicaoEstoqueAndar2(bloco2 != null ? bloco2.getEstoque().getPosicaoFisica() : null)
+            .corAndar2(bloco2 != null ? bloco2.getCor().getValue() : 0)
+            .posicaoEstoqueAndar2(bloco2 != null ? bloco2.getEstoque().getPosicaoFisica() : 0)
             .corLamina1Andar2(bloco2 != null ? bloco2.getLaminas().stream()
                 .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
                 .mapToInt(l -> l.getCor().getValue())
@@ -130,8 +133,8 @@ public class PedidoMapper {
                 .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
                 .mapToInt(l -> l.getPadrao().getValue())
                 .findFirst().orElse(0) : 0)
-            .corAndar3(bloco3 != null ? bloco3.getAndar().getValue() : 0)
-            .posicaoEstoqueAndar3(bloco3 != null ? bloco3.getEstoque().getPosicaoFisica() : null)
+            .corAndar3(bloco3 != null ? bloco3.getCor().getValue() : 0)
+            .posicaoEstoqueAndar3(bloco3 != null ? bloco3.getEstoque().getPosicaoFisica() : 0)
             .corLamina1Andar3(bloco3 != null ? bloco3.getLaminas().stream()
                 .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
                 .mapToInt(l -> l.getCor().getValue())
@@ -159,6 +162,16 @@ public class PedidoMapper {
             .numeroPedido(entity.getOrdemDeProducao())
             .andares(entity.getTipo().getValue())
             .posicaoExpedicao(entity.getExpedicao().getPosicaoFisica())
+            .build();
+    }
+
+    public static PedidoConfigDTO mapToConfigDTOByEntity(Pedido entity) {
+        return PedidoConfigDTO
+            .builder()
+            .idPedido(entity.getId())
+            .tipoPedido(entity.getTipo().getValue())
+            .tampaPedido(entity.getCorTampa().getValue())
+            .ipClp(IP_CLP_1)
             .build();
     }
 }

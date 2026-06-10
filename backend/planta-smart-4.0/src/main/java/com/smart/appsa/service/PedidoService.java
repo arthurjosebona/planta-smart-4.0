@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smart.appsa.dto.clp.PedidoConfigDTO;
+import com.smart.appsa.dto.clp.PedidoInfoDTO;
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.exception.DuplicateAndarException;
@@ -36,6 +38,7 @@ public class PedidoService {
     private final BlocoService blocoService;
     private final EstoqueService estoqueService;
     private final ExpedicaoService expedicaoService;
+    private final SmartService smartService;
 
     @Transactional
     public PedidoResponseDTO create(PedidoRequestDTO requestDTO) {
@@ -45,7 +48,6 @@ public class PedidoService {
         pedido.setStatus(StatusPedido.PENDENTE);
         Pedido saved = pedidoRepository.save(pedido);
         createBlocks(saved, requestDTO.blocos());
-        System.out.println(PedidoMapper.mapToInfoDTOByEntity(saved).toString());
         return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
     }
 
@@ -125,6 +127,15 @@ public class PedidoService {
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
         prepareForCompletion(pedido);
         Pedido updated = saveWithExpedition(pedido);
+        System.out.println("DTOs PARA A BANCADA: ");
+        PedidoInfoDTO infoDTO = PedidoMapper.mapToInfoDTOByEntity(updated);
+        PedidoConfigDTO configDTO = PedidoMapper.mapToConfigDTOByEntity(updated);
+
+        System.out.println(infoDTO.toString());
+        System.out.println(configDTO.toString());
+
+        smartService.enviarParaProducao(configDTO, infoDTO);
+
         return PedidoMapper.mapDto(updated);
     }
 

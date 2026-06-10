@@ -12,7 +12,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponseDTO> handleAppException(AppException ex) {
-        System.out.println(ex.getMessage() + String.valueOf(ex.getStatus().value()));
+        System.out.println("STACK TRACE ERRO: ");
+        ex.printStackTrace();
+        System.out.println(ex.getMessage() + " " + String.valueOf(ex.getStatus().value()));
         return ResponseEntity
             .status(ex.getStatus())
             .body(new ErrorResponseDTO(ex.getMessage(), ex.getStatus().value()));
