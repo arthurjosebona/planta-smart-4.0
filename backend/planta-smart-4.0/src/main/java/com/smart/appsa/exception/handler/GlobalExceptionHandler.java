@@ -12,6 +12,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponseDTO> handleAppException(AppException ex) {
+        System.out.println(ex.getMessage() + String.valueOf(ex.getStatus().value()));
         return ResponseEntity
             .status(ex.getStatus())
             .body(new ErrorResponseDTO(ex.getMessage(), ex.getStatus().value()));
@@ -19,6 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex) {
+        System.out.println(ex.getMessage());
         return ResponseEntity
             .badRequest()
             .body(new ErrorResponseDTO(ex.getMessage(), 400));

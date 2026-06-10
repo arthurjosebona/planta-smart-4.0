@@ -45,6 +45,7 @@ public class PedidoService {
         pedido.setStatus(StatusPedido.PENDENTE);
         Pedido saved = pedidoRepository.save(pedido);
         createBlocks(saved, requestDTO.blocos());
+        System.out.println(PedidoMapper.mapToInfoDTOByEntity(saved).toString());
         return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
     }
 

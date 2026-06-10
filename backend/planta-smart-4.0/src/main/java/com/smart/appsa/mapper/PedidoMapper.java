@@ -2,9 +2,14 @@ package com.smart.appsa.mapper;
 
 import java.util.ArrayList;
 
+import com.smart.appsa.dto.clp.PedidoInfoDTO;
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
+import com.smart.appsa.exception.core.BusinessException;
+import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Pedido;
+import com.smart.appsa.model.enums.AndarBloco;
+import com.smart.appsa.model.enums.PosicaoLamina;
 
 public class PedidoMapper {
     public static PedidoResponseDTO mapDto(Pedido pedido) {
@@ -49,6 +54,111 @@ public class PedidoMapper {
             .status(responseDTO.status())
             .tipo(responseDTO.tipo())
             .corTampa(responseDTO.corTampa())
+            .build();
+    }
+
+    public static PedidoInfoDTO mapToInfoDTOByEntity(Pedido entity) {
+        Bloco bloco1 = entity.getBlocos()
+            .stream()
+            .filter(b -> b.getAndar().getValue() == 1)
+            .findFirst()
+            .orElseThrow(() -> new BusinessException("Pedido não possui bloco com primeiro andar"));
+
+        Bloco bloco2 = entity.getBlocos()
+            .stream()
+            .filter(b -> b.getAndar().getValue() == 2)   
+            .findFirst()
+            .orElse(null);
+
+        Bloco bloco3 = entity.getBlocos()
+            .stream()
+            .filter(b -> b.getAndar().getValue() == 3)  
+            .findFirst()
+            .orElse(null);
+
+        return PedidoInfoDTO
+            .builder()
+            .corAndar1(bloco1.getAndar().getValue())
+            .posicaoEstoqueAndar1(bloco1.getEstoque().getPosicaoFisica())
+            .corLamina1Andar1(bloco1.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0))
+            .corLamina2Andar1(bloco1.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.FRENTE)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0))
+            .corLamina3Andar1(bloco1.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0))
+            .padraoLamina1Andar1(bloco1.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0))
+            .padraoLamina2Andar1(bloco1.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.FRENTE)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0))
+            .padraoLamina3Andar1(bloco1.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0))
+            .corAndar2(bloco2 != null ? bloco2.getAndar().getValue() : 0)
+            .posicaoEstoqueAndar2(bloco2 != null ? bloco2.getEstoque().getPosicaoFisica() : null)
+            .corLamina1Andar2(bloco2 != null ? bloco2.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0) : 0)
+            .corLamina2Andar2(bloco2 != null ? bloco2.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.FRENTE)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0) : 0)
+            .corLamina3Andar2(bloco2 != null ? bloco2.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0) : 0)
+            .padraoLamina1Andar2(bloco2 != null ? bloco2.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0) : 0)
+            .padraoLamina2Andar2(bloco2 != null ? bloco2.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.FRENTE)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0) : 0)
+            .padraoLamina3Andar2(bloco2 != null ? bloco2.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0) : 0)
+            .corAndar3(bloco3 != null ? bloco3.getAndar().getValue() : 0)
+            .posicaoEstoqueAndar3(bloco3 != null ? bloco3.getEstoque().getPosicaoFisica() : null)
+            .corLamina1Andar3(bloco3 != null ? bloco3.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0) : 0)
+            .corLamina2Andar3(bloco3 != null ? bloco3.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.FRENTE)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0) : 0)
+            .corLamina3Andar3(bloco3 != null ? bloco3.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
+                .mapToInt(l -> l.getCor().getValue())
+                .findFirst().orElse(0) : 0)
+            .padraoLamina1Andar3(bloco3 != null ? bloco3.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.ESQUERDA)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0) : 0)
+            .padraoLamina2Andar3(bloco3 != null ? bloco3.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.FRENTE)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0) : 0)
+            .padraoLamina3Andar3(bloco3 != null ? bloco3.getLaminas().stream()
+                .filter(l -> l.getPosicao() == PosicaoLamina.DIREITA)
+                .mapToInt(l -> l.getPadrao().getValue())
+                .findFirst().orElse(0) : 0)
+            .numeroPedido(entity.getOrdemDeProducao())
+            .andares(entity.getTipo().getValue())
+            .posicaoExpedicao(entity.getExpedicao().getPosicaoFisica())
             .build();
     }
 }
