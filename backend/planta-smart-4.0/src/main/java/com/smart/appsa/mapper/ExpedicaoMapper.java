@@ -20,5 +20,4 @@ public class ExpedicaoMapper {
             .posicaoFisica(dto.posicaoFisica())
             .build();
     }
-
 }

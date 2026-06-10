@@ -147,7 +147,7 @@ public class PedidoService {
     private Pedido saveWithExpedition(Pedido pedido) {
         Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
         pedido.setExpedicao(nextFree);
-        expedicaoService.AssignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
+        expedicaoService.assignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
         return pedidoRepository.save(pedido);
     }
 }       

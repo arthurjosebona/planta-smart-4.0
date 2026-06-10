@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smart.appsa.dto.request.ExpedicaoRequestDTO;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
@@ -49,7 +50,7 @@ public class ExpedicaoService {
     }
 
     @Transactional
-    public void AssignOrdemAtPosicao(int ordemDeProducao, int posicaoFisica) {
+    public void assignOrdemAtPosicao(int ordemDeProducao, int posicaoFisica) {
         validateFields(ordemDeProducao, posicaoFisica);
         Expedicao expedicao = expedicaoRepository.findByPosicaoFisica(posicaoFisica)
                 .orElseThrow(() -> new RuntimeException("Posição não encontrada no banco."));
@@ -64,6 +65,13 @@ public class ExpedicaoService {
             throw new PosicaoExpedicaoOcupadaException(posicaoFisica);
         if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) 
             throw new OrdemDeProducaoExpedidaException(ordemDeProducao);
+    }
+
+    @Transactional
+    public void updateAll(List<ExpedicaoRequestDTO> expedicao) {
+        for(ExpedicaoRequestDTO e : expedicao) {
+            assignOrdemAtPosicao(e.ordemDeProducao(), e.posicaoFisica());
+        }  
     }
 
     @Transactional(readOnly = true)
