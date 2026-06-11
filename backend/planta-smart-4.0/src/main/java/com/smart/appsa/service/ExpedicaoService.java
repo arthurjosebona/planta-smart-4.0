@@ -61,10 +61,10 @@ public class ExpedicaoService {
     private void validateFields(int ordemDeProducao, int posicaoFisica) {
         if (posicaoFisica < 1 || posicaoFisica > 12) 
             throw new InvalidPosicaoExpedicaoException(posicaoFisica);
-        if (expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica)) 
-            throw new PosicaoExpedicaoOcupadaException(posicaoFisica);
-        if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) 
-            throw new OrdemDeProducaoExpedidaException(ordemDeProducao);
+        // if (expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica)) 
+        //     throw new PosicaoExpedicaoOcupadaException(posicaoFisica);
+        // if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) 
+        //     throw new OrdemDeProducaoExpedidaException(ordemDeProducao);
     }
 
     @Transactional
