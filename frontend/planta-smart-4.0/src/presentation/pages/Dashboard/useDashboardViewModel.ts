@@ -86,6 +86,82 @@ export function useDashboardViewModel() {
     }
   }
 
+  function enterExpedicaoEditMode() {
+    setModel((s) => ({
+      ...s,
+      expedicaoEditMode: true,
+      expedicaoSnapshot: s.expedicao,
+      selectedExpedicaoId: null,
+      opInput: '',
+    }));
+  }
+
+  function cancelExpedicaoEditMode() {
+    setModel((s) => ({
+      ...s,
+      expedicaoEditMode: false,
+      expedicao: s.expedicaoSnapshot,
+      expedicaoSnapshot: [],
+      selectedExpedicaoId: null,
+      opInput: '',
+    }));
+  }
+
+  function selectSlot(id: number) {
+    setModel((s) => {
+      // aplica o input pendente no slot anterior antes de trocar
+      const expedicaoAtualizada =
+        s.selectedExpedicaoId !== null
+          ? s.expedicao.map((slot) =>
+              slot.id === s.selectedExpedicaoId
+                ? { ...slot, ordemDeProducaoAtual: Number(s.opInput) }
+                : slot
+            )
+          : s.expedicao;
+
+      const slotSelecionado = expedicaoAtualizada.find((slot) => slot.id === id);
+
+      return {
+        ...s,
+        expedicao: expedicaoAtualizada,
+        selectedExpedicaoId: id,
+        opInput: slotSelecionado?.ordemDeProducaoAtual?.toString() ?? '',
+      };
+    });
+  }
+
+  function changeOpInput(value: string) {
+    setModel((s) => ({ ...s, opInput: value }));
+  }
+
+  async function saveExpedicao() {
+    // aplica o input pendente do slot ainda aberto antes de salvar
+    const expedicaoFinal =
+      model.selectedExpedicaoId !== null
+        ? model.expedicao.map((slot) =>
+            slot.id === model.selectedExpedicaoId
+              ? { ...slot, ordemDeProducaoAtual: Number(model.opInput) }
+              : slot
+          )
+        : model.expedicao;
+
+    setModel((s) => ({ ...s, loading: true, erro: null, expedicao: expedicaoFinal }));
+    try {
+      expedicaoService.updateAll(model.expedicao);
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        expedicaoEditMode: false,
+        expedicaoSnapshot: [],
+        selectedExpedicaoId: null,
+        opInput: '',
+      }));
+    } catch (error: unknown) {
+      const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
+      setModel((s) => ({ ...s, loading: false, erro: mensagem }));
+    }
+  }
+
   return {
     model,
     enterEditMode,
@@ -95,5 +171,10 @@ export function useDashboardViewModel() {
     cleanEstoque,
     saveEstoque,
     dismissErro,
+    enterExpedicaoEditMode,
+  cancelExpedicaoEditMode,
+  selectSlot,
+  changeOpInput,
+  saveExpedicao,
   };
 }

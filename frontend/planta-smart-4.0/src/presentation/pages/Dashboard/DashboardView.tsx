@@ -15,6 +15,11 @@ export default function DashboardView() {
     cleanEstoque,
     saveEstoque,
     dismissErro,
+    enterExpedicaoEditMode,
+    cancelExpedicaoEditMode,
+    selectSlot,
+    changeOpInput,
+    saveExpedicao,
   } = useDashboardViewModel();
 
   if (model.loading && model.estoque.length === 0) {
@@ -51,7 +56,18 @@ export default function DashboardView() {
             onClean={cleanEstoque}
             onSave={saveEstoque}
           />
-          <ExpedicaoSection expedicao={model.expedicao} />
+          <ExpedicaoSection
+            expedicao={model.expedicao}
+            editMode={model.expedicaoEditMode}
+            selectedId={model.selectedExpedicaoId}
+            opInput={model.opInput}
+            loading={model.loading}
+            onEnterEdit={enterExpedicaoEditMode}
+            onCancel={cancelExpedicaoEditMode}
+            onToggleSlot={selectSlot}
+            onOpInputChange={changeOpInput}
+            onSave={saveExpedicao}
+          />
         </div>
       </main>
     </AppTemplate>

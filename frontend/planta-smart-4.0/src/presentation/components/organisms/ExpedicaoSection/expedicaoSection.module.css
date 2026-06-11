@@ -7,3 +7,104 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-surface);
 }
+
+/* Input de OP */
+.op-input-row {
+  @apply flex items-center;
+  gap: var(--spacing-3);
+  animation: fadeSlideDown 0.18s ease both;
+}
+
+.op-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.op-input {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  @apply flex-1 rounded;
+  padding: 6px var(--spacing-3);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--ease-fast);
+}
+
+.op-input:focus {
+  border-color: var(--color-accent);
+}
+
+.op-input:disabled {
+  @apply opacity-40 cursor-not-allowed;
+}
+
+/* Botões — espelham EstoqueButtonBox */
+.button-box {
+  @apply flex items-center justify-between;
+  gap: var(--spacing-3);
+}
+
+.edit,
+.save,
+.cancel {
+  font-family: var(--font-mono);
+  @apply font-medium rounded transition-all;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 7px var(--spacing-4);
+  border: 1px solid transparent;
+  transition:
+    background-color var(--ease-fast),
+    border-color var(--ease-fast),
+    color var(--ease-fast),
+    opacity var(--ease-fast),
+    transform var(--ease-fast);
+}
+
+.edit:disabled,
+.save:disabled,
+.cancel:disabled {
+  @apply opacity-40 cursor-not-allowed;
+}
+
+.edit {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+.edit:hover:not(:disabled) {
+  background: #6aa0ff;
+  border-color: #6aa0ff;
+  transform: translateY(-1px);
+}
+
+.save {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #0a1f14;
+}
+.save:hover:not(:disabled) {
+  background: #5dc48e;
+  border-color: #5dc48e;
+  transform: translateY(-1px);
+}
+
+.cancel {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+.cancel:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
