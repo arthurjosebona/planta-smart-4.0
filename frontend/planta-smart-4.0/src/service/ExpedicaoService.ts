@@ -13,6 +13,6 @@ export class ExpedicaoService {
   }
 
   async updateAll(expedicao: Expedicao[]): Promise<void> {
-    return this.expedicaoRepository.updateAll();
+    return this.expedicaoRepository.updateAll(expedicao);
   }
 }
