@@ -9,8 +9,6 @@ import com.smart.appsa.dto.request.ExpedicaoRequestDTO;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
-import com.smart.appsa.exception.OrdemDeProducaoExpedidaException;
-import com.smart.appsa.exception.PosicaoExpedicaoOcupadaException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.ExpedicaoMapper;
 import com.smart.appsa.model.Expedicao;
