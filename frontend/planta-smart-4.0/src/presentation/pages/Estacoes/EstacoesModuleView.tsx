@@ -5,7 +5,7 @@ import {
   Smart40Bancada,
   BancadaStatus,
   BANCADA_STATUS_DEFAULT,
-} from '@components/organisms/Smart40Bancada/Estacoes';
+} from '@components/organisms/EstacoesSection/Estacoes';
 
 /**
  * MonitorView
