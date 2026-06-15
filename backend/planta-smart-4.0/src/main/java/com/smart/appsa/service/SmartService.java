@@ -9,8 +9,17 @@ import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
-
+import com.smart.appsa.exception.core.BusinessException;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +39,7 @@ public class SmartService {
                 // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
                 connector.writeBlock(9, 2, 60, buffer);
                 System.out.println("Dados enviados para o CLP: " + config.getIpClp());
-
+                enviarTampa(config.getTampaPedido());
                 iniciarExecucaoPedido(config.getIpClp());
 
             } catch (Exception ex) {
@@ -112,6 +121,55 @@ public class SmartService {
 
         } catch (Exception ex) {
 
+        }
+    }
+
+    public void enviarTampa(int tampa) {
+        System.out.println("\n\nSELETOR DE TAMPAS INSTALADO NA BANCADA\n\n");
+        // Passo 2) Selecionar a tampa via POST
+        try {
+            RestTemplate apiSeletorTampa = new RestTemplate();
+            String url = "http://10.74.241.245/api/move_pos";
+
+            // 1. Definir o cabeçalho como application/x-www-form-urlencoded
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            // 2. Usar MultiValueMap (específico para formulários no Spring)
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("pos", String.valueOf(tampa));
+            map.add("offset", "0");
+
+            // 3. Criar a entidade com cabeçalhos e corpo
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+            // 4. Tente ler a resposta primeiro como String para ver o que o ESP32 está
+            // realmente enviando
+            ResponseEntity<String> rawResponse = apiSeletorTampa.postForEntity(url, request, String.class);
+            System.out.println("Resposta Bruta do ESP32: " + rawResponse.getBody());
+
+            // 5. Agora, para a sua lógica de negócio, usamos o Map
+            ResponseEntity<Map> response = apiSeletorTampa.postForEntity(url, request, Map.class);
+            Map<String, Object> body = response.getBody();
+
+            // Verificação robusta
+            if (body == null || body.get("status") == null) {
+                System.out.println("Deu erro");
+                return;
+            }
+
+            String status = body.get("status").toString();
+
+            // Verificação flexível (ignora maiúsculas/minúsculas)
+            if (!status.toLowerCase().contains("ok")) {
+                System.out.println("Deu erro");
+                return;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Deu erro");
+            return;
         }
     }
 }

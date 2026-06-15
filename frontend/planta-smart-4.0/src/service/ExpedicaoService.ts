@@ -11,4 +11,8 @@ export class ExpedicaoService {
   async findAll(): Promise<Expedicao[]> {
     return this.expedicaoRepository.findAll();
   }
+
+  async updateAll(expedicao: Expedicao[]): Promise<void> {
+    return this.expedicaoRepository.updateAll(expedicao);
+  }
 }
