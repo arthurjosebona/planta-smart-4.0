@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import styles from './MonitorView.module.css';
+import styles from './EstacoesView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 import {
-  Smart40Bancada,
+  Estacoes,
   BancadaStatus,
   BANCADA_STATUS_DEFAULT,
 } from '@components/organisms/EstacoesSection/Estacoes';
@@ -26,7 +26,7 @@ export default function MonitorView() {
   return (
     <AppTemplate>
       <main id="main-content" className={styles.main}>
-        <Smart40Bancada status={status} />
+        <Estacoes status={status} />
       </main>
     </AppTemplate>
   );

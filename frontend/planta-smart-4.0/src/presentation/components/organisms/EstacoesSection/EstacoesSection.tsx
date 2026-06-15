@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Smart40Bancada.module.css';
+import styles from './estacoesSection.module.css';
 import { BancadaStatus, ModuleStatus } from './types';
 
 import bancadaImg from '../../../../assets/bancada/Smart40.png';
@@ -33,7 +33,7 @@ interface Props {
   status: BancadaStatus;
 }
 
-export function Smart40Bancada({ status }: Props) {
+export function Estacoes({ status }: Props) {
   return (
     <div className={styles.wrapper} aria-label="Bancada Smart 4.0">
       <img
