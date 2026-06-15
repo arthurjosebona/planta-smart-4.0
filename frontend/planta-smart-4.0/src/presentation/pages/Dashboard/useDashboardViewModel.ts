@@ -147,7 +147,7 @@ export function useDashboardViewModel() {
 
     setModel((s) => ({ ...s, loading: true, erro: null, expedicao: expedicaoFinal }));
     try {
-      expedicaoService.updateAll(model.expedicao);
+      expedicaoService.updateAll(expedicaoFinal);
       setModel((s) => ({
         ...s,
         loading: false,
