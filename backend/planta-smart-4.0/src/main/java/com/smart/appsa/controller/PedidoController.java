@@ -19,9 +19,6 @@ import com.smart.appsa.service.PedidoService;
 
 import lombok.RequiredArgsConstructor;
 
-
-
-
 @RestController
 @RequestMapping("/api/pedidos")
 @RequiredArgsConstructor
@@ -33,13 +30,12 @@ public class PedidoController {
     public ResponseEntity<PedidoResponseDTO> create(@RequestBody PedidoRequestDTO entity) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.create(entity));
     }
-    
 
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.findById(id));
     }
-    
+
     @GetMapping("")
     public ResponseEntity<List<PedidoResponseDTO>> findAll() {
         return ResponseEntity.ok(pedidoService.findAll());
@@ -49,5 +45,18 @@ public class PedidoController {
     public ResponseEntity<PedidoResponseDTO> updateStatusToConcluido(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.updateStatusAsCompleted(id));
     }
-    
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        pedidoService.delete(id);
+        return ResponseEntity.noContent().build(); // 204
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PedidoResponseDTO> update(
+            @PathVariable Long id,
+            @RequestBody PedidoRequestDTO requestDTO) {
+        return ResponseEntity.ok(pedidoService.update(id, requestDTO));
+    }
+
 }

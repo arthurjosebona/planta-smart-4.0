@@ -109,4 +109,9 @@ public class BlocoService {
         }
         blocoRepository.deleteById(id);
     }
+
+    @Transactional
+public void deleteAllByPedido(Pedido pedido) {
+    blocoRepository.deleteAllByPedido(pedido);
+}
 }

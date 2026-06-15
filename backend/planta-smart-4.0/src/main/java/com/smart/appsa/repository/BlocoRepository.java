@@ -7,5 +7,5 @@ import com.smart.appsa.model.Bloco;
 
 @Repository
 public interface BlocoRepository extends JpaRepository<Bloco, Long> {
-
+    void deleteAllByPedido(Pedido pedido);
 }
