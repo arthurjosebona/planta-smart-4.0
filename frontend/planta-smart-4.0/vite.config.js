@@ -24,6 +24,7 @@ export default defineConfig({
       '@repositoriesImp': path.resolve(__dirname, './src/infrastructure/repositories'),
       '@error': path.resolve(__dirname, './src/domain/error'),
       '@styles': path.resolve(__dirname, './src/styles'),
+      '@assets': path.resolve(__dirname, './src/assets'),
     },
   },
 });
