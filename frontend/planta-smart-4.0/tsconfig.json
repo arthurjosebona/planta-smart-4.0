@@ -22,6 +22,7 @@
       "@error/*": ["./src/domain/error/*"],
       "@styles/*": ["./src/styles/*"],
       "@assets/*": ["./src/assets/*"],
+      "@utils/*": ["./src/presentation/utils/*"],
     }
   },
   "include": ["src", "src/vite-env.d.ts"],

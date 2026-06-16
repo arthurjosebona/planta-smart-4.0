@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PedidoCard } from '@components/organisms/PedidoCard/PedidoCard';
+import { PedidoModal } from '@components/organisms/PedidoModal/PedidoModal';
 import { Pedido } from '@entities/Pedido';
 import styles from '@components/organisms/PedidoSection/pedidosSection.module.css';
 import { StatusPedido } from '@enums/StatusPedido';
@@ -28,6 +29,9 @@ export function PedidosSection({
   onFiltroStatus,
   iniciarProducao,
 }: PedidosSectionProps) {
+  const [pedidoSelecionadoId, setPedidoSelecionadoId] = useState<number | null>(null);
+  const pedidoSelecionado = pedidos.find((p) => p.id === pedidoSelecionadoId) ?? null;
+
   return (
     <section className={styles.section} aria-label="Pedidos de Produção">
       <div aria-hidden="true" className={styles.accentLine} />
@@ -61,9 +65,17 @@ export function PedidosSection({
       ) : (
         <div className={styles.list}>
           {pedidos.map((p) => (
-            <PedidoCard key={p.id} pedido={p} iniciarProducao={iniciarProducao} />
+            <PedidoCard key={p.id} pedido={p} onClick={() => setPedidoSelecionadoId(p.id)} />
           ))}
         </div>
+      )}
+
+      {pedidoSelecionado && (
+        <PedidoModal
+          pedido={pedidoSelecionado}
+          iniciarProducao={iniciarProducao}
+          onClose={() => setPedidoSelecionadoId(null)}
+        />
       )}
     </section>
   );
