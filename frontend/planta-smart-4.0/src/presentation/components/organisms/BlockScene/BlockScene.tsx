@@ -1,14 +1,8 @@
 import { useMemo } from 'react';
 import { StoreModel } from '@pages/Store/StoreModel';
+import { BLOCK, COLUMN, BLADE, LID, COR_TAMPA_HEX, COR_TAMPA_FALLBACK } from '@config/blockModel';
 import { Block } from '../Block/Block';
 import { Tampa } from '@components/atoms/Tampa/Tampa';
-
-// Alinhado com --color-nav-red, --color-bloco-azul, --color-bloco-preto
-const COR_TAMPA_HEX: Record<string, string> = {
-  preto:    '#252527',
-  vermelho: '#CC2222',
-  azul:     '#1A55CC',
-};
 
 interface BlockSceneProps {
   state: StoreModel;
@@ -25,15 +19,15 @@ interface BlockSceneProps {
 
 export function BlockScene({
   state,
-  blockW = 1.7,
-  blockD = 1.7,
-  blockH = 0.71,
-  baseT = 0.1,
-  colW = 0.22,
-  colRadius = 0.045,
-  bladeT = 0.08,
-  bladeRecess = -0.14,
-  lidH = 0.22,
+  blockW = BLOCK.width,
+  blockD = BLOCK.depth,
+  blockH = BLOCK.height,
+  baseT = BLOCK.baseThickness,
+  colW = COLUMN.width,
+  colRadius = COLUMN.radius,
+  bladeT = BLADE.thickness,
+  bladeRecess = BLADE.recess,
+  lidH = LID.height,
 }: BlockSceneProps) {
   const { numBlocos, corTampa, blocos } = state;
 
@@ -58,7 +52,7 @@ export function BlockScene({
         <Block key={i} config={blocos[i]} blockY={blockOffsets[i]} {...blockDimProps} />
       ))}
       <Tampa
-        color={COR_TAMPA_HEX[corTampa] ?? '#252527'}
+        color={COR_TAMPA_HEX[corTampa] ?? COR_TAMPA_FALLBACK}
         y={totalH}
         blockW={blockW}
         blockD={blockD}

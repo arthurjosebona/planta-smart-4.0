@@ -18,6 +18,7 @@ import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
+import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
@@ -165,7 +166,7 @@ public class PedidoService {
 
         // Se pedido concluído, libera a posição na expedição
         if (pedido.getStatus() == StatusPedido.CONCLUIDO && pedido.getExpedicao() != null) {
-            expedicaoService.AssignOrdemAtPosicao(null, pedido.getExpedicao().getPosicaoFisica());
+            expedicaoService.assignOrdemAtPosicao(null, pedido.getExpedicao().getPosicaoFisica());
         }
 
         pedidoRepository.delete(pedido);
