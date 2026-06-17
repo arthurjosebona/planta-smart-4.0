@@ -1,11 +1,6 @@
 package com.smart.appsa.model.clp;
 
 public class EstoqueInfo {
-    
-    //********************** Estoque ***************************
-    //----------------------- NodeToPlc ------------------------
-    /*---- InformacaoPedido -------*/
-    // InfoPedido
     int cor_Andar_1 = 0;
     int posicao_Estoque_Andar_1 = 0;
     int cor_Lamina_1_Andar_1 = 0;
@@ -42,29 +37,16 @@ public class EstoqueInfo {
 
     boolean iniciarPedido = false;
 
-    /*---- GerenciamentoEstoque -------*/
     boolean recebidoEstoque = false;
     boolean iniciarGuardarEst = false;
     int posicaoGuardarEst = 0;
 
-    /*---- PosicoesOcupadas -------*/
     byte[] posicoesOcupadas = new byte[28];
 
-    //----------------------- PlcToNode
-    /*---- GerenciamentoEstoque ------*/
     boolean pedirPosicaoEst = false;
     int posicaoEstoque = 0;
     boolean adicionarEstoque = false;
     boolean removerEstoque = false;
     boolean retornoEstoqueCheio = false;
     int corGuardarEstoque = 0;
-
-    /*---- RealidadeAumentada */
-    boolean xEmergenciaAtivadaEst = false;
-    boolean xComutadorAutomaticoEst = false;
-    boolean xNecessitaHomeEixoVerticalEst = false;
-    boolean xNecessitaHomeEixoGiroEst = false;
-    boolean xServoDesligadoEixoVerticalEst = false;
-    boolean xServoDesligadoEixoGiroEst = false;
-    boolean xCondicaoIniciarEst = false;
 }

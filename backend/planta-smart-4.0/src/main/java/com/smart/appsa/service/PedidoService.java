@@ -217,7 +217,9 @@ public class PedidoService {
         pedidoRepository.findByOrdemDeProducao(requestDTO.ordemDeProducao())
                 .filter(p -> !p.getId().equals(currentId))
                 .ifPresent(p -> {
-                    throw new OrdemDeProducaoExistenteException()      "Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
+                    throw new OrdemDeProducaoExistenteException(
+                        "Pedido já existe com ordem de produção " + 
+                        requestDTO.ordemDeProducao());
                 });
 
         validateDuplicateAndar(requestDTO.blocos());
