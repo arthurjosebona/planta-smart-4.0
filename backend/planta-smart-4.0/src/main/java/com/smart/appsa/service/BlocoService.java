@@ -13,6 +13,7 @@ import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Lamina;
+import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.enums.PosicaoLamina;
 import com.smart.appsa.repository.BlocoRepository;
 

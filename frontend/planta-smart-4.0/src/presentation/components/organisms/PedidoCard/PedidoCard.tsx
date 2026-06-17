@@ -6,9 +6,11 @@ import styles from '@components/organisms/PedidoCard/pedidoCard.module.css';
 interface PedidoCardProps {
   pedido: Pedido;
   iniciarProducao: (id: number) => void;
+  onAtualizar: (id: number) => void;
+  onDeletar: (id: number) => void;
 }
 
-export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
+export function PedidoCard({ pedido, iniciarProducao, onAtualizar, onDeletar }: PedidoCardProps) {
   return (
     <article className={styles.card}>
       <div aria-hidden="true" className={styles.accentLine} />
@@ -18,6 +20,8 @@ export function PedidoCard({ pedido, iniciarProducao }: PedidoCardProps) {
         ordemDeProducao={pedido.ordemDeProducao}
         status={pedido.status}
         iniciarProducao={iniciarProducao}
+        onAtualizar={onAtualizar}
+        onDeletar={onDeletar}
       />
 
       <hr className={styles.divider} />

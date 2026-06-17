@@ -1,23 +1,24 @@
 package com.smart.appsa.service;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.smart.appsa.dto.clp.PedidoConfigDTO;
-import com.smart.appsa.dto.clp.PedidoInfoDTO;
+
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.exception.DuplicateAndarException;
 import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
-import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
+import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
@@ -29,7 +30,9 @@ import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.repository.PedidoRepository;
 
+
 import lombok.RequiredArgsConstructor;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ public class PedidoService {
     private final BlocoService blocoService;
     private final EstoqueService estoqueService;
     private final ExpedicaoService expedicaoService;
-    private final SmartService smartService;
+
 
     @Transactional
     public PedidoResponseDTO create(PedidoRequestDTO requestDTO) {
@@ -51,10 +54,12 @@ public class PedidoService {
         return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
     }
 
+
     private void validatePedido(PedidoRequestDTO requestDTO) {
         validateRequiredFields(requestDTO);
         validateBusinessRules(requestDTO);
     }
+
 
     private void validateRequiredFields(PedidoRequestDTO requestDTO) {
         if (requestDTO == null)
@@ -67,15 +72,17 @@ public class PedidoService {
             throw new RequiredFieldException("Cor da tampa");
     }
 
+
     private void validateBusinessRules(PedidoRequestDTO requestDTO) {
         if (requestDTO.ordemDeProducao() <= 0)
             throw new InvalidOrdemDeProducaoException(requestDTO.ordemDeProducao());
         if (requestDTO.tipo().getValue() != requestDTO.blocos().size())
             throw new TipoIncompativelComBlocosException(requestDTO.tipo(), requestDTO.blocos().size());
         if (pedidoRepository.existsByOrdemDeProducao(requestDTO.ordemDeProducao()))
-            throw new OrdemDeProducaoExistenteException(requestDTO.ordemDeProducao());
+            throw new BusinessException("Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
         validateDuplicateAndar(requestDTO.blocos());
     }
+
 
     private void validateDuplicateAndar(List<Bloco> blocos) {
         Map<AndarBloco, Long> countByAndar = blocos.stream()
@@ -83,15 +90,18 @@ public class PedidoService {
                         Bloco::getAndar,
                         Collectors.counting()));
 
+
         List<AndarBloco> duplicateAndar = countByAndar.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue() > 1)
                 .map(Map.Entry::getKey)
                 .toList();
 
+
         if (!duplicateAndar.isEmpty())
             throw new DuplicateAndarException(duplicateAndar);
     }
+
 
     private void createBlocks(Pedido pedido, List<Bloco> blocos) {
         for (Bloco bloco : blocos) {
@@ -105,11 +115,13 @@ public class PedidoService {
         }
     }
 
+
     @Transactional(readOnly = true)
     public PedidoResponseDTO findById(Long id) {
         return PedidoMapper.mapDto(pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id)));
     }
+
 
     @Transactional(readOnly = true)
     public List<PedidoResponseDTO> findAll() {
@@ -119,28 +131,22 @@ public class PedidoService {
                 .toList();
     }
 
+
     @Transactional
     public PedidoResponseDTO updateStatusAsCompleted(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
         prepareForCompletion(pedido);
         Pedido updated = saveWithExpedition(pedido);
-        System.out.println("DTOs PARA A BANCADA: ");
-        PedidoInfoDTO infoDTO = PedidoMapper.mapToInfoDTOByEntity(updated);
-        PedidoConfigDTO configDTO = PedidoMapper.mapToConfigDTOByEntity(updated);
-
-        System.out.println(infoDTO.toString());
-        System.out.println(configDTO.toString());
-
-        smartService.enviarParaProducao(configDTO, infoDTO);
-
         return PedidoMapper.mapDto(updated);
     }
+
 
     private void prepareForCompletion(Pedido pedido) {
         pedido.setStatus(StatusPedido.CONCLUIDO);
         pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
     }
+
 
     private Pedido saveWithExpedition(Pedido pedido) {
         Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
@@ -149,12 +155,14 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
+
     @Transactional
     public void delete(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
 
-        // Libera os estoques ocupados pelos blocos antes de deletar
+
+       
         for (Bloco bloco : pedido.getBlocos()) {
             if (bloco.getEstoque() != null) {
                 estoqueService.assignBlockColor(
@@ -163,22 +171,27 @@ public class PedidoService {
             }
         }
 
-        // Se pedido concluído, libera a posição na expedição
+
+       
         if (pedido.getStatus() == StatusPedido.CONCLUIDO && pedido.getExpedicao() != null) {
-            expedicaoService.AssignOrdemAtPosicao(null, pedido.getExpedicao().getPosicaoFisica());
+            expedicaoService.assignOrdemAtPosicao(0, pedido.getExpedicao().getPosicaoFisica());
         }
+
 
         pedidoRepository.delete(pedido);
     }
+
 
     @Transactional
     public PedidoResponseDTO update(Long id, PedidoRequestDTO requestDTO) {
         Pedido existing = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
 
+
         validatePedidoForUpdate(requestDTO, id);
 
-        // Libera estoques dos blocos antigos
+
+       
         for (Bloco bloco : existing.getBlocos()) {
             if (bloco.getEstoque() != null) {
                 estoqueService.assignBlockColor(
@@ -187,37 +200,46 @@ public class PedidoService {
             }
         }
 
-        // Remove os blocos antigos
+
+       
         blocoService.deleteAllByPedido(existing);
 
-        // Atualiza os campos do pedido
+
+       
         existing.setOrdemDeProducao(requestDTO.ordemDeProducao());
         existing.setTipo(requestDTO.tipo());
         existing.setCorTampa(requestDTO.corTampa());
         Pedido saved = pedidoRepository.save(existing);
 
-        // Recria os blocos com os novos dados
+
+       
         createBlocks(saved, requestDTO.blocos());
+
 
         return PedidoMapper.mapDto(pedidoRepository.findById(saved.getId()).get());
     }
 
+
     private void validatePedidoForUpdate(PedidoRequestDTO requestDTO, Long currentId) {
         validateRequiredFields(requestDTO);
+
 
         if (requestDTO.ordemDeProducao() <= 0)
             throw new InvalidOrdemDeProducaoException(requestDTO.ordemDeProducao());
 
+
         if (requestDTO.tipo().getValue() != requestDTO.blocos().size())
             throw new TipoIncompativelComBlocosException(requestDTO.tipo(), requestDTO.blocos().size());
 
-        // Verifica duplicata de ordemDeProducao ignorando o próprio pedido
+
+       
         pedidoRepository.findByOrdemDeProducao(requestDTO.ordemDeProducao())
                 .filter(p -> !p.getId().equals(currentId))
                 .ifPresent(p -> {
                     throw new BusinessException(
                             "Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
                 });
+
 
         validateDuplicateAndar(requestDTO.blocos());
     }

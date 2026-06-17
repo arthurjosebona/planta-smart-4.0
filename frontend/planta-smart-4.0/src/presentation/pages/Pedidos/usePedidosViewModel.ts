@@ -40,6 +40,22 @@ export function usePedidosViewModel() {
     }
   }
 
+  async function deletarPedido(id: number) {
+    setModel((s) => ({ ...s, loading: true, erro: null }));
+    try {
+      await pedidoService.delete(id);
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        erro: null,
+        pedidos: s.pedidos.filter((p) => p.id !== id),
+      }));
+    } catch (error: unknown) {
+      const mensagem = error instanceof HttpError ? error.message : 'Erro ao deletar pedido.';
+      setModel((s) => ({ ...s, loading: false, erro: mensagem }));
+    }
+  }
+
   function dismissErro() {
     setModel((s) => ({ ...s, erro: null }));
   }
@@ -59,6 +75,7 @@ export function usePedidosViewModel() {
   return {
     model,
     iniciarProducao,
+    deletarPedido,
     dismissErro,
     pedidosFiltrados,
     setStatusPedidoFiltro,
