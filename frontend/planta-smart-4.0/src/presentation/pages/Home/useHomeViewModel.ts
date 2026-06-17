@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StoreModel, StoreModelInitial } from '@pages/Home/HomeModel';
-// import { connectionService } from '@config/diContainer';
+import { conexaoService } from '@config/diContainer';
 
 export function useHomeViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
@@ -36,7 +36,7 @@ export function useHomeViewModel() {
   async function conectar() {
     setModel((s) => ({ ...s, loading: true, erro: null, sucesso: null }));
     try {
-      // await connectionService.conectar({ modulos: model.modulos });
+      await conexaoService.conectar(model.modulos);
       await new Promise((res) => setTimeout(res, 1200)); // placeholder
       setModel((s) => ({
         ...s,
