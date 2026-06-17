@@ -4,9 +4,11 @@ import { SiteTitle } from '@components/molecules/SiteTitle/SiteTitle';
 import { NavLink } from '@components/molecules/NavLink/NavLink';
 import { NavSeparator } from '@components/atoms/NavSeparator/NavSeparator';
 import { HamburgerButton } from '@components/atoms/HamburgerButton/HamburgerButton';
+import { StatusIndicator } from '@components/atoms/StatusIndicator/StatusIndicator';
 import styles from '@components/organisms/Header/header.module.css';
+import { useConexaoStatus } from '../../../hook/useConexaoStatus';
 
-const IconHome = (
+const IconHome = (  
   <>
     <path d="m3 9 9-7 9 7" />
     <path d="M5 10v10a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V10" />
@@ -50,24 +52,25 @@ interface NavItem {
   matchPath?: string;
 }
 const NAV_ITEMS: (NavItem | 'separator')[] = [
-  { href: '/', label: 'Home', icon: IconHome},
-  { href: '/store',     label: 'Store',     icon: IconStore     },
-  { href: '/pedidos',   label: 'Pedidos',   icon: IconPedido    },
+  { href: '/', label: 'Home', icon: IconHome },
+  { href: '/store', label: 'Store', icon: IconStore },
+  { href: '/pedidos', label: 'Pedidos', icon: IconPedido },
   'separator',
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
-  { href: '/estacoes',  label: 'Estações',  icon: IconEstacoes  },
-  
-
+  { href: '/estacoes', label: 'Estações', icon: IconEstacoes },
 ];
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
-  const navRef    = useRef<HTMLElement>(null);
+  const conectado = useConexaoStatus();
+  const navRef = useRef<HTMLElement>(null);
   const btnWrapRef = useRef<HTMLDivElement>(null);
 
   // Fecha ao navegar para outra rota
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   // Fecha ao clicar fora
   useEffect(() => {
@@ -76,7 +79,8 @@ export function Header() {
         menuOpen &&
         !navRef.current?.contains(e.target as Node) &&
         !btnWrapRef.current?.contains(e.target as Node)
-      ) setMenuOpen(false);
+      )
+        setMenuOpen(false);
     }
     document.addEventListener('mousedown', onMouseDown);
     return () => document.removeEventListener('mousedown', onMouseDown);
@@ -118,6 +122,8 @@ export function Header() {
             ),
           )}
         </nav>
+
+        <StatusIndicator conectado={conectado} compact />
 
         {/* div wrapper: dispensa forwardRef no HamburgerButton */}
         <div ref={btnWrapRef} className={styles.menuBtn}>
