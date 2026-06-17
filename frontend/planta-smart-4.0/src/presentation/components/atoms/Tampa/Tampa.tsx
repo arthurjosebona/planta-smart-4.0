@@ -31,7 +31,7 @@ export function Tampa({
         <PlasticMat color={color} />
       </mesh>
 
-      {/* Saliência de encaixe (lip) na face inferior */}
+      {/* Saliência de encaixe (lip) */}
       <mesh position={[0, y - LID.lipHeight / 2, 0]}>
         <boxGeometry
           args={[blockW - 2 * LID.lipInset, LID.lipHeight, blockD - 2 * LID.lipInset]}

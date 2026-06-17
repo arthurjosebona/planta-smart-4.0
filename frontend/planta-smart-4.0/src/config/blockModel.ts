@@ -16,22 +16,22 @@ import { CorTampa } from '@enums/CorTampa';
 export const BLOCK = {
   width: 1.7, // X — largura externa
   depth: 1.7, // Z — profundidade externa
-  height: 0.71, // Y — altura de um bloco (passo de empilhamento)
-  baseThickness: 0.1, // espessura do piso/base
-  cornerRadius: 0.045, // raio de arredondamento padrão das peças
+  height: 0.82, // Y — altura de um bloco (passo de empilhamento)
+  baseThickness: 0.14, // espessura do piso/base (banda sólida inferior)
+  cornerRadius: 0.05, // raio de arredondamento padrão das peças
 } as const;
 
 /** Borda elevada ao redor do piso (a "moldura" da base). */
 export const BASE_RIM = {
-  height: 0.05, // o quanto a borda sobe acima do piso
+  height: 0.07, // o quanto a borda sobe acima do piso
   thickness: 0.09, // espessura da parede da borda
 } as const;
 
 /** Colunas verticais nos quatro cantos. */
 export const COLUMN = {
-  width: 0.22, // seção quadrada (X e Z)
-  radius: 0.045, // arredondamento
-  overshoot: 0.18, // altura extra acima do corpo (cria a sobreposição no empilhamento)
+  width: 0.19, // seção quadrada (X e Z) — postes esbeltos como no original
+  radius: 0.04, // arredondamento
+  overshoot: 0.2, // altura extra acima do corpo (cria a sobreposição no empilhamento)
 } as const;
 
 /** Pino de encaixe no topo de cada coluna (conector de empilhamento). */
