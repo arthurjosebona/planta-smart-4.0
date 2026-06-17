@@ -128,7 +128,7 @@ public class ExpedicaoServiceTest {
     }
  
     // -------------------------------------------------------------------------
-    // AssignOrdemAtPosicao
+    // assignOrdemAtPosicao
     // -------------------------------------------------------------------------
  
     @Test
@@ -144,7 +144,7 @@ public class ExpedicaoServiceTest {
         when(expedicaoRepository.save(any(Expedicao.class))).thenReturn(expedicao);
  
         // Act
-        expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisica);
+        expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisica);
  
         // Assert
         verify(expedicaoRepository, times(1)).save(any(Expedicao.class));
@@ -158,7 +158,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(InvalidPosicaoExpedicaoException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  
@@ -170,7 +170,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(InvalidPosicaoExpedicaoException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  
@@ -184,7 +184,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(PosicaoExpedicaoOcupadaException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoOcupada));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoOcupada));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  
@@ -199,7 +199,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(OrdemDeProducaoExpedidaException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemJaExpedida, posicaoFisica));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemJaExpedida, posicaoFisica));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  
@@ -215,7 +215,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(RuntimeException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisica));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisica));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  

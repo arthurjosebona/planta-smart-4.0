@@ -38,6 +38,7 @@ public class ClpConfigController {
 
     @PutMapping("/ips")
     public ResponseEntity<Void> setAllIps(@RequestBody Map<String, String> novosIps) {
+        System.out.println("Atualizando IPs: " + novosIps);
         novosIps.forEach(clpIpConfig::setIp);
         return ResponseEntity.noContent().build();
     }
