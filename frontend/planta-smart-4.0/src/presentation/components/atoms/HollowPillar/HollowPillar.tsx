@@ -3,18 +3,22 @@ import * as THREE from 'three';
 import { PILLAR } from '@config/blockModel';
 import { PlasticMat } from '@components/atoms/PlasticMat/PlasticMat';
 
-/** Cria a geometria de um tubo (cilindro oco) extrudando um anel. */
+/**
+ * Cria a geometria de um tubo (cilindro oco) por revolução do perfil da parede
+ * em torno do eixo Y (LatheGeometry). Construção robusta — gera paredes interna
+ * e externa, além das coroas de topo e base, sem os problemas de triangulação
+ * (valores NaN) que o ExtrudeGeometry de um anel pode produzir. O tubo já nasce
+ * em pé, com altura de 0 a `depth`.
+ */
 function makeTube(outer: number, inner: number, depth: number, segments: number) {
-  const shape = new THREE.Shape();
-  shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
-  const hole = new THREE.Path();
-  hole.absarc(0, 0, inner, 0, Math.PI * 2, true);
-  shape.holes.push(hole);
-  return new THREE.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: false,
-    curveSegments: segments,
-  });
+  const profile = [
+    new THREE.Vector2(inner, 0),
+    new THREE.Vector2(outer, 0),
+    new THREE.Vector2(outer, depth),
+    new THREE.Vector2(inner, depth),
+    new THREE.Vector2(inner, 0),
+  ];
+  return new THREE.LatheGeometry(profile, segments);
 }
 
 interface HollowPillarProps {
@@ -67,16 +71,12 @@ export function HollowPillar({
 
   return (
     <group>
-      {/* Extrude é gerado no plano XY; a rotação coloca o tubo na vertical (Y). */}
-      <mesh geometry={bodyGeom} position={[x, baseY, z]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* O tubo (LatheGeometry) já nasce em pé no eixo Y — sem rotação. */}
+      <mesh geometry={bodyGeom} position={[x, baseY, z]}>
         <PlasticMat color={color} />
       </mesh>
       {pinGeom && (
-        <mesh
-          geometry={pinGeom}
-          position={[x, baseY + bodyHeight, z]}
-          rotation={[-Math.PI / 2, 0, 0]}
-        >
+        <mesh geometry={pinGeom} position={[x, baseY + bodyHeight, z]}>
           <PlasticMat color={color} />
         </mesh>
       )}

@@ -142,8 +142,18 @@ export const FLOOR_PAD = {
 /** Tampa (lid) que fecha o topo do bloco superior. */
 export const LID = {
   height: 0.22,
-  lipHeight: 0.06, // saliência inferior que encaixa entre as colunas
-  lipInset: 0.13, // recuo da saliência em relação à borda externa
+  /**
+   * O quanto a tampa transborda além das faces do bloco. Mínimo necessário só
+   * para a tampa cobrir o topo arredondado das colunas nos cantos (região de
+   * encaixe) e eliminar a emenda — mantendo praticamente o tamanho original.
+   */
+  overhang: 0.004,
+} as const;
+
+/** Giro automático do modelo quando ocioso (sem interação do usuário). */
+export const AUTO_ROTATE = {
+  speed: 2.0, // velocidade do giro horizontal (padrão do drei = 2.0)
+  resumeDelayMs: 2500, // ociosidade após interação até o giro recomeçar
 } as const;
 
 // ─── Materiais ───────────────────────────────────────────────────────────────
