@@ -71,11 +71,72 @@ export const BASE_CLIP = {
   edgeInset: 0.12, // recuo do clipe a partir da face interna
 } as const;
 
-/** Pequeno suporte central elevado no piso. */
-export const CENTER_HOLDER = {
-  width: 0.34,
-  depth: 0.22,
-  height: 0.09,
+// ─── Detalhes internos do bloco ──────────────────────────────────────────────
+
+/**
+ * Pilar de sustentação cilíndrico oco nos cantos internos. É o tubo vertical
+ * com furo no topo que recebe o pino do bloco de cima (conector de empilhamento).
+ */
+export const PILLAR = {
+  outerRadius: 0.09, // raio externo do tubo
+  innerRadius: 0.045, // raio do furo (parte oca)
+  segments: 24, // suavidade do cilindro
+  inset: 0.0, // recuo do centro a partir do canto interno (0 = no canto)
+  pin: true, // renderiza o pino conector no topo
+  pinRadius: 0.055, // raio externo do pino superior
+  pinInnerRadius: 0.025, // furo do pino
+  pinHeight: 0.16, // o quanto o pino se projeta acima do corpo
+} as const;
+
+/** Aleta triangular de reforço (gusset) que liga o pilar às paredes do canto. */
+export const CORNER_GUSSET = {
+  width: 0.32, // comprimento da parede diagonal
+  height: 0.32, // altura da aleta
+  thickness: 0.04, // espessura
+} as const;
+
+/** Bossas (furos de fixação) cilíndricas ocas no piso. */
+export const FLOOR_BOSS = {
+  outerRadius: 0.058,
+  innerRadius: 0.024,
+  height: 0.2,
+  segments: 20,
+  offsetX: 0.6, // posição lateral em fração da meia-largura
+  offsetZ: -0.04, // leve deslocamento em profundidade
+} as const;
+
+/** Moldura retangular central elevada (suporte tipo "janela") no piso. */
+export const CENTER_FRAME = {
+  width: 0.5,
+  depth: 0.26,
+  height: 0.14,
+  wallThickness: 0.04,
+  offsetZ: -0.24, // deslocada para o fundo do piso
+} as const;
+
+/** Trilho fino no piso, com pequenos clipes em "C" nas pontas. */
+export const FLOOR_RAIL = {
+  length: 0.64,
+  width: 0.05,
+  height: 0.1,
+  offsetZ: 0.28, // deslocado para a frente do piso
+  clipLength: 0.11,
+  clipWidth: 0.1,
+  clipThickness: 0.04,
+} as const;
+
+/** Marcas circulares de ejeção no piso (detalhe sutil e plano). */
+export const FLOOR_PAD = {
+  radius: 0.075,
+  height: 0.008,
+  segments: 20,
+  /** Posições [x, z] em fração da meia-dimensão do piso. */
+  positions: [
+    [-0.46, 0.46],
+    [0.46, 0.46],
+    [-0.46, -0.12],
+    [0.46, -0.12],
+  ] as ReadonlyArray<readonly [number, number]>,
 } as const;
 
 /** Tampa (lid) que fecha o topo do bloco superior. */

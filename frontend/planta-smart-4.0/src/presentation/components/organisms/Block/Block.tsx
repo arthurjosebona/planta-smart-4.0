@@ -5,7 +5,6 @@ import {
   COLUMN,
   BACK_WALL,
   BLADE,
-  CENTER_HOLDER,
   COR_BLOCO_HEX,
   COR_LAMINA_HEX,
   COR_BLOCO_FALLBACK,
@@ -16,6 +15,7 @@ import { BaseFloor } from '@components/atoms/BaseFloor/BaseFloor';
 import { Column } from '@components/atoms/Column/Column';
 import { BladeRail } from '@components/atoms/BladeRail/BladeRail';
 import { BaseClip } from '@components/atoms/BaseClip/BaseClip';
+import { BlockInterior } from '@components/molecules/BlockInterior/BlockInterior';
 import { Blade } from '@components/molecules/Blade/Blade';
 
 /** As três faces abertas do bloco (a traseira é sempre fechada). */
@@ -72,13 +72,18 @@ export function Block({
       {/* Piso + moldura */}
       <BaseFloor baseBottomY={blockY} color={hex} blockW={blockW} blockD={blockD} baseT={baseT} colW={colW} />
 
-      {/* Suporte central no piso */}
-      <mesh position={[0, floorTopY + CENTER_HOLDER.height / 2, 0]}>
-        <boxGeometry args={[CENTER_HOLDER.width, CENTER_HOLDER.height, CENTER_HOLDER.depth]} />
-        <PlasticMat color={hex} />
-      </mesh>
+      {/* Detalhes internos: pilares ocos, aletas, bossas, moldura, trilho e marcas */}
+      <BlockInterior
+        blockY={blockY}
+        color={hex}
+        blockW={blockW}
+        blockD={blockD}
+        baseT={baseT}
+        colW={colW}
+        bodyHeight={bodyH}
+      />
 
-      {/* Colunas dos quatro cantos (com pino de encaixe no topo) */}
+      {/* Colunas (paredes) dos quatro cantos */}
       {corners.map(([x, z]) => (
         <Column
           key={`${x},${z}`}
@@ -88,7 +93,6 @@ export function Block({
           bodyHeight={bodyH}
           color={hex}
           width={colW}
-          withPeg
         />
       ))}
 
