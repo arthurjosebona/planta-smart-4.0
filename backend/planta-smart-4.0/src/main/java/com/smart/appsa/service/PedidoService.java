@@ -166,7 +166,7 @@ public class PedidoService {
 
         // Se pedido concluído, libera a posição na expedição
         if (pedido.getStatus() == StatusPedido.CONCLUIDO && pedido.getExpedicao() != null) {
-            expedicaoService.assignOrdemAtPosicao(null, pedido.getExpedicao().getPosicaoFisica());
+            expedicaoService.assignOrdemAtPosicao(0, pedido.getExpedicao().getPosicaoFisica());
         }
 
         pedidoRepository.delete(pedido);

@@ -14,6 +14,7 @@ import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.Lamina;
+import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.enums.PosicaoLamina;
 import com.smart.appsa.repository.BlocoRepository;
 
@@ -34,9 +35,8 @@ public class BlocoService {
     @Transactional(readOnly = true)
     public Bloco findById(Long id) {
         return blocoRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Bloco", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Bloco", id));
     }
-    
 
     @Transactional
     public Bloco create(Bloco bloco) {
@@ -47,42 +47,39 @@ public class BlocoService {
         return blocoSalvo;
     }
 
-
     private void validateRequiredFields(Bloco bloco) {
-        // if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty()) 
-        //     throw new RequiredFieldException("laminas");
+        // if (bloco.getLaminas() == null || bloco.getLaminas().isEmpty())
+        // throw new RequiredFieldException("laminas");
     }
 
     private void validateBusinessRules(Bloco bloco) {
-        if (bloco.getLaminas().size() > 3 || bloco.getLaminas().size() < 0) 
+        if (bloco.getLaminas().size() > 3 || bloco.getLaminas().size() < 0)
             throw new LaminasSizeException(bloco.getLaminas().size());
         validateLaminasPosition(bloco.getLaminas());
     }
 
     private void validateLaminasPosition(List<Lamina> laminas) {
         Map<PosicaoLamina, Long> countByPosicaoLamina = laminas.stream()
-            .collect(Collectors.groupingBy(
-                Lamina::getPosicao,
-                Collectors.counting()
-            ));
+                .collect(Collectors.groupingBy(
+                        Lamina::getPosicao,
+                        Collectors.counting()));
 
         List<PosicaoLamina> duplicatePosicao = countByPosicaoLamina.entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() > 1)
-            .map(Map.Entry::getKey)
-            .toList();
+                .stream()
+                .filter(entry -> entry.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .toList();
 
         if (!duplicatePosicao.isEmpty()) {
             throw new DuplicatePosicaoException(duplicatePosicao);
         }
-    } 
+    }
 
     private Bloco createBloco(Bloco bloco) {
         Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
         bloco.setEstoque(estoque);
         return blocoRepository.save(bloco);
     }
-
 
     private void createLaminas(List<Lamina> laminas, Bloco bloco) {
         for (Lamina lamina : laminas) {
@@ -112,7 +109,7 @@ public class BlocoService {
     }
 
     @Transactional
-public void deleteAllByPedido(Pedido pedido) {
-    blocoRepository.deleteAllByPedido(pedido);
-}
+    public void deleteAllByPedido(Pedido pedido) {
+        blocoRepository.deleteAllByPedido(pedido);
+    }
 }

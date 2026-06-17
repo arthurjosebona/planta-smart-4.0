@@ -1,8 +1,4 @@
-export interface ModuloIP {
-    key: 'estoque' | 'processo' | 'montagem' | 'expedicao';
-    label: string;
-    ip: string;
-  }
+import { ModuloIP } from '@entities/ModuloIP';
   
   export interface StoreModel {
     modulos: ModuloIP[];
