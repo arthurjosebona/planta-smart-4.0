@@ -8,29 +8,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class MontagemCommService {
-
-    //********************** Monatgem **************************
-    //----------------------- NodeToPlc ------------------------
-    /*---- StatusOP -------*/
-    boolean recebidoOpMon = false;
-    //----------------------- PlcToNode ------------------------
-    /*---- StatusOP -------*/
-    int numeroOPMon = 0;
-    boolean cancelOPMon = false;
-    boolean finishOPMon = false;
-    boolean startOPMon = false;
-
-    /*---- StatusEstacao -------*/
-    boolean ocupadoMon = false;
-    boolean aguardandoMon = false;
-    boolean manualMon = false;
-    boolean emergenciaMon = false;
-
-    /*---- RealidadeAumentada --------*/
-    boolean xEmergenciaAtivadaMon = false;
-    boolean xComutadorAutomaticoMon = false;
-    boolean xCondicaoIniciarMon = false;
-
     private PlcConnectionService plcConnectionService;
 
     public void processData(String ip, byte[] dadosClp3) {

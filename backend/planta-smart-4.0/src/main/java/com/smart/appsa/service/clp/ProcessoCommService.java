@@ -3,38 +3,15 @@ package com.smart.appsa.service.clp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smart.appsa.clpcomm.PlcConnectionService;
+
+import lombok.AllArgsConstructor;
+
 
 @Service
+@AllArgsConstructor
 public class ProcessoCommService {
-
-    //********************** Processo **************************
-    //----------------------- NodeToPlc ------------------------
-    /*---- StatusOP -------*/
-    boolean recebidoOpPro = false;
-    //----------------------- PlcToNode ------------------------
-    /*---- StatusOP -------*/
-    int numeroOPPro = 0;
-    boolean cancelOPPro = false;
-    boolean finishOPPro = false;
-    boolean startOPPro = false;
-
-    /*---- StatusEstacao -------*/
-    boolean ocupadoPro = false;
-    boolean aguardandoPro = false;
-    boolean manualPro = false;
-    boolean emergenciaPro = false;
-
-    /*---- RealidadeAumentada --------*/
-    boolean xEmergenciaAtivadaPro = false;
-    boolean xComutadorAutomaticoPro = false;
-    boolean xNecessitaHomeEixoXPro = false;
-    boolean xNecessitaHomeEixoYPro = false;
-    boolean xServoDesligadoEixoXPro = false;
-    boolean xServoDesligadoEixoYPro = false;
-    boolean xCondicaoIniciarPro = false;
-
-
-    @Autowired private PlcConnectionService plcConnectionService;
+    private PlcConnectionService plcConnectionService;
 
     public void processData(String ip, byte[] dadosClp2) {
         // lógica que hoje está no método clpProcesso(...)

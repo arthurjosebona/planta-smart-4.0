@@ -9,41 +9,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ExpedicaoCommService {
-
-    //********************** Expedição *************************
-    //----------------------- NodeToPlc ------------------------
-    /*---- StatusOP -------*/
-    boolean recebidoOpExp = false;
-    /*---- GerenciamentoExpedicao -------*/
-    boolean recebidoExpedicao = false;
-    boolean iniciarGuardarExp = false;
-    int posicaoGuardarExp = 0;
-
-    /*---- RemoverPedido -------*/
-    int[] orderExpedicao = new int[12];
-
-    //public static int posicaoExpedicaoSolicitada = 0;
-    //----------------------- PlcToNode ------------------------
-    /*---- StatusOP ------------------*/
-    int numeroOPExp = 0;
-    boolean cancelOPExp = false;
-    boolean finishOPExp = false;
-    boolean startOPExp = false;
-
-    /*---- StatusEstacao -------*/
-    boolean ocupadoExp = false;
-    boolean aguardandoExp = false;
-    boolean manualExp = false;
-    boolean emergenciaExp = false;
-
-    /*---- GerenciamentoEstoque ------*/
-    boolean pedirPosicaoExp = false;
-    int posicaoGuardadoExpedicao = 0;
-    int posicaoRemovidoExpedicao = 0;
-    boolean adicionarExpedicao = false;
-    boolean removerExpedicao = false;
-    int opGuardadoExpedicao = 0;
-
     private PlcConnectionService plcConnectionService;
     private ExpedicaoRepository expedicaoRepository;
     private ApiIntegrationService apiIntegrationService;
