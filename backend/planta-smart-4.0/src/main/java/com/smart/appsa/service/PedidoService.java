@@ -18,7 +18,6 @@ import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
-import com.smart.appsa.exception.core.BusinessException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Bloco;
@@ -29,7 +28,6 @@ import com.smart.appsa.model.enums.AndarBloco;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.repository.PedidoRepository;
-import com.smart.appsa.service.clp.SmartService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -217,9 +215,7 @@ public class PedidoService {
         pedidoRepository.findByOrdemDeProducao(requestDTO.ordemDeProducao())
                 .filter(p -> !p.getId().equals(currentId))
                 .ifPresent(p -> {
-                    throw new OrdemDeProducaoExistenteException(
-                        "Pedido já existe com ordem de produção " + 
-                        requestDTO.ordemDeProducao());
+                    throw new OrdemDeProducaoExistenteException(requestDTO.ordemDeProducao());
                 });
 
         validateDuplicateAndar(requestDTO.blocos());

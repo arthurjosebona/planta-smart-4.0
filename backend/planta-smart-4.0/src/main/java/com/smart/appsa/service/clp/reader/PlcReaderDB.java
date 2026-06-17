@@ -1,4 +1,4 @@
-package com.smart.appsa.service.clp;
+package com.smart.appsa.service.clp.reader;
 
 import java.util.function.Consumer;
 

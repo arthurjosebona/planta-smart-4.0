@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
+import com.smart.appsa.model.clp.EstoqueInfo;
+import com.smart.appsa.model.clp.EstoqueInfoClp;
+import com.smart.appsa.service.SmartService;
 
 import lombok.AllArgsConstructor;
 
@@ -18,11 +21,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class EstoqueCommService {
     private PlcConnectionService plcConnectionService;
-    private EstoqueCommRepository estoqueRepository;
-    private ApiIntegrationService apiIntegrationService;
+    private EstoqueInfoClp estoqueInfoClp;
 
     public void processData(String ip, byte[] dadosClp1) {
-        // lógica que hoje está no método clpEstoque(...)
         //-------------- Apresentação no console -----------------
         StringBuilder leituraClp1 = new StringBuilder();
         for (byte b : dadosClp1) {
@@ -36,38 +37,40 @@ public class EstoqueCommService {
             return;
         }
         //-------------- Leitura das variáveis -------------------
-        recebidoOpEst = (dadosClp1[0] & 0x01) != 0;
+        estoqueInfoClp.setRecebidoOp((dadosClp1[0] & 0x01) != 0);
 
-        iniciarPedido = (dadosClp1[62] & (byte) 0x01) != 0;
-        recebidoEstoque = (dadosClp1[64] & 0x01) != 0;
-        iniciarGuardarEst = (dadosClp1[64] & 0x02) != 0;
+        estoqueInfoClp.setIniciarPedido((dadosClp1[62] & (byte) 0x01) != 0);
+        estoqueInfoClp.setRecebidoEstoque((dadosClp1[64] & 0x01) != 0);
+        estoqueInfoClp.setIniciarGuardarEst((dadosClp1[64] & 0x02) != 0);
 
-        posicaoGuardarEst = ((dadosClp1[66] & 0xFF) << 8) | (dadosClp1[67] & 0xFF);
-        
+        estoqueInfoClp.setPosicaoGuardarEst(((dadosClp1[66] & 0xFF) << 8) | (dadosClp1[67] & 0xFF));
+
+        byte[] posicoesOcupadas = new byte[28];
         for (int c = 0; c < 28; c++) {
             posicoesOcupadas[c] = dadosClp1[68 + c];
         }
-        
-        numeroOPEst = ((dadosClp1[96] & 0xFF) << 8) | (dadosClp1[97] & 0xFF);
-        cancelOPEst = (dadosClp1[98] & 0x01) != 0;
-        finishOPEst = (dadosClp1[98] & 0x02) != 0;
-        startOPEst = (dadosClp1[98] & 0x04) != 0;
+        estoqueInfoClp.setPosicoesOcupadas(posicoesOcupadas);
 
-        ocupadoEst = (dadosClp1[100] & 0x01) != 0;
-        aguardandoEst = (dadosClp1[100] & 0x02) != 0;
-        manualEst = (dadosClp1[100] & 0x04) != 0;
-        emergenciaEst = (dadosClp1[100] & 0x08) != 0;
+        estoqueInfoClp.setNumeroOP(((dadosClp1[96] & 0xFF) << 8) | (dadosClp1[97] & 0xFF));
+        estoqueInfoClp.setCancelOP((dadosClp1[98] & 0x01) != 0);
+        estoqueInfoClp.setFinishOP((dadosClp1[98] & 0x02) != 0);
+        estoqueInfoClp.setStartOP((dadosClp1[98] & 0x04) != 0);
 
-        pedirPosicaoEst = (dadosClp1[102] & 0x01) != 0;
-        posicaoEstoque = ((dadosClp1[104] & 0xFF) << 8) | (dadosClp1[105] & 0xFF);
-        adicionarEstoque = (dadosClp1[106] & 0x01) != 0;
+        estoqueInfoClp.setOcupado((dadosClp1[100] & 0x01) != 0);
+        estoqueInfoClp.setAguardando((dadosClp1[100] & 0x02) != 0);
+        estoqueInfoClp.setManual((dadosClp1[100] & 0x04) != 0);
+        estoqueInfoClp.setEmergencia((dadosClp1[100] & 0x08) != 0);
 
-        removerEstoque = (boolean) ((dadosClp1[106] & 0x02) != 0);
+        estoqueInfoClp.setPedirPosicaoEst((dadosClp1[102] & 0x01) != 0);
+        estoqueInfoClp.setPosicaoEstoque(((dadosClp1[104] & 0xFF) << 8) | (dadosClp1[105] & 0xFF));
+        estoqueInfoClp.setAdicionarEstoque((dadosClp1[106] & 0x01) != 0);
 
-        retornoEstoqueCheio = (dadosClp1[106] & 0x04) != 0;
-        corGuardarEstoque = ((dadosClp1[108] & 0xFF) << 8) | (dadosClp1[109] & 0xFF);
+        estoqueInfoClp.setRemoverEstoque((dadosClp1[106] & 0x02) != 0);
 
-        removerEstoque = (dadosClp1[106] & 0x02) != 0;
+        estoqueInfoClp.setRetornoEstoqueCheio((dadosClp1[106] & 0x04) != 0);
+        estoqueInfoClp.setCorGuardarEstoque(((dadosClp1[108] & 0xFF) << 8) | (dadosClp1[109] & 0xFF));
+
+        estoqueInfoClp.setRemoverEstoque((dadosClp1[106] & 0x02) != 0);
 
         // System.out.println("StatusEstoque: " + statusEstoque + "\n"
         //         + "StatusProcesso: " + statusProcesso + "\n"
@@ -77,7 +80,7 @@ public class EstoqueCommService {
         // Se o pedido foi iniciado e a estação ESTOQUE informou que iniciou a operação
         // ficando no estado OCUPADO
         // então a flag iniciarPedido fica em FALSE
-        if (iniciarPedido == true && ocupadoEst == true) {
+        if (estoqueInfoClp.isIniciarPedido() == true && estoqueInfoClp.isOcupado() == true) {
             SmartService.pedidoEmCurso = true;
             SmartService.statusEstoque = 0;
             SmartService.statusProducao = 0;
@@ -105,7 +108,7 @@ public class EstoqueCommService {
 
         // Se as três flags (StartOP, FinishOP e CancelOP) estão em FALSE, então a flag
         // RecebidoOP fica em FALSE
-        if (startOPEst == false & finishOPEst == false & cancelOPEst == false) {
+        if (estoqueInfoClp.isStartOP() == false & estoqueInfoClp.isFinishOP() == false & estoqueInfoClp.isCancelOP() == false) {
             //eventos.add("Seq " + seq++ + ": startOPEst == false & finishOPEst == false & cancelOPEst == false");
             if (SmartService.readOnly == false) {
 
@@ -122,7 +125,7 @@ public class EstoqueCommService {
 
         // Se a estação ESTOQUE sinalizou o início da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
-        if (startOPEst == true & recebidoOpEst == false) {
+        if (estoqueInfoClp.isStartOP() == true & estoqueInfoClp.isRecebidoOp() == false) {
             if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
                 SmartService.statusEstoque = 1;
             } else {
@@ -146,7 +149,7 @@ public class EstoqueCommService {
 
         // Se a estação ESTOQUE sinalizou o témino da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
-        if (finishOPEst == true & recebidoOpEst == false) {
+        if (estoqueInfoClp.isFinishOP() == true & estoqueInfoClp.isRecebidoOp() == false) {
             //eventos.add("Seq " + seq++ + ": finishOPEst == true & recebidoOpEst == false");
             if (SmartService.readOnly == false) {
                 //System.out.println("Flag: RecebidoOPEstoque_TRUE");
@@ -168,7 +171,7 @@ public class EstoqueCommService {
         }
 
         // Se as flags de remover ou adicionar no estoque estão em FALSE então a flag RecebidoEstoque fica em FALSE
-        if (removerEstoque == false & adicionarEstoque == false) {
+        if (estoqueInfoClp.isRemoverEstoque() == false & estoqueInfoClp.isAdicionarEstoque() == false) {
             //eventos.add("Seq " + seq++ + ": removerEstoque == false & adicionarEstoque == false");
             if (SmartService.readOnly == false) {
 
@@ -184,7 +187,7 @@ public class EstoqueCommService {
         }
 
         // Atualiza a posição removida na tabela Estoque e na memória do clp Estoque
-        if ((posicaoEstoque > 0) && removerEstoque == true) {
+        if ((estoqueInfoClp.getPosicaoEstoque() > 0) && estoqueInfoClp.isRemoverEstoque() == true) {
             if (!SmartService.readOnly) {
                 try {
                     plcConnectorEst.writeBit(9, 64, 0, true);
@@ -192,16 +195,16 @@ public class EstoqueCommService {
                     System.out.println("ERRO: Atualização da Flag RecebidoEstoque [DB9:64.0] para TRUE");
                 }
 
-                byte offset = (byte) (68 + (posicaoEstoque - 1));
+                byte offset = (byte) (68 + (estoqueInfoClp.getPosicaoEstoque() - 1));
 
                 try {
                     // Atualiza cor no CLP
-                    System.out.println("\n\nREMOVENDO ESTOQUE NA POSIÇÃO: " + offset + " COR: " + corGuardarEstoque + "\n\n");
+                    System.out.println("\n\nREMOVENDO ESTOQUE NA POSIÇÃO: " + offset + " COR: " + estoqueInfoClp.getCorGuardarEstoque() + "\n\n");
                     plcConnectorEst.writeByte(9, offset, (byte) 0);
 
                     // Cria mapa de dados com apenas uma posição
                     Map<String, Integer> dadosMap = new HashMap<>();
-                    dadosMap.put("posicao:" + posicaoEstoque, 0);
+                    dadosMap.put("posicao:" + estoqueInfoClp.getPosicaoEstoque(), 0);
 
                     // === Chama serviço de integração ===
                     boolean sucesso = apiIntegrationService.salvarEstoque(dadosMap);
@@ -221,7 +224,7 @@ public class EstoqueCommService {
         }
 
         // Atualiza na posição a cor do bloco adicionado na tabela Estoque e na memória do clp Estoque
-        if ((posicaoEstoque > 0) && adicionarEstoque == true) {
+        if ((estoqueInfoClp.getPosicaoEstoque() > 0) && estoqueInfoClp.isAdicionarEstoque() == true) {
             //eventos.add("Seq " + seq++ + ": (posicaoEstoque > 0) & adicionarEstoque == true");
             if (SmartService.readOnly == false) {
 
@@ -235,15 +238,15 @@ public class EstoqueCommService {
                 }
 
                 //eventos.add("Seq " + seq++ + ": Adicionando bloco na posição: " + posicaoEstoque);
-                byte offset = (byte) (68 + (posicaoEstoque - 1));
+                byte offset = (byte) (68 + (estoqueInfoClp.getPosicaoEstoque() - 1));
 
                 try {
                     // Atualiza cor no CLP
-                    plcConnectorEst.writeByte(9, offset, (byte) corGuardarEstoque);
+                    plcConnectorEst.writeByte(9, offset, (byte) estoqueInfoClp.getCorGuardarEstoque());
 
                     // Cria mapa de dados com apenas uma posição
                     Map<String, Integer> dadosMap = new HashMap<>();
-                    dadosMap.put("posicao:" + posicaoEstoque, corGuardarEstoque);
+                    dadosMap.put("posicao:" + estoqueInfoClp.getPosicaoEstoque(), estoqueInfoClp.getCorGuardarEstoque());
 
                     // === Chama serviço de integração ===
                     boolean sucesso = apiIntegrationService.salvarEstoque(dadosMap);
@@ -264,7 +267,7 @@ public class EstoqueCommService {
 
         //--------------------------------------------------------------------------------------------------------------------------------------
         // Se as flags ocupadoEst ou retornoEstoqueCheio estão em TRUE E a flag iniciarGuardarEst foi ativada então a flag iniciarGuardarEst fica em FALSE
-        if ((ocupadoEst == true | retornoEstoqueCheio == true) & iniciarGuardarEst == true) {
+        if ((estoqueInfoClp.isOcupado() == true | estoqueInfoClp.isRetornoEstoqueCheio() == true) & estoqueInfoClp.isIniciarGuardarEst() == true) {
             //eventos.add("Seq " + seq++ + ": (ocupadoEst == true | retornoEstoqueCheio == true) & iniciarGuardarEst == true");
             if (SmartService.readOnly == false) {
                 //System.out.println("Flag: IniciarGuardar_FALSE");
@@ -285,7 +288,7 @@ public class EstoqueCommService {
         // Verificar se a estação Estoque está livre E pede posição para guardar
         // Aqui deve ser implementada/chamada a função que verifica qual a situação de ocupação de cada
         // posição do Magazine de Estoque
-        if (pedirPosicaoEst == true & ocupadoEst == false) {
+        if (estoqueInfoClp.isPedirPosicaoEst() == true & estoqueInfoClp.isOcupado() == false) {
             //System.out.println("ESTOU AQUI- (pedirPosicaoEst == true) & ocupadoEst == false");
             //eventos.add("Seq " + seq++ + ": pedirPosicaoEst == true & ocupadoEst == false");
             // Rotina para verificar qual posição está disponível para guardar
@@ -320,14 +323,4 @@ public class EstoqueCommService {
         }
 
     }
-
-    public int buscarPrimeiraPosicaoPorCor(int cor, Set<Integer> usadas) {
-        return estoqueRepository.findByCorOrderByPosicaoEstoqueAsc(cor)
-                .stream()
-                .filter(e -> !usadas.contains(e.getPosicaoEstoque()))
-                .map(Estoque::getPosicaoEstoque)
-                .findFirst()
-                .orElse(-1);
-    }
-
 }

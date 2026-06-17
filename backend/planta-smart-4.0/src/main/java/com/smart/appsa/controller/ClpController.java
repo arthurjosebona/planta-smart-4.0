@@ -27,10 +27,10 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.service.clp.EstoqueCommService;
 import com.smart.appsa.service.clp.ExpedicaoCommService;
 import com.smart.appsa.service.clp.MontagemCommService;
-import com.smart.appsa.service.clp.PlcReaderDB;
-import com.smart.appsa.service.clp.PlcReaderMultDB;
 import com.smart.appsa.service.clp.ProcessoCommService;
 import com.smart.appsa.service.clp.SmartService;
+import com.smart.appsa.service.clp.reader.PlcReaderDB;
+import com.smart.appsa.service.clp.reader.PlcReaderMultDB;
 
 import lombok.AllArgsConstructor;
 

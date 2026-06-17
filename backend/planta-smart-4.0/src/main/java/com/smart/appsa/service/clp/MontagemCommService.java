@@ -3,12 +3,15 @@ package com.smart.appsa.service.clp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smart.appsa.model.clp.MontagemInfo;
+
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class MontagemCommService {
     private PlcConnectionService plcConnectionService;
+    private MontagemInfo montagemInfo;
 
     public void processData(String ip, byte[] dadosClp3) {
         // lógica que hoje está no método clpMontagem(...)
@@ -26,17 +29,17 @@ public class MontagemCommService {
             return;
         }
         //-------------- Leitura das variáveis -------------------
-        recebidoOpMon = (dadosClp3[0] & 0x01) != 0;
+        montagemInfo.setRecebidoOp((dadosClp3[0] & 0x01) != 0);
 
-        numeroOPMon = ((dadosClp3[2] & 0xFF) << 8) | (dadosClp3[3] & 0xFF);
-        cancelOPMon = (dadosClp3[4] & 0x01) != 0;
-        finishOPMon = (dadosClp3[4] & 0x02) != 0;
-        startOPMon = (dadosClp3[4] & 0x04) != 0;
+        montagemInfo.setNumeroOP(((dadosClp3[2] & 0xFF) << 8) | (dadosClp3[3] & 0xFF));
+        montagemInfo.setCancelOP((dadosClp3[4] & 0x01) != 0);
+        montagemInfo.setFinishOP((dadosClp3[4] & 0x02) != 0);
+        montagemInfo.setStartOP((dadosClp3[4] & 0x04) != 0);
 
-        ocupadoMon = (dadosClp3[6] & 0x01) != 0;
-        aguardandoMon = (dadosClp3[6] & 0x02) != 0;
-        manualMon = (dadosClp3[6] & 0x04) != 0;
-        emergenciaMon = (dadosClp3[6] & 0x08) != 0;
+        montagemInfo.setOcupado((dadosClp3[6] & 0x01) != 0);
+        montagemInfo.setAguardando((dadosClp3[6] & 0x02) != 0);
+        montagemInfo.setManual((dadosClp3[6] & 0x04) != 0);
+        montagemInfo.setEmergencia((dadosClp3[6] & 0x08) != 0);
 
         // System.out.println("StatusEstoque: " + statusEstoque + "\n"
         //         + "StatusProcesso: " + statusProcesso + "\n"
@@ -44,7 +47,7 @@ public class MontagemCommService {
         //         + "StatusExpedicao: " + statusExpedicao + "\n");
         // Se as três flags (StartOPMon, FinishOPMon e CancelOPMon) estão em FALSE, então a flag
         // RecebidoOPMon fica em FALSE
-        if (startOPMon == false && finishOPMon == false && cancelOPMon == false) {
+        if (montagemInfo.isStartOP() == false && montagemInfo.isFinishOP() == false && montagemInfo.isCancelOP() == false) {
             if (SmartService.readOnly == false) {
 
                 try {
@@ -56,7 +59,7 @@ public class MontagemCommService {
         }
         // Se a estação MONTAGEM sinalizou o inicio da operação e recebidoOpMon está em FALSE, então a
         // flag RecebidoOPMon fica em TRUE
-        if (startOPMon == true && recebidoOpMon == false) {
+        if (montagemInfo.isStartOP() == true && montagemInfo.isRecebidoOp() == false) {
             if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
                 SmartService.statusMontagem = 1;
             } else {
@@ -78,7 +81,7 @@ public class MontagemCommService {
 
         // Se a estação MONTAGEM sinalizou o témino da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
-        if (finishOPMon == true && recebidoOpMon == false) {
+        if (montagemInfo.isFinishOP() == true && montagemInfo.isRecebidoOp() == false) {
             if (SmartService.readOnly == false) {
 
                 try {

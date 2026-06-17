@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
+import com.smart.appsa.model.clp.ProcessoInfo;
 
 import lombok.AllArgsConstructor;
 
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ProcessoCommService {
     private PlcConnectionService plcConnectionService;
+    private ProcessoInfo processoInfo;
 
     public void processData(String ip, byte[] dadosClp2) {
         // lógica que hoje está no método clpProcesso(...)
@@ -30,17 +32,17 @@ public class ProcessoCommService {
         }
 
         //-------------- Leitura das variáveis -------------------
-        recebidoOpPro = (dadosClp2[0] & 0x01) != 0;
+        processoInfo.setRecebidoOp((dadosClp2[0] & 0x01) != 0);
 
-        numeroOPPro = ((dadosClp2[2] & 0xFF) << 8) | (dadosClp2[3] & 0xFF);
-        cancelOPPro = (dadosClp2[4] & 0x01) != 0;
-        finishOPPro = (dadosClp2[4] & 0x02) != 0;
-        startOPPro = (dadosClp2[4] & 0x04) != 0;
+        processoInfo.setNumeroOP(((dadosClp2[2] & 0xFF) << 8) | (dadosClp2[3] & 0xFF));
+        processoInfo.setCancelOP((dadosClp2[4] & 0x01) != 0);
+        processoInfo.setFinishOP((dadosClp2[4] & 0x02) != 0);
+        processoInfo.setStartOP((dadosClp2[4] & 0x04) != 0);
 
-        ocupadoPro = (dadosClp2[6] & 0x01) != 0;
-        aguardandoPro = (dadosClp2[6] & 0x02) != 0;
-        manualPro = (dadosClp2[6] & 0x04) != 0;
-        emergenciaPro = (dadosClp2[6] & 0x08) != 0;
+        processoInfo.setOcupado((dadosClp2[6] & 0x01) != 0);
+        processoInfo.setAguardando((dadosClp2[6] & 0x02) != 0);
+        processoInfo.setManual((dadosClp2[6] & 0x04) != 0);
+        processoInfo.setEmergencia((dadosClp2[6] & 0x08) != 0);
 
         // System.out.println("StatusEstoque: " + statusEstoque + "\n"
         //         + "StatusProcesso: " + statusProcesso + "\n"
@@ -48,7 +50,7 @@ public class ProcessoCommService {
         //         + "StatusExpedicao: " + statusExpedicao + "\n");
         // Se as três flags (StartOP, FinishOP e CancelOP) estão em FALSE, então a flag
         // RecebidoOP fica em FALSE
-        if (startOPPro == false && finishOPPro == false && cancelOPPro == false) {
+        if (processoInfo.isStartOP() == false && processoInfo.isFinishOP() == false && processoInfo.isCancelOP() == false) {
             if (SmartService.readOnly == false) {
 
                 try {
@@ -59,7 +61,7 @@ public class ProcessoCommService {
         }
         // Se a estação PROCESSO sinalizou o inicio da operação e recebidoOpPro está em FALSE, então a
         // flag RecebidoOPPRO fica em TRUE
-        if (startOPPro == true && recebidoOpPro == false) {
+        if (processoInfo.isStartOP() == true && processoInfo.isRecebidoOp() == false) {
             if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
                 SmartService.statusProcesso = 1;
             } else {
@@ -78,7 +80,7 @@ public class ProcessoCommService {
         }
         // Se a estação PROCESSO sinalizou o témino da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
-        if (finishOPPro == true && recebidoOpPro == false) {
+        if (processoInfo.isFinishOP() == true && processoInfo.isRecebidoOp() == false) {
             if (SmartService.readOnly == false) {
 
                 try {

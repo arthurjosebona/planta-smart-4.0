@@ -7,11 +7,13 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smart.appsa.clpcomm.PlcConnectionService;
+import com.smart.appsa.model.clp.ExpedicaoInfoClp;
+
 @Service
 public class ExpedicaoCommService {
     private PlcConnectionService plcConnectionService;
-    private ExpedicaoRepository expedicaoRepository;
-    private ApiIntegrationService apiIntegrationService;
+    private ExpedicaoInfoClp expedicaoInfoClp;
 
     public void processData(String ip, byte[] dadosClp4) {
         // lógica que hoje está no método clpExpedicao(...)
@@ -29,34 +31,36 @@ public class ExpedicaoCommService {
             return;
         }
         //-------------- Leitura das variáveis -------------------
-        recebidoOpExp = (dadosClp4[0] & 0x01) != 0;
+        expedicaoInfoClp.setRecebidoOp((dadosClp4[0] & 0x01) != 0);
 
-        recebidoExpedicao = (dadosClp4[2] & 0x01) != 0;
-        iniciarGuardarExp = (dadosClp4[2] & 0x02) != 0;
-        posicaoGuardarExp = ((dadosClp4[4] & 0xFF) << 8) | (dadosClp4[5] & 0xFF);
+        expedicaoInfoClp.setRecebidoExpedicao((dadosClp4[2] & 0x01) != 0);
+        expedicaoInfoClp.setIniciarGuardarExp((dadosClp4[2] & 0x02) != 0);
+        expedicaoInfoClp.setPosicaoGuardarExp(((dadosClp4[4] & 0xFF) << 8) | (dadosClp4[5] & 0xFF));
 
+        int[] orderExpedicao = new int[12];
         int x = 0;
         for (int c = 0; c < 24; c += 2) {
             orderExpedicao[x] = (int) ((dadosClp4[c + 6] & 0xFF) << 8) | (dadosClp4[c + 7] & 0xFF);
             x++;
         }
+        expedicaoInfoClp.setOrderExpedicao(orderExpedicao);
 
-        numeroOPExp = ((dadosClp4[30] & 0xFF) << 8) | (dadosClp4[31] & 0xFF);
-        cancelOPExp = (dadosClp4[32] & 0x01) != 0;
-        finishOPExp = (dadosClp4[32] & 0x02) != 0;
-        startOPExp = (dadosClp4[32] & 0x04) != 0;
+        expedicaoInfoClp.setNumeroOP(((dadosClp4[30] & 0xFF) << 8) | (dadosClp4[31] & 0xFF));
+        expedicaoInfoClp.setCancelOP((dadosClp4[32] & 0x01) != 0);
+        expedicaoInfoClp.setFinishOP((dadosClp4[32] & 0x02) != 0);
+        expedicaoInfoClp.setStartOP((dadosClp4[32] & 0x04) != 0);
 
-        ocupadoExp = (dadosClp4[34] & 0x01) != 0;
-        aguardandoExp = (dadosClp4[34] & 0x02) != 0;
-        manualExp = (dadosClp4[34] & 0x04) != 0;
-        emergenciaExp = (dadosClp4[34] & 0x08) != 0;
+        expedicaoInfoClp.setOcupado((dadosClp4[34] & 0x01) != 0);
+        expedicaoInfoClp.setAguardando((dadosClp4[34] & 0x02) != 0);
+        expedicaoInfoClp.setManual((dadosClp4[34] & 0x04) != 0);
+        expedicaoInfoClp.setEmergencia((dadosClp4[34] & 0x08) != 0);
 
-        pedirPosicaoExp = (dadosClp4[36] & 0x01) != 0;
-        posicaoGuardadoExpedicao = ((dadosClp4[38] & 0xFF) << 8) | (dadosClp4[39] & 0xFF);
-        posicaoRemovidoExpedicao = ((dadosClp4[40] & 0xFF) << 8) | (dadosClp4[41] & 0xFF);
-        adicionarExpedicao = (dadosClp4[42] & 0x01) != 0;
-        removerExpedicao = (dadosClp4[42] & 0x02) != 0;
-        opGuardadoExpedicao = ((dadosClp4[44] & 0xFF) << 8) | (dadosClp4[45] & 0xFF);
+        expedicaoInfoClp.setPedirPosicaoExp((dadosClp4[36] & 0x01) != 0);
+        expedicaoInfoClp.setPosicaoGuardadoExpedicao(((dadosClp4[38] & 0xFF) << 8) | (dadosClp4[39] & 0xFF));
+        expedicaoInfoClp.setPosicaoRemovidoExpedicao(((dadosClp4[40] & 0xFF) << 8) | (dadosClp4[41] & 0xFF));
+        expedicaoInfoClp.setAdicionarExpedicao((dadosClp4[42] & 0x01) != 0);
+        expedicaoInfoClp.setRemoverExpedicao((dadosClp4[42] & 0x02) != 0);
+        expedicaoInfoClp.setOpGuardadoExpedicao(((dadosClp4[44] & 0xFF) << 8) | (dadosClp4[45] & 0xFF));
 
         // System.out.println("StatusEstoque: " + statusEstoque + "\n"
         //         + "StatusProcesso: " + statusProcesso + "\n"
@@ -64,7 +68,7 @@ public class ExpedicaoCommService {
         //         + "StatusExpedicao: " + statusExpedicao + "\n");
         // Se as três flags (StartOPExp, FinishOPExp e CancelOPExp) estão em FALSE, então a flag
         // RecebidoOPExp fica em FALSE
-        if (startOPExp == false & finishOPExp == false & cancelOPExp == false) {
+        if (expedicaoInfoClp.isStartOP() == false & expedicaoInfoClp.isFinishOP() == false & expedicaoInfoClp.isCancelOP() == false) {
             if (SmartService.readOnly == false) {
                 try {
 
@@ -82,7 +86,7 @@ public class ExpedicaoCommService {
         // Se o pedido foi finalizado pela estação de MONTAGEM e a estação EXPEDIÇÃO
         // informou que iniciou a operação
         // então a flag recebidoOpExp fica em TRUE
-        if (startOPExp == true & recebidoOpExp == false) {
+        if (expedicaoInfoClp.isStartOP() == true & expedicaoInfoClp.isRecebidoOp() == false) {
             if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
                 SmartService.statusExpedicao = 1;
             } else {
@@ -104,7 +108,7 @@ public class ExpedicaoCommService {
 
         // Se a estação EXPEDIÇÃO sinalizou o término da operação e ficou OCUPADO, então
         // a flag RecebidoOP fica em TRUE
-        if (finishOPExp == true & recebidoOpExp == false) {
+        if (expedicaoInfoClp.isFinishOP() == true & expedicaoInfoClp.isRecebidoOp() == false) {
             if (SmartService.readOnly == false) {
                 // JOptionPane.showMessageDialog(null, "1 - Vou iniciar a guarda do BLOCO!!!");
 
@@ -126,7 +130,7 @@ public class ExpedicaoCommService {
             }
         }
 
-        if (pedirPosicaoExp == false) {
+        if (expedicaoInfoClp.isPedirPosicaoExp() == false) {
             if (!SmartService.readOnly) {
                 SmartService.aux_expedicao = false;
                 // Coloca a flag IniciarGuardar em FALSE
@@ -141,7 +145,7 @@ public class ExpedicaoCommService {
         }
 
         // verifica se Expedição pede posição para guardar
-        if ((pedirPosicaoExp == true) & SmartService.aux_expedicao == false) {
+        if ((expedicaoInfoClp.isPedirPosicaoExp() == true) & SmartService.aux_expedicao == false) {
 
             //System.out.println(
             //       "\n\nEstou aqui -  if ((pedirPosicaoExp == true) & aux_expedicao == false)\n\n");
@@ -177,14 +181,14 @@ public class ExpedicaoCommService {
 
         }
 
-        if (!SmartService.readOnly & (!adicionarExpedicao || !removerExpedicao)) {
+        if (!SmartService.readOnly & (!expedicaoInfoClp.isAdicionarExpedicao() || !expedicaoInfoClp.isRemoverExpedicao())) {
             try {
                 //System.out.println("(!readOnly & (!adicionarExpedicao || !removerExpedicao)): Atualização da Flag RecebidoExpedicao [DB9:2.0] para FALSE");
                 plcConnectorExp.writeBit(9, 2, 0, false); // coloca RecebidoExpedicao em FALSE
             } catch (Exception e) {
-                if (!adicionarExpedicao & !removerExpedicao) {
+                if (!expedicaoInfoClp.isAdicionarExpedicao() & !expedicaoInfoClp.isRemoverExpedicao()) {
                     System.out.println("ERRO [Adicionar e Remover Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para FALSE");
-                } else if (!adicionarExpedicao) {
+                } else if (!expedicaoInfoClp.isAdicionarExpedicao()) {
                     System.out.println("ERRO [Adicionar Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para FALSE");
                 } else {
                     System.out.println("ERRO [Remover Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para FALSE");
@@ -193,7 +197,7 @@ public class ExpedicaoCommService {
         }
 
         // Se a flag adicionarExpedicao está TRUE E aux_expedicao está FALSE então a flag RecebidoExpedicao fica em TRUE
-        if ((adicionarExpedicao == true) & SmartService.aux_expedicao == false) {
+        if ((expedicaoInfoClp.isAdicionarExpedicao() == true) & SmartService.aux_expedicao == false) {
             SmartService.aux_expedicao = true;
 
             // Ler as variáveis PosicaoGuardadoExpedicao e opGuardadoExpedicao
@@ -208,17 +212,17 @@ public class ExpedicaoCommService {
                             "ERRO [Adicionar Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para TRUE");
                 }
 
-                int offset = 6 + (posicaoGuardarExp - 1) * 2;
-                System.out.println("Guardando Operacao em posicaoGuardarExp: " + posicaoGuardarExp);
-                if (posicaoGuardarExp > 0) {
+                int offset = 6 + (expedicaoInfoClp.getPosicaoGuardarExp() - 1) * 2;
+                System.out.println("Guardando Operacao em posicaoGuardarExp: " + expedicaoInfoClp.getPosicaoGuardarExp());
+                if (expedicaoInfoClp.getPosicaoGuardarExp() > 0) {
 
                     try {
                         // Atualiza cor no CLP
-                        plcConnectorExp.writeInt(9, offset, opGuardadoExpedicao);
+                        plcConnectorExp.writeInt(9, offset, expedicaoInfoClp.getOpGuardadoExpedicao());
 
                         // Cria mapa de dados com apenas uma posição
                         Map<String, Integer> dadosMap = new HashMap<>();
-                        dadosMap.put("OP:" + posicaoGuardarExp, opGuardadoExpedicao);
+                        dadosMap.put("OP:" + expedicaoInfoClp.getPosicaoGuardarExp(), expedicaoInfoClp.getOpGuardadoExpedicao());
 
                         // === Chama serviço de integração ===
                         boolean sucesso = apiIntegrationService.salvarExpedicao(dadosMap);
@@ -239,7 +243,7 @@ public class ExpedicaoCommService {
 
         }
         // Se a flag removerExpedicao está TRUE E aux_expedicao está FALSE então a flag RecebidoExpedicao fica em TRUE
-        if ((removerExpedicao == true) & SmartService.aux_expedicao == false) { // verifica se Expedição pede posição
+        if ((expedicaoInfoClp.isRemoverExpedicao() == true) & SmartService.aux_expedicao == false) { // verifica se Expedição pede posição
             // para remover
             SmartService.aux_expedicao = true;
             //System.out.println("Estou Aqui em => (removerExpedicao == true) & aux_expedicao == false)");
@@ -258,11 +262,11 @@ public class ExpedicaoCommService {
                             "ERRO [Adicionar Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para TRUE");
                 }
 
-                int offset = 6 + (posicaoRemovidoExpedicao - 1) * 2;
+                int offset = 6 + (expedicaoInfoClp.getPosicaoRemovidoExpedicao() - 1) * 2;
 
-                System.out.println("Removendo Operacao de posicaoREmovidoExpedicao: " + posicaoRemovidoExpedicao);
+                System.out.println("Removendo Operacao de posicaoREmovidoExpedicao: " + expedicaoInfoClp.getPosicaoRemovidoExpedicao());
 
-                if (posicaoRemovidoExpedicao > 0 && !SmartService.readOnly) {
+                if (expedicaoInfoClp.getPosicaoRemovidoExpedicao() > 0 && !SmartService.readOnly) {
 
                     try {
                         // Atualiza cor no CLP
@@ -270,7 +274,7 @@ public class ExpedicaoCommService {
 
                         // Cria mapa de dados com apenas uma posição
                         Map<String, Integer> dadosMap = new HashMap<>();
-                        dadosMap.put("OP:" + posicaoRemovidoExpedicao, 0);
+                        dadosMap.put("OP:" + expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
 
                         // === Chama serviço de integração ===
                         boolean sucesso = apiIntegrationService.salvarExpedicao(dadosMap);
@@ -293,7 +297,7 @@ public class ExpedicaoCommService {
             //}
         }
 
-        if ((posicaoGuardadoExpedicao == posicaoGuardarExp) & (ocupadoExp == false) & (finishOPExp == true)) {
+        if ((expedicaoInfoClp.getPosicaoGuardadoExpedicao() == expedicaoInfoClp.getPosicaoGuardarExp()) & (expedicaoInfoClp.isOcupado() == false) & (expedicaoInfoClp.isFinishOP() == true)) {
 
             if (SmartService.readOnly == false) {
 
@@ -307,22 +311,11 @@ public class ExpedicaoCommService {
                     SmartService.statusProducao = 1;
                 }
 
-                System.out.println("Operação OP:" + opGuardadoExpedicao + " Finalizada: ");
+                System.out.println("Operação OP:" + expedicaoInfoClp.getOpGuardadoExpedicao() + " Finalizada: ");
             }
 
             // }
         }
 
-    }
-
-    public int buscarPrimeiraPosicaoLivreExp() {
-        List<Integer> ocupadas = expedicaoRepository.findAllPosicoesOcupadas();
-
-        for (int i = 1; i <= 12; i++) {
-            if (!ocupadas.contains(i)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

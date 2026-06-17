@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class EstacaoInfo {
+public abstract class EstacaoInfoClp {
     private boolean recebidoOp;
     private int numeroOP;
 

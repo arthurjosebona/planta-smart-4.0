@@ -1,5 +1,8 @@
 package com.smart.appsa.model.clp;
 
-public class MontagemInfo extends EstacaoInfo {
+import org.springframework.stereotype.Component;
+
+@Component
+public class MontagemInfo extends EstacaoInfoClp {
     
 }
