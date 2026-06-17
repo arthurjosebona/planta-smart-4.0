@@ -29,6 +29,7 @@ import com.smart.appsa.model.enums.AndarBloco;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.repository.PedidoRepository;
+import com.smart.appsa.service.clp.SmartService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -216,8 +217,7 @@ public class PedidoService {
         pedidoRepository.findByOrdemDeProducao(requestDTO.ordemDeProducao())
                 .filter(p -> !p.getId().equals(currentId))
                 .ifPresent(p -> {
-                    throw new BusinessException(
-                            "Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
+                    throw new OrdemDeProducaoExistenteException()      "Pedido já existe com ordem de produção " + requestDTO.ordemDeProducao());
                 });
 
         validateDuplicateAndar(requestDTO.blocos());
