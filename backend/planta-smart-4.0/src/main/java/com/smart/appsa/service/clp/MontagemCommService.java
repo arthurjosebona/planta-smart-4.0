@@ -1,17 +1,26 @@
 package com.smart.appsa.service.clp;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smart.appsa.clpcomm.PlcConnectionService;
+import com.smart.appsa.clpcomm.PlcConnector;
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.clp.MontagemInfo;
+import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class MontagemCommService {
+public class MontagemCommService implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private MontagemInfo montagemInfo;
+    private AppStateConfig appStateConfig;
+
+    @Override
+    public void onData(String ip, byte[] data) {
+        processData(ip, data);
+    }
 
     public void processData(String ip, byte[] dadosClp3) {
         // lógica que hoje está no método clpMontagem(...)
@@ -48,7 +57,7 @@ public class MontagemCommService {
         // Se as três flags (StartOPMon, FinishOPMon e CancelOPMon) estão em FALSE, então a flag
         // RecebidoOPMon fica em FALSE
         if (montagemInfo.isStartOP() == false && montagemInfo.isFinishOP() == false && montagemInfo.isCancelOP() == false) {
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
 
@@ -60,14 +69,14 @@ public class MontagemCommService {
         // Se a estação MONTAGEM sinalizou o inicio da operação e recebidoOpMon está em FALSE, então a
         // flag RecebidoOPMon fica em TRUE
         if (montagemInfo.isStartOP() == true && montagemInfo.isRecebidoOp() == false) {
-            if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                SmartService.statusMontagem = 1;
+            if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                appStateConfig.setStatusMontagem((byte) 1);
             } else {
                 //statusMontagem = 0;
             }
 
             // updateDisplayStation();
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
 
@@ -82,15 +91,15 @@ public class MontagemCommService {
         // Se a estação MONTAGEM sinalizou o témino da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
         if (montagemInfo.isFinishOP() == true && montagemInfo.isRecebidoOp() == false) {
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
                     plcConnectorMon.writeBit(57, 0, 0, Boolean.parseBoolean("TRUE"));  // coloca RecebidoOPMon em TRUE
                 } catch (Exception e) {
                     e.printStackTrace();
                 } // RecebidoOPMon
-                if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                    SmartService.statusMontagem = 2;
+                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                    appStateConfig.setStatusMontagem((byte) 2);
                 } else {
                     //statusMontagem = 0;
                 }

@@ -10,18 +10,24 @@ import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
-import com.smart.appsa.model.clp.EstoqueInfo;
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
-import com.smart.appsa.service.SmartService;
+import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
 
 
 @Service
 @AllArgsConstructor
-public class EstoqueCommService {
+public class EstoqueCommService implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private EstoqueInfoClp estoqueInfoClp;
+    private AppStateConfig appStateConfig;
+
+    @Override
+    public void onData(String ip, byte[] data) {
+        processData(ip, data);
+    }
 
     public void processData(String ip, byte[] dadosClp1) {
         //-------------- Apresentação no console -----------------
@@ -81,12 +87,12 @@ public class EstoqueCommService {
         // ficando no estado OCUPADO
         // então a flag iniciarPedido fica em FALSE
         if (estoqueInfoClp.isIniciarPedido() == true && estoqueInfoClp.isOcupado() == true) {
-            SmartService.pedidoEmCurso = true;
-            SmartService.statusEstoque = 0;
-            SmartService.statusProducao = 0;
+            appStateConfig.setPedidoEmCurso(true);
+            appStateConfig.setStatusEstoque((byte) 0);
+            appStateConfig.setStatusProducao((byte) 0);
             //updateDisplayStation();
             //eventos.add("Seq " + seq++ + ": iniciarPedido == true & ocupadoEst == true");
-            if (!SmartService.readOnly) {
+            if (!appStateConfig.isReadOnly()) {
                 //System.out.println("Flag: IniciarPedido: Verificando se a estação ESTOQUE iniciou o pedido...");
 
                 // System.out.println("Flag: IniciarPedido: ESTOQUE iniciou o pedido...");
@@ -110,7 +116,7 @@ public class EstoqueCommService {
         // RecebidoOP fica em FALSE
         if (estoqueInfoClp.isStartOP() == false & estoqueInfoClp.isFinishOP() == false & estoqueInfoClp.isCancelOP() == false) {
             //eventos.add("Seq " + seq++ + ": startOPEst == false & finishOPEst == false & cancelOPEst == false");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
                     //System.out.println("Seq " + seq++ + ": colocando RecebidoOPEst em FALSE");
@@ -126,14 +132,14 @@ public class EstoqueCommService {
         // Se a estação ESTOQUE sinalizou o início da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
         if (estoqueInfoClp.isStartOP() == true & estoqueInfoClp.isRecebidoOp() == false) {
-            if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                SmartService.statusEstoque = 1;
+            if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                appStateConfig.setStatusEstoque((byte) 1);
             } else {
                 //statusEstoque = 0;
             }
             // updateDisplayStation();
             //eventos.add("Seq " + seq++ + ": startOPEst == true & recebidoOpEst == false");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 //System.out.println("Flag: RecebidoOPEstoque_TRUE");
                 try {
                     //System.out.println("StartOP: colocando RecebidoOPEstoque em TRUE");
@@ -151,7 +157,7 @@ public class EstoqueCommService {
         // flag RecebidoOP fica em TRUE
         if (estoqueInfoClp.isFinishOP() == true & estoqueInfoClp.isRecebidoOp() == false) {
             //eventos.add("Seq " + seq++ + ": finishOPEst == true & recebidoOpEst == false");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 //System.out.println("Flag: RecebidoOPEstoque_TRUE");
                 try {
                     //System.out.println("FinishOP: colocando RecebidoOPEstoque em TRUE");
@@ -162,8 +168,8 @@ public class EstoqueCommService {
                     System.out.println(
                             "ERRO [finishOp]: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para TRUE");
                 }
-                if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                    SmartService.statusEstoque = 2;
+                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                    appStateConfig.setStatusEstoque((byte) 2);
                 } else {
                     //statusEstoque = 0;
                 }
@@ -173,7 +179,7 @@ public class EstoqueCommService {
         // Se as flags de remover ou adicionar no estoque estão em FALSE então a flag RecebidoEstoque fica em FALSE
         if (estoqueInfoClp.isRemoverEstoque() == false & estoqueInfoClp.isAdicionarEstoque() == false) {
             //eventos.add("Seq " + seq++ + ": removerEstoque == false & adicionarEstoque == false");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 //System.out.println("colocando RecebidoEstoque em FALSEe");
                 try {
@@ -188,7 +194,7 @@ public class EstoqueCommService {
 
         // Atualiza a posição removida na tabela Estoque e na memória do clp Estoque
         if ((estoqueInfoClp.getPosicaoEstoque() > 0) && estoqueInfoClp.isRemoverEstoque() == true) {
-            if (!SmartService.readOnly) {
+            if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorEst.writeBit(9, 64, 0, true);
                 } catch (Exception e) {
@@ -226,7 +232,7 @@ public class EstoqueCommService {
         // Atualiza na posição a cor do bloco adicionado na tabela Estoque e na memória do clp Estoque
         if ((estoqueInfoClp.getPosicaoEstoque() > 0) && estoqueInfoClp.isAdicionarEstoque() == true) {
             //eventos.add("Seq " + seq++ + ": (posicaoEstoque > 0) & adicionarEstoque == true");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 //System.out.println("Flag: RecebidoEstoque_TRUE - ADICIONAR ESTOQUE");
                 // Coloca a flag RecebidoEstoque em TRUE
@@ -269,7 +275,7 @@ public class EstoqueCommService {
         // Se as flags ocupadoEst ou retornoEstoqueCheio estão em TRUE E a flag iniciarGuardarEst foi ativada então a flag iniciarGuardarEst fica em FALSE
         if ((estoqueInfoClp.isOcupado() == true | estoqueInfoClp.isRetornoEstoqueCheio() == true) & estoqueInfoClp.isIniciarGuardarEst() == true) {
             //eventos.add("Seq " + seq++ + ": (ocupadoEst == true | retornoEstoqueCheio == true) & iniciarGuardarEst == true");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 //System.out.println("Flag: IniciarGuardar_FALSE");
 
                 // Coloca a flag IniciarGuardar em FALSE
@@ -292,7 +298,7 @@ public class EstoqueCommService {
             //System.out.println("ESTOU AQUI- (pedirPosicaoEst == true) & ocupadoEst == false");
             //eventos.add("Seq " + seq++ + ": pedirPosicaoEst == true & ocupadoEst == false");
             // Rotina para verificar qual posição está disponível para guardar
-            if (!SmartService.readOnly) {
+            if (!appStateConfig.isReadOnly()) {
                 // Solicita posição disponível para guardar (0-LIVRE 1-PRETO 2-VERMELHO 3-AZUL)
                 // Certifique-se de que posEstoqueLivre é seguro para acesso
                 Set<Integer> posicoesUsadas = new HashSet<>(); // Para evitar duplicidade

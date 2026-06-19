@@ -1,19 +1,27 @@
 package com.smart.appsa.service.clp;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
+import com.smart.appsa.clpcomm.PlcConnector;
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.clp.ProcessoInfo;
+import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
 
 
 @Service
 @AllArgsConstructor
-public class ProcessoCommService {
+public class ProcessoCommService implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private ProcessoInfo processoInfo;
+    private AppStateConfig appStateConfig;
+
+    @Override
+    public void onData(String ip, byte[] data) {
+        processData(ip, data);
+    }
 
     public void processData(String ip, byte[] dadosClp2) {
         // lógica que hoje está no método clpProcesso(...)
@@ -51,7 +59,7 @@ public class ProcessoCommService {
         // Se as três flags (StartOP, FinishOP e CancelOP) estão em FALSE, então a flag
         // RecebidoOP fica em FALSE
         if (processoInfo.isStartOP() == false && processoInfo.isFinishOP() == false && processoInfo.isCancelOP() == false) {
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
                     plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("FALSE")); // coloca RecebidoOPPro em FALSE
@@ -62,13 +70,13 @@ public class ProcessoCommService {
         // Se a estação PROCESSO sinalizou o inicio da operação e recebidoOpPro está em FALSE, então a
         // flag RecebidoOPPRO fica em TRUE
         if (processoInfo.isStartOP() == true && processoInfo.isRecebidoOp() == false) {
-            if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                SmartService.statusProcesso = 1;
+            if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                appStateConfig.setStatusProcesso((byte) 1);
             } else {
                 //statusProcesso = 0;
             }
 
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 try {
                     plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("TRUE"));   // coloca RecebidoOPPro em TRUE
                 } catch (Exception e) {
@@ -81,7 +89,7 @@ public class ProcessoCommService {
         // Se a estação PROCESSO sinalizou o témino da operação e ficou OCUPADO, então a
         // flag RecebidoOP fica em TRUE
         if (processoInfo.isFinishOP() == true && processoInfo.isRecebidoOp() == false) {
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
                     plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("TRUE"));  // coloca RecebidoOPPro em TRUE
@@ -89,8 +97,8 @@ public class ProcessoCommService {
 
                     e.printStackTrace();
                 }
-                if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                    SmartService.statusProcesso = 2;
+                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                    appStateConfig.setStatusProcesso((byte) 2);
                 } else {
                     //statusProcesso = 0;
                 }

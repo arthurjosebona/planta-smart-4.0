@@ -4,16 +4,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
+import com.smart.appsa.service.clp.reader.PlcDataObserver;
+
+import lombok.AllArgsConstructor;
 
 @Service
-public class ExpedicaoCommService {
+@AllArgsConstructor
+public class ExpedicaoCommService implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private ExpedicaoInfoClp expedicaoInfoClp;
+    private AppStateConfig appStateConfig;
+
+    @Override
+    public void onData(String ip, byte[] data) {
+        processData(ip, data);
+    }
 
     public void processData(String ip, byte[] dadosClp4) {
         // lógica que hoje está no método clpExpedicao(...)
@@ -69,7 +79,7 @@ public class ExpedicaoCommService {
         // Se as três flags (StartOPExp, FinishOPExp e CancelOPExp) estão em FALSE, então a flag
         // RecebidoOPExp fica em FALSE
         if (expedicaoInfoClp.isStartOP() == false & expedicaoInfoClp.isFinishOP() == false & expedicaoInfoClp.isCancelOP() == false) {
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 try {
 
                     //System.out.println("(startOPExp == false & finishOPExp == false & cancelOPExp == false): Atualização da Flag RecebidoOPExp [DB9:2.0] para FALSE");
@@ -87,14 +97,14 @@ public class ExpedicaoCommService {
         // informou que iniciou a operação
         // então a flag recebidoOpExp fica em TRUE
         if (expedicaoInfoClp.isStartOP() == true & expedicaoInfoClp.isRecebidoOp() == false) {
-            if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                SmartService.statusExpedicao = 1;
+            if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                appStateConfig.setStatusExpedicao((byte) 1);
             } else {
                 //statusExpedicao = 0;
             }
             // blockFinished = true;
             // updateDisplayStation();
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 try {
                     plcConnectorExp.writeBit(9, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPExp em TRUE
 
@@ -109,20 +119,20 @@ public class ExpedicaoCommService {
         // Se a estação EXPEDIÇÃO sinalizou o término da operação e ficou OCUPADO, então
         // a flag RecebidoOP fica em TRUE
         if (expedicaoInfoClp.isFinishOP() == true & expedicaoInfoClp.isRecebidoOp() == false) {
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 // JOptionPane.showMessageDialog(null, "1 - Vou iniciar a guarda do BLOCO!!!");
 
                 try {
                     // Panel3.plcWrite = new PlcConnector(ipExpedicao, 9, 0, 1, 0, 1);
                     plcConnectorExp.writeBit(9, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPExp em TRUE
-                    SmartService.blockFinished = true;
+                    appStateConfig.setBlockFinished(true);
 
                 } catch (Exception e) {
                     System.out.println(
                             "ERRO [finishOp]: Atualização da Flag RecebidoOPExp [DB9:0.0] para TRUE");
                 }
-                if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
-                    SmartService.statusExpedicao = 2;
+                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                    appStateConfig.setStatusExpedicao((byte) 2);
                 } else {
                     //statusExpedicao = 0;
 
@@ -131,8 +141,8 @@ public class ExpedicaoCommService {
         }
 
         if (expedicaoInfoClp.isPedirPosicaoExp() == false) {
-            if (!SmartService.readOnly) {
-                SmartService.aux_expedicao = false;
+            if (!appStateConfig.isReadOnly()) {
+                appStateConfig.setAux_expedicao(false);
                 // Coloca a flag IniciarGuardar em FALSE
                 try {
                     plcConnectorExp.writeBit(9, 2, 1, Boolean.parseBoolean("FALSE"));  // coloca  IniciarGuardar em FALSE
@@ -145,17 +155,17 @@ public class ExpedicaoCommService {
         }
 
         // verifica se Expedição pede posição para guardar
-        if ((expedicaoInfoClp.isPedirPosicaoExp() == true) & SmartService.aux_expedicao == false) {
+        if ((expedicaoInfoClp.isPedirPosicaoExp() == true) & appStateConfig.isAux_expedicao() == false) {
 
             //System.out.println(
             //       "\n\nEstou aqui -  if ((pedirPosicaoExp == true) & aux_expedicao == false)\n\n");
             // Rotina para verificar qual posição está disponível para guardar
-            SmartService.aux_expedicao = true;
+            appStateConfig.setAux_expedicao(true);
 
             // ROTINA PARA LOCALIZAR POSIÇÃO DISPONÍVEL NO MAGAZINE DA EXPEDIÇÃO PARA
             // ADICIONAR BLOCO CONCLUÍDO
             // Rotina para verificar qual posição está disponível para guardar
-            if (!SmartService.readOnly) {
+            if (!appStateConfig.isReadOnly()) {
 
                 // Solicita posição disponível para guardar (0-LIVRE 1-OCUPADA)
                 // Certifique-se de que posExpedicaoLivre é seguro para acesso
@@ -163,7 +173,7 @@ public class ExpedicaoCommService {
                 //System.out.println("Posição disponível no Magazine Expedição: " + posExpedicaoLivre);
                 // Atualiza a variável PosicaoGuardarExpedicao no CLP EXPEDIÇÂO
                 try {
-                    plcConnectorExp.writeInt(9, 4, SmartService.posicaoExpedicaoSolicitada);   // Atualiza a variável PosicaoGuardarExpedicao no CLP EXPEDIÇÂO
+                    plcConnectorExp.writeInt(9, 4, appStateConfig.getPosicaoExpedicaoSolicitada());   // Atualiza a variável PosicaoGuardarExpedicao no CLP EXPEDIÇÂO
 
                 } catch (Exception e) {
                     System.out.println("ERRO: Atualização da PosicaoGuardarExpedicao [DB9:4]");
@@ -181,7 +191,7 @@ public class ExpedicaoCommService {
 
         }
 
-        if (!SmartService.readOnly & (!expedicaoInfoClp.isAdicionarExpedicao() || !expedicaoInfoClp.isRemoverExpedicao())) {
+        if (!appStateConfig.isReadOnly() & (!expedicaoInfoClp.isAdicionarExpedicao() || !expedicaoInfoClp.isRemoverExpedicao())) {
             try {
                 //System.out.println("(!readOnly & (!adicionarExpedicao || !removerExpedicao)): Atualização da Flag RecebidoExpedicao [DB9:2.0] para FALSE");
                 plcConnectorExp.writeBit(9, 2, 0, false); // coloca RecebidoExpedicao em FALSE
@@ -197,11 +207,11 @@ public class ExpedicaoCommService {
         }
 
         // Se a flag adicionarExpedicao está TRUE E aux_expedicao está FALSE então a flag RecebidoExpedicao fica em TRUE
-        if ((expedicaoInfoClp.isAdicionarExpedicao() == true) & SmartService.aux_expedicao == false) {
-            SmartService.aux_expedicao = true;
+        if ((expedicaoInfoClp.isAdicionarExpedicao() == true) & appStateConfig.isAux_expedicao() == false) {
+            appStateConfig.setAux_expedicao(true);
 
             // Ler as variáveis PosicaoGuardadoExpedicao e opGuardadoExpedicao
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
                 try {
                     // Panel3.plcWrite = new PlcConnector(ipExpedicao, 9, 2, 1, 0, 1);
@@ -243,16 +253,16 @@ public class ExpedicaoCommService {
 
         }
         // Se a flag removerExpedicao está TRUE E aux_expedicao está FALSE então a flag RecebidoExpedicao fica em TRUE
-        if ((expedicaoInfoClp.isRemoverExpedicao() == true) & SmartService.aux_expedicao == false) { // verifica se Expedição pede posição
+        if ((expedicaoInfoClp.isRemoverExpedicao() == true) & appStateConfig.isAux_expedicao() == false) { // verifica se Expedição pede posição
             // para remover
-            SmartService.aux_expedicao = true;
+            appStateConfig.setAux_expedicao(true);
             //System.out.println("Estou Aqui em => (removerExpedicao == true) & aux_expedicao == false)");
 
             // Ler a variável PosicaoRemovidoExpedicao
             // posicaoRemovidoExpedicao = ((dadosClp4[40] & 0xFF) << 8) | (dadosClp4[41] & 0xFF);
             //if (readOnly == false) {
             // System.out.println("Flag: RecebidoExpediçcao_TRUE");
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
                 try {
                     // Panel3.plcWrite = new PlcConnector(ipExpedicao, 9, 2, 1, 0, 1);
                     plcConnectorExp.writeBit(9, 2, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPExpedicao em TRUE
@@ -266,7 +276,7 @@ public class ExpedicaoCommService {
 
                 System.out.println("Removendo Operacao de posicaoREmovidoExpedicao: " + expedicaoInfoClp.getPosicaoRemovidoExpedicao());
 
-                if (expedicaoInfoClp.getPosicaoRemovidoExpedicao() > 0 && !SmartService.readOnly) {
+                if (expedicaoInfoClp.getPosicaoRemovidoExpedicao() > 0 && !appStateConfig.isReadOnly()) {
 
                     try {
                         // Atualiza cor no CLP
@@ -299,16 +309,16 @@ public class ExpedicaoCommService {
 
         if ((expedicaoInfoClp.getPosicaoGuardadoExpedicao() == expedicaoInfoClp.getPosicaoGuardarExp()) & (expedicaoInfoClp.isOcupado() == false) & (expedicaoInfoClp.isFinishOP() == true)) {
 
-            if (SmartService.readOnly == false) {
+            if (appStateConfig.isReadOnly() == false) {
 
-                System.out.println("AQUI: statusProducao: " + SmartService.statusProducao);
-                System.out.println("AQUI: pedidoEmCurso:: " + SmartService.pedidoEmCurso);
-                if (SmartService.statusProducao == 0 & SmartService.pedidoEmCurso == true) {
+                System.out.println("AQUI: statusProducao: " + appStateConfig.getStatusProducao());
+                System.out.println("AQUI: pedidoEmCurso:: " + appStateConfig.isPedidoEmCurso());
+                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
 
                     System.out.println("--------------------------------------------------");
                     System.out.println(" ");
                     //pedidoEmCurso = false;
-                    SmartService.statusProducao = 1;
+                    appStateConfig.setStatusProducao((byte) 1);
                 }
 
                 System.out.println("Operação OP:" + expedicaoInfoClp.getOpGuardadoExpedicao() + " Finalizada: ");
