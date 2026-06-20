@@ -2,14 +2,14 @@ package com.smart.appsa.model.clp;
 
 import org.springframework.stereotype.Component;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Component
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 public class EstoqueInfoClp extends EstacaoInfoClp {
     private int cor_Andar_1;
     private int posicao_Estoque_Andar_1;

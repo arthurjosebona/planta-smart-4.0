@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
@@ -25,6 +24,7 @@ import com.smart.appsa.exception.DuplicateAndarException;
 import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
+import com.smart.appsa.exception.PedidoNaoPendenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
@@ -52,16 +52,18 @@ public class PedidoServiceTest {
     private EstoqueService estoqueService;
     @Mock
     private ExpedicaoService expedicaoService;
+    @Mock
+    private SmartService smartService;
     @InjectMocks
     private PedidoService pedidoService;
+
+    // ─── create ───────────────────────────────────────────────────────────────
 
     @Test
     void deveCriarPedidoComCamposValidos() {
         Pedido pedido = createPedido();
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
-        when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
-            .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
 
         PedidoResponseDTO response = pedidoService.create(PedidoMapper.mapRequestDto(pedido));
 
@@ -79,25 +81,10 @@ public class PedidoServiceTest {
         Pedido pedido = createPedido();
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
-        when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
-            .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
 
         pedidoService.create(PedidoMapper.mapRequestDto(pedido));
 
         verify(blocoService, times(pedido.getBlocos().size())).create(any(Bloco.class));
-    }
-
-    @Test
-    void deveAtribuirEstoqueVazioAposAssociarBlocoAoCriarPedido() {
-        Pedido pedido = createPedido();
-        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
-        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
-        when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
-            .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
-
-        pedidoService.create(PedidoMapper.mapRequestDto(pedido));
-
-        verify(estoqueService, times(1)).assignBlockColor(anyLong(), any(CorEstoque.class));
     }
 
     @Test
@@ -141,22 +128,22 @@ public class PedidoServiceTest {
     }
 
     @Test
-    void deveRetornarOrdemDeProducaoExistenteExceptionQuandoCriarPedidoComOrdemJaExistente() {
-        Pedido pedido = createPedido();
-        when(pedidoRepository.existsByOrdemDeProducao(pedido.getOrdemDeProducao())).thenReturn(true);
-
-        assertThrows(OrdemDeProducaoExistenteException.class,
-            () -> pedidoService.create(PedidoMapper.mapRequestDto(pedido)));
-        verify(pedidoRepository, never()).save(any());
-    }
-
-    @Test
     void deveRetornarInvalidOrdemDeProducaoExceptionQuandoCriarPedidoComOrdemNegativa() {
         Pedido pedido = createPedido();
         pedido.setOrdemDeProducao(-5);
         PedidoRequestDTO request = PedidoMapper.mapRequestDto(pedido);
 
         assertThrows(InvalidOrdemDeProducaoException.class, () -> pedidoService.create(request));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveRetornarOrdemDeProducaoExistenteExceptionQuandoCriarPedidoComOrdemJaExistente() {
+        Pedido pedido = createPedido();
+        when(pedidoRepository.existsByOrdemDeProducao(pedido.getOrdemDeProducao())).thenReturn(true);
+
+        assertThrows(OrdemDeProducaoExistenteException.class,
+            () -> pedidoService.create(PedidoMapper.mapRequestDto(pedido)));
         verify(pedidoRepository, never()).save(any());
     }
 
@@ -187,16 +174,7 @@ public class PedidoServiceTest {
         verify(pedidoRepository, never()).save(any());
     }
 
-    @Test
-    void deveRetornarEstoqueInsuficienteExceptionQuandoNaoHouverEstoqueDisponivel() {
-        Pedido pedido = createPedido();
-        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
-        when(estoqueService.findByCorEstoque(any(CorEstoque.class))).thenReturn(List.of());
-
-        assertThrows(EstoqueInsuficienteException.class,
-            () -> pedidoService.create(PedidoMapper.mapRequestDto(pedido)));
-        verify(blocoService, never()).create(any());
-    }
+    // ─── findById / findAll ───────────────────────────────────────────────────
 
     @Test
     void deveRetornarPedidoQuandoBuscarPorIdValido() {
@@ -242,41 +220,181 @@ public class PedidoServiceTest {
         verify(pedidoRepository, times(1)).findAll();
     }
 
+    // ─── startProduction ─────────────────────────────────────────────────────
+
     @Test
-    void deveAtualizarStatusParaConcluidoQuandoIdValido() {
+    void deveIniciarProducaoEAtribuirStatusProducaoQuandoIdValido() {
         Pedido pedido = createPedido();
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
-        when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
+            .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
         when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
+        when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        pedidoService.updateStatusAsCompleted(1L);
+        pedidoService.startProduction(1L);
 
         verify(pedidoRepository, times(1)).findById(1L);
         verify(pedidoRepository, times(1)).save(any(Pedido.class));
-        assertEquals(StatusPedido.CONCLUIDO, pedido.getStatus());
+        assertEquals(StatusPedido.PRODUCAO, pedido.getStatus());
     }
 
     @Test
-    void devePreencherRegistroEntradaExpedicaoAoAtualizarStatusParaConcluido() {
+    void deveAtribuirExpedicaoAoPedidoAoIniciarProducao() {
+        Pedido pedido = createPedido();
+        Expedicao expedicao = createExpedicao();
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+        when(estoqueService.findByCorEstoque(CorEstoque.AZUL))
+            .thenReturn(List.of(createEstoque(1L, CorEstoque.AZUL)));
+        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(expedicao);
+        when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        pedidoService.startProduction(1L);
+
+        assertEquals(expedicao, pedido.getExpedicao());
+    }
+
+    @Test
+    void deveLancarEstoqueInsuficienteExceptionAoIniciarProducaoSemEstoque() {
         Pedido pedido = createPedido();
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
-        when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(expedicaoService.findFirstPosicaoLivre()).thenReturn(createExpedicao());
-        
+        when(estoqueService.findByCorEstoque(any(CorEstoque.class))).thenReturn(List.of());
 
-        pedidoService.updateStatusAsCompleted(1L);
-
-        assertNotNull(pedido.getRegistroEntradaExpedicao());
+        assertThrows(EstoqueInsuficienteException.class, () -> pedidoService.startProduction(1L));
+        verify(pedidoRepository, never()).save(any());
     }
 
     @Test
-    void deveRetornarResourceNotFoundExceptionQuandoAtualizarStatusDePedidoComIdInvalido() {
+    void deveRetornarResourceNotFoundExceptionAoIniciarProducaoComIdInvalido() {
         Long id = 99L;
         when(pedidoRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> pedidoService.updateStatusAsCompleted(id));
+        assertThrows(ResourceNotFoundException.class, () -> pedidoService.startProduction(id));
         verify(pedidoRepository, never()).save(any());
     }
+
+    // ─── delete ───────────────────────────────────────────────────────────────
+
+    @Test
+    void deveDeletarPedidoPendenteComSucesso() {
+        Pedido pedido = createPedido();
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+
+        pedidoService.delete(1L);
+
+        verify(pedidoRepository, times(1)).delete(pedido);
+    }
+
+    @Test
+    void deveLancarResourceNotFoundExceptionAoDeletarPedidoComIdInvalido() {
+        when(pedidoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> pedidoService.delete(99L));
+        verify(pedidoRepository, never()).delete(any());
+    }
+
+    @Test
+    void deveLancarPedidoNaoPendenteExceptionAoDeletarPedidoNaoPendente() {
+        Pedido pedido = createPedido();
+        pedido.setStatus(StatusPedido.PRODUCAO);
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+
+        assertThrows(PedidoNaoPendenteException.class, () -> pedidoService.delete(1L));
+        verify(pedidoRepository, never()).delete(any());
+    }
+
+    // ─── update ───────────────────────────────────────────────────────────────
+
+    @Test
+    void deveAtualizarPedidoPendenteComCamposValidos() {
+        Pedido pedido = createPedido();
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+        when(pedidoRepository.findByOrdemDeProducao(pedido.getOrdemDeProducao())).thenReturn(Optional.of(pedido));
+        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
+
+        PedidoResponseDTO response = pedidoService.update(1L, PedidoMapper.mapRequestDto(pedido));
+
+        assertNotNull(response);
+        verify(blocoService, times(1)).deleteAllByPedido(any(Pedido.class));
+        verify(pedidoRepository, times(1)).save(any(Pedido.class));
+    }
+
+    @Test
+    void deveLancarResourceNotFoundExceptionAoAtualizarPedidoComIdInvalido() {
+        when(pedidoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+            () -> pedidoService.update(99L, PedidoMapper.mapRequestDto(createPedido())));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarPedidoNaoPendenteExceptionAoAtualizarPedidoNaoPendente() {
+        Pedido pedido = createPedido();
+        pedido.setStatus(StatusPedido.PRODUCAO);
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+
+        assertThrows(PedidoNaoPendenteException.class,
+            () -> pedidoService.update(1L, PedidoMapper.mapRequestDto(createPedido())));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarOrdemDeProducaoExistenteExceptionAoAtualizarComOrdemDeOutroPedido() {
+        Pedido pedido = createPedido();
+        Pedido outro = createPedido();
+        outro.setId(2L);
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
+        when(pedidoRepository.findByOrdemDeProducao(pedido.getOrdemDeProducao())).thenReturn(Optional.of(outro));
+
+        assertThrows(OrdemDeProducaoExistenteException.class,
+            () -> pedidoService.update(1L, PedidoMapper.mapRequestDto(pedido)));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarInvalidOrdemDeProducaoExceptionAoAtualizarComOrdemZero() {
+        Pedido pedido = createPedido();
+        pedido.setOrdemDeProducao(0);
+        Pedido existente = createPedido();
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(existente));
+
+        assertThrows(InvalidOrdemDeProducaoException.class,
+            () -> pedidoService.update(1L, PedidoMapper.mapRequestDto(pedido)));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarTipoIncompativelComBlocosExceptionAoAtualizarComQuantidadeErrada() {
+        Pedido pedido = createPedido();
+        pedido.setBlocos(List.of(
+            createBloco(pedido, AndarBloco.PRIMEIRO),
+            createBloco(pedido, AndarBloco.SEGUNDO)
+        ));
+        Pedido existente = createPedido();
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(existente));
+
+        assertThrows(TipoIncompativelComBlocosException.class,
+            () -> pedidoService.update(1L, PedidoMapper.mapRequestDto(pedido)));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarDuplicateAndarExceptionAoAtualizarComAndaresDuplicados() {
+        Pedido pedido = createPedido();
+        pedido.setTipo(TipoPedido.DUPLO);
+        pedido.setBlocos(List.of(
+            createBloco(pedido, AndarBloco.PRIMEIRO),
+            createBloco(pedido, AndarBloco.PRIMEIRO)
+        ));
+        Pedido existente = createPedido();
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(existente));
+
+        assertThrows(DuplicateAndarException.class,
+            () -> pedidoService.update(1L, PedidoMapper.mapRequestDto(pedido)));
+        verify(pedidoRepository, never()).save(any());
+    }
+
+    // ─── helpers ──────────────────────────────────────────────────────────────
 
     private Pedido createPedido() {
         Pedido pedido = Pedido.builder()
@@ -298,7 +416,7 @@ public class PedidoServiceTest {
         return Bloco.builder()
             .id(1L)
             .pedido(pedido)
-            .laminas(null)
+            .laminas(List.of())
             .estoque(Estoque.builder().id(1L).build())
             .cor(CorBloco.AZUL)
             .andar(andar)

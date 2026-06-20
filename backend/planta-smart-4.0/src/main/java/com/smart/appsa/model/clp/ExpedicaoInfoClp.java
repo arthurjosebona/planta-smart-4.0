@@ -2,13 +2,13 @@ package com.smart.appsa.model.clp;
 
 import org.springframework.stereotype.Component;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 @Component
 public class ExpedicaoInfoClp extends EstacaoInfoClp {
     boolean recebidoExpedicao;
