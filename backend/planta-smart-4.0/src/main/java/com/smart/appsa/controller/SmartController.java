@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +25,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
+import com.smart.appsa.dto.clp.ClpReadOnlyDTO;
+import com.smart.appsa.dto.clp.ClpStatusPingDTO;
 import com.smart.appsa.model.enums.Estacao;
 import com.smart.appsa.service.clp.ClpReadingService;
 import com.smart.appsa.service.clp.PlcDataStore;
@@ -32,28 +36,28 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/smart")
 @AllArgsConstructor
-public class ClpController {
+public class SmartController {
 
-    private final ClpReadingService readingManager;
+    private final ClpReadingService clpReadingService;
     private final PlcDataStore dataStore;
     private final AppStateConfig appStateConfig;
     private final ClpIpConfig clpIpConfig;
 
     @PostMapping("/start-readings")
     public ResponseEntity<String> startReadings(@RequestBody Map<String, String> ips) {
-        readingManager.start(ips);
+        clpReadingService.start(ips);
         return ResponseEntity.ok("Leituras iniciadas.");
     }
 
     @PostMapping("/stop-readings")
     public ResponseEntity<String> stopReadings() {
-        readingManager.stop();
+        clpReadingService.stop();
         return ResponseEntity.ok("Leituras interrompidas e eventos registrados.");
     }
 
     @GetMapping("/data/{clp}")
     public ResponseEntity<String> getData(@PathVariable String clp) {
-        Optional<Estacao> estacao = estacaoDoApelido(clp);
+        Optional<Estacao> estacao = Estacao.fromNome(clp);
         if (estacao.isEmpty()) {
             return ResponseEntity.ok("CLP inválido: " + clp);
         }
@@ -110,20 +114,9 @@ public class ClpController {
                 .orElse(null);
     }
 
-    /** Mapeia os apelidos legados clp1..clp4 (ou o nome da estação) para a estação. */
-    private Optional<Estacao> estacaoDoApelido(String clp) {
-        return switch (clp.toLowerCase()) {
-            case "clp1" -> Optional.of(Estacao.ESTOQUE);
-            case "clp2" -> Optional.of(Estacao.PROCESSO);
-            case "clp3" -> Optional.of(Estacao.MONTAGEM);
-            case "clp4" -> Optional.of(Estacao.EXPEDICAO);
-            default -> Estacao.fromNome(clp);
-        };
-    }
-
     @PostMapping("/smart/ping")
-    public Map<String, Boolean> pingHosts() {
-        Map<String, Boolean> resultados = new HashMap<>();
+    public ResponseEntity<List<ClpStatusPingDTO>> pingHosts() {
+        List<ClpStatusPingDTO> statusClps = new ArrayList<>();
 
         clpIpConfig.getIps().forEach((nome, ip) -> {
             boolean isClpOnline = false;
@@ -137,10 +130,10 @@ public class ClpController {
             }
 
             System.out.println(nome + ": " + isClpOnline);
-            resultados.put(nome, isClpOnline);
+            statusClps.add(ClpStatusPingDTO.builder().nome(nome).ip(ip).online(isClpOnline).verifiedAt(LocalDateTime.now().toString()).build());
         });
 
-        return resultados;
+        return ResponseEntity.ok(statusClps);
     }
 
     @PostMapping("/smart/reset-status")
@@ -156,7 +149,7 @@ public class ClpController {
     }
 
     @GetMapping("/smart/readonly")
-    public boolean getReadOnly() {
-        return appStateConfig.isReadOnly();
+    public ResponseEntity<ClpReadOnlyDTO> getReadOnly() {
+        return ResponseEntity.ok(ClpReadOnlyDTO.builder().readOnly(appStateConfig.isReadOnly()).build());
     }
 }

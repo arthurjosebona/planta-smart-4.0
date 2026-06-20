@@ -75,8 +75,13 @@ public class BlocoService {
     }
 
     private Bloco createBloco(Bloco bloco) {
-        Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
-        bloco.setEstoque(estoque);
+        // O slot físico (Estoque) só é atribuído no envio para produção.
+        if (bloco.getEstoque() != null && bloco.getEstoque().getId() != null) {
+            Estoque estoque = estoqueService.findEntityById(bloco.getEstoque().getId());
+            bloco.setEstoque(estoque);
+        } else {
+            bloco.setEstoque(null);
+        }
         return blocoRepository.save(bloco);
     }
 

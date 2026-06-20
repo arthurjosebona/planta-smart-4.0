@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ProcessoCommService implements PlcDataObserver {
+public class ProcessoComm implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private ProcessoInfo processoInfo;
     private AppStateConfig appStateConfig;
@@ -24,22 +24,31 @@ public class ProcessoCommService implements PlcDataObserver {
     }
 
     public void processData(String ip, byte[] dadosClp2) {
-        // lógica que hoje está no método clpProcesso(...)
-
-        //-------------- Apresentação no console -----------------
-        StringBuilder leituraClp2 = new StringBuilder();
-        for (byte b : dadosClp2) {
-            leituraClp2.append(String.format("%02X ", b));
-        }
-        String clp2 = leituraClp2.toString().trim();
-        //System.out.println("[CLP2] " + clp2);
+        logLeitura(dadosClp2);
 
         PlcConnector plcConnectorPro = plcConnectionService.getConnection(ip);
         if (plcConnectorPro == null) {
             return;
         }
 
-        //-------------- Leitura das variáveis -------------------
+        lerVariaveis(dadosClp2);
+
+        // Regras de negócio da estação PROCESSO
+        tratarResetRecebidoOp(plcConnectorPro);
+        tratarStartOp(plcConnectorPro);
+        tratarFinishOp(plcConnectorPro);
+    }
+
+    /** Apresentação no console da leitura bruta (em hexadecimal). */
+    private void logLeitura(byte[] dadosClp2) {
+        StringBuilder leituraClp2 = new StringBuilder();
+        for (byte b : dadosClp2) {
+            leituraClp2.append(String.format("%02X ", b));
+        }
+    }
+
+    /** Lê as variáveis do bloco bruto do CLP PROCESSO para {@link ProcessoInfo}. */
+    private void lerVariaveis(byte[] dadosClp2) {
         processoInfo.setRecebidoOp((dadosClp2[0] & 0x01) != 0);
 
         processoInfo.setNumeroOP(((dadosClp2[2] & 0xFF) << 8) | (dadosClp2[3] & 0xFF));
@@ -51,24 +60,29 @@ public class ProcessoCommService implements PlcDataObserver {
         processoInfo.setAguardando((dadosClp2[6] & 0x02) != 0);
         processoInfo.setManual((dadosClp2[6] & 0x04) != 0);
         processoInfo.setEmergencia((dadosClp2[6] & 0x08) != 0);
+    }
 
-        // System.out.println("StatusEstoque: " + statusEstoque + "\n"
-        //         + "StatusProcesso: " + statusProcesso + "\n"
-        //         + "StatusMontagem: " + statusMontagem + "\n"
-        //         + "StatusExpedicao: " + statusExpedicao + "\n");
-        // Se as três flags (StartOP, FinishOP e CancelOP) estão em FALSE, então a flag
-        // RecebidoOP fica em FALSE
+    /**
+     * StartOP, FinishOP e CancelOP todas em FALSE:
+     * baixa a flag RecebidoOP [DB2:0.0] para FALSE.
+     */
+    private void tratarResetRecebidoOp(PlcConnector plcConnectorPro) {
         if (processoInfo.isStartOP() == false && processoInfo.isFinishOP() == false && processoInfo.isCancelOP() == false) {
             if (appStateConfig.isReadOnly() == false) {
-
                 try {
                     plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("FALSE")); // coloca RecebidoOPPro em FALSE
                 } catch (Exception ex) {
                 }
             }
         }
-        // Se a estação PROCESSO sinalizou o inicio da operação e recebidoOpPro está em FALSE, então a
-        // flag RecebidoOPPRO fica em TRUE
+    }
+
+    /**
+     * startOP == true & recebidoOp == false:
+     * PROCESSO sinalizou o início da operação -> statusProcesso = 1 (se há pedido em curso)
+     * e sobe a flag RecebidoOP [DB2:0.0] para TRUE.
+     */
+    private void tratarStartOp(PlcConnector plcConnectorPro) {
         if (processoInfo.isStartOP() == true && processoInfo.isRecebidoOp() == false) {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
                 appStateConfig.setStatusProcesso((byte) 1);
@@ -78,23 +92,25 @@ public class ProcessoCommService implements PlcDataObserver {
 
             if (appStateConfig.isReadOnly() == false) {
                 try {
-                    plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("TRUE"));   // coloca RecebidoOPPro em TRUE
+                    plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPPro em TRUE
                 } catch (Exception e) {
-
                     e.printStackTrace();
                 }
             }
-
         }
-        // Se a estação PROCESSO sinalizou o témino da operação e ficou OCUPADO, então a
-        // flag RecebidoOP fica em TRUE
+    }
+
+    /**
+     * finishOP == true & recebidoOp == false:
+     * PROCESSO sinalizou o término da operação -> sobe a flag RecebidoOP [DB2:0.0] para
+     * TRUE e marca statusProcesso = 2 (se há pedido em curso).
+     */
+    private void tratarFinishOp(PlcConnector plcConnectorPro) {
         if (processoInfo.isFinishOP() == true && processoInfo.isRecebidoOp() == false) {
             if (appStateConfig.isReadOnly() == false) {
-
                 try {
-                    plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("TRUE"));  // coloca RecebidoOPPro em TRUE
+                    plcConnectorPro.writeBit(2, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPPro em TRUE
                 } catch (Exception e) {
-
                     e.printStackTrace();
                 }
                 if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
@@ -102,15 +118,7 @@ public class ProcessoCommService implements PlcDataObserver {
                 } else {
                     //statusProcesso = 0;
                 }
-
             }
-
         }
-
-
-
-        
     }
-
-
 }

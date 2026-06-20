@@ -12,8 +12,10 @@ import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -146,12 +148,15 @@ public class SmartService {
 
             // 4. Tente ler a resposta primeiro como String para ver o que o ESP32 está
             // realmente enviando
-            ResponseEntity<String> rawResponse = apiSeletorTampa.postForEntity(url, request, String.class);
-            System.out.println("Resposta Bruta do ESP32: " + rawResponse.getBody());
+            ResponseEntity<Map<String, Object>> response = apiSeletorTampa.exchange(
+                url,
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
 
-            // 5. Agora, para a sua lógica de negócio, usamos o Map
-            ResponseEntity<Map> response = apiSeletorTampa.postForEntity(url, request, Map.class);
             Map<String, Object> body = response.getBody();
+            System.out.println("Resposta do ESP32: " + body);
 
             // Verificação robusta
             if (body == null || body.get("status") == null) {

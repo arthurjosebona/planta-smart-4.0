@@ -10,11 +10,8 @@ import com.smart.appsa.model.enums.Estacao;
 
 import lombok.AllArgsConstructor;
 
-/**
- * Armazena o último {@code byte[]} bruto lido de cada estação.
- * Substitui os antigos campos {@code static dataClp1..4} do {@code ClpController} e
- * é o ponto único consultado pelos endpoints {@code /data} e {@code /smartstream}.
- */
+
+// Armazena o último byte[] bruto lido de cada estação.
 @Component
 @AllArgsConstructor
 public class PlcDataStore {
@@ -26,19 +23,17 @@ public class PlcDataStore {
         dados.put(estacao, data);
     }
 
+    // Obtem em bytes
     public byte[] getRaw(Estacao estacao) {
         return dados.get(estacao);
     }
 
-    /** Última leitura da estação como string hexadecimal ("AB CD ..."), ou {@code null}. */
+    // Obtem em hexa
     public String getHex(Estacao estacao) {
         return toHex(getRaw(estacao));
     }
 
-    /**
-     * Leitura do ESTOQUE acrescida dos 6 bytes de status usados pelo stream SSE
-     * (statusEstoque/Processo/Montagem/Expedicao/Producao + flag pedidoEmCurso).
-     */
+    // Método que devolve as infos de estoque + os status de todas as bancadas ao fim do array de bytes
     public byte[] getEstoqueComStatus() {
         byte[] base = getRaw(Estacao.ESTOQUE);
         if (base == null) {

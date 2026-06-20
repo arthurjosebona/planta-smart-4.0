@@ -16,6 +16,7 @@ import com.smart.appsa.exception.DuplicateAndarException;
 import com.smart.appsa.exception.EstoqueInsuficienteException;
 import com.smart.appsa.exception.InvalidOrdemDeProducaoException;
 import com.smart.appsa.exception.OrdemDeProducaoExistenteException;
+import com.smart.appsa.exception.PedidoNaoPendenteException;
 import com.smart.appsa.exception.RequiredFieldException;
 import com.smart.appsa.exception.TipoIncompativelComBlocosException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
@@ -94,14 +95,12 @@ public class PedidoService {
     }
 
     private void createBlocks(Pedido pedido, List<Bloco> blocos) {
+        // Pedidos podem ser criados independentemente da quantidade em estoque.
+        // O slot físico e a baixa do estoque só acontecem no envio para produção
         for (Bloco bloco : blocos) {
             bloco.setPedido(pedido);
-            List<Estoque> estoques = estoqueService.findByCorEstoque(CorEstoque.fromValue(bloco.getCor().getValue()));
-            if (estoques.isEmpty())
-                throw new EstoqueInsuficienteException(bloco.getCor().name());
-            bloco.setEstoque(estoques.get(0));
+            bloco.setEstoque(null);
             blocoService.create(bloco);
-            estoqueService.assignBlockColor(bloco.getEstoque().getId(), CorEstoque.VAZIO);
         }
     }
 
@@ -120,9 +119,10 @@ public class PedidoService {
     }
 
     @Transactional
-    public PedidoResponseDTO updateStatusAsCompleted(Long id) {
+    public PedidoResponseDTO startProduction(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
+        assignEstoqueSlots(pedido);
         prepareForCompletion(pedido);
         Pedido updated = saveWithExpedition(pedido);
         System.out.println("DTOs PARA A BANCADA: ");
@@ -138,15 +138,37 @@ public class PedidoService {
     }
 
     private void prepareForCompletion(Pedido pedido) {
-        pedido.setStatus(StatusPedido.CONCLUIDO);
-        pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
+        pedido.setStatus(StatusPedido.PRODUCAO);
+        // pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
     }
 
     private Pedido saveWithExpedition(Pedido pedido) {
         Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
         pedido.setExpedicao(nextFree);
-        expedicaoService.assignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
+        // Antes a OP já era escrita no banco nessa etapa, agora fica quando receber via EstoqueComm
+        // expedicaoService.assignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
         return pedidoRepository.save(pedido);
+    }
+
+    //  Verifica a disponibilidade física no estoque e vincula cada bloco a uma posição
+    //  realmente ocupada da sua cor. Só aqui a quantidade é validada, a criação do pedido
+    //  é independente do estoque. 
+    private void assignEstoqueSlots(Pedido pedido) {
+        Map<CorEstoque, List<Bloco>> blocosPorCor = pedido.getBlocos().stream()
+                .collect(Collectors.groupingBy(b -> CorEstoque.fromValue(b.getCor().getValue())));
+
+        for (Map.Entry<CorEstoque, List<Bloco>> entry : blocosPorCor.entrySet()) {
+            CorEstoque cor = entry.getKey();
+            List<Bloco> blocos = entry.getValue();
+
+            List<Estoque> disponiveis = estoqueService.findByCorEstoque(cor);
+            if (disponiveis.size() < blocos.size())
+                throw new EstoqueInsuficienteException(cor.name());
+
+            for (int i = 0; i < blocos.size(); i++) {
+                blocos.get(i).setEstoque(disponiveis.get(i));
+            }
+        }
     }
 
     @Transactional
@@ -154,20 +176,11 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
 
-        // Libera os estoques ocupados pelos blocos antes de deletar
-        for (Bloco bloco : pedido.getBlocos()) {
-            if (bloco.getEstoque() != null) {
-                estoqueService.assignBlockColor(
-                        bloco.getEstoque().getId(),
-                        CorEstoque.fromValue(bloco.getCor().getValue()));
-            }
-        }
+        if (pedido.getStatus() != StatusPedido.PENDENTE)
+            throw new PedidoNaoPendenteException("excluir", pedido.getStatus());
 
-        // Se pedido concluído, libera a posição na expedição
-        if (pedido.getStatus() == StatusPedido.CONCLUIDO && pedido.getExpedicao() != null) {
-            expedicaoService.assignOrdemAtPosicao(0, pedido.getExpedicao().getPosicaoFisica());
-        }
-
+        // O estado físico do estoque é de responsabilidade do CLP (EstoqueCommService),
+        // por isso o delete não restaura cor de estoque — evita estoque fantasma.
         pedidoRepository.delete(pedido);
     }
 
@@ -176,18 +189,12 @@ public class PedidoService {
         Pedido existing = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
 
+        if (existing.getStatus() != StatusPedido.PENDENTE)
+            throw new PedidoNaoPendenteException("atualizar", existing.getStatus());
+
         validatePedidoForUpdate(requestDTO, id);
 
-        // Libera estoques dos blocos antigos
-        for (Bloco bloco : existing.getBlocos()) {
-            if (bloco.getEstoque() != null) {
-                estoqueService.assignBlockColor(
-                        bloco.getEstoque().getId(),
-                        CorEstoque.fromValue(bloco.getCor().getValue()));
-            }
-        }
-
-        // Remove os blocos antigos
+        // Remove os blocos antigos (estoque físico é gerido pelo CLP, não restaurado aqui)
         blocoService.deleteAllByPedido(existing);
 
         // Atualiza os campos do pedido

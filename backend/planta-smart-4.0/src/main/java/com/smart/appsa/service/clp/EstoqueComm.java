@@ -1,17 +1,14 @@
 package com.smart.appsa.service.clp;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
+import com.smart.appsa.model.enums.CorEstoque;
+import com.smart.appsa.service.EstoqueService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
@@ -19,10 +16,11 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class EstoqueCommService implements PlcDataObserver {
+public class EstoqueComm implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private EstoqueInfoClp estoqueInfoClp;
     private AppStateConfig appStateConfig;
+    private EstoqueService estoqueService;
 
     @Override
     public void onData(String ip, byte[] data) {
@@ -30,19 +28,38 @@ public class EstoqueCommService implements PlcDataObserver {
     }
 
     public void processData(String ip, byte[] dadosClp1) {
-        //-------------- Apresentação no console -----------------
-        StringBuilder leituraClp1 = new StringBuilder();
-        for (byte b : dadosClp1) {
-            leituraClp1.append(String.format("%02X ", b));
-        }
-        //String clp1 = leituraClp1.toString().trim();
+        logLeitura(dadosClp1);
 
-        //System.out.println("[CLP ESTOQUE] " + clp1);
         PlcConnector plcConnectorEst = plcConnectionService.getConnection(ip);
         if (plcConnectorEst == null) {
             return;
         }
-        //-------------- Leitura das variáveis -------------------
+
+        lerVariaveis(dadosClp1);
+
+        // Encadeamento das regras de negócio (cada uma lê estoqueInfoClp e,
+        // se não estiver em readOnly, escreve as flags de volta no CLP).
+        tratarInicioPedido(plcConnectorEst);
+        tratarResetRecebidoOp(plcConnectorEst);
+        tratarStartOp(plcConnectorEst);
+        tratarFinishOp(plcConnectorEst);
+        tratarResetRecebidoEstoque(plcConnectorEst);
+        tratarRemoverEstoque(plcConnectorEst);
+        tratarAdicionarEstoque(plcConnectorEst);
+        tratarResetIniciarGuardar(plcConnectorEst);
+        tratarPedirPosicaoGuardar(plcConnectorEst);
+    }
+
+    /** Apresentação no console da leitura bruta (em hexadecimal). */
+    private void logLeitura(byte[] dadosClp1) {
+        StringBuilder leituraClp1 = new StringBuilder();
+        for (byte b : dadosClp1) {
+            leituraClp1.append(String.format("%02X ", b));
+        }
+    }
+
+    /** Lê todas as variáveis do bloco bruto do CLP ESTOQUE para {@link EstoqueInfoClp}. */
+    private void lerVariaveis(byte[] dadosClp1) {
         estoqueInfoClp.setRecebidoOp((dadosClp1[0] & 0x01) != 0);
 
         estoqueInfoClp.setIniciarPedido((dadosClp1[62] & (byte) 0x01) != 0);
@@ -70,100 +87,82 @@ public class EstoqueCommService implements PlcDataObserver {
         estoqueInfoClp.setPedirPosicaoEst((dadosClp1[102] & 0x01) != 0);
         estoqueInfoClp.setPosicaoEstoque(((dadosClp1[104] & 0xFF) << 8) | (dadosClp1[105] & 0xFF));
         estoqueInfoClp.setAdicionarEstoque((dadosClp1[106] & 0x01) != 0);
-
         estoqueInfoClp.setRemoverEstoque((dadosClp1[106] & 0x02) != 0);
-
         estoqueInfoClp.setRetornoEstoqueCheio((dadosClp1[106] & 0x04) != 0);
         estoqueInfoClp.setCorGuardarEstoque(((dadosClp1[108] & 0xFF) << 8) | (dadosClp1[109] & 0xFF));
-
         estoqueInfoClp.setRemoverEstoque((dadosClp1[106] & 0x02) != 0);
+    }
 
-        // System.out.println("StatusEstoque: " + statusEstoque + "\n"
-        //         + "StatusProcesso: " + statusProcesso + "\n"
-        //         + "StatusMontagem: " + statusMontagem + "\n"
-        //         + "StatusExpedicao: " + statusExpedicao + "\n");
-        // //--------------------------------------------------------
-        // Se o pedido foi iniciado e a estação ESTOQUE informou que iniciou a operação
-        // ficando no estado OCUPADO
-        // então a flag iniciarPedido fica em FALSE
+    /**
+     * iniciarPedido == true & ocupadoEst == true:
+     * ESTOQUE confirmou o início do pedido e ficou OCUPADO -> marca pedidoEmCurso,
+     * zera os status e baixa a flag IniciarPedido [DB9:62.0] para FALSE.
+     */
+    private void tratarInicioPedido(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isIniciarPedido() == true && estoqueInfoClp.isOcupado() == true) {
             appStateConfig.setPedidoEmCurso(true);
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
-            //updateDisplayStation();
-            //eventos.add("Seq " + seq++ + ": iniciarPedido == true & ocupadoEst == true");
             if (!appStateConfig.isReadOnly()) {
-                //System.out.println("Flag: IniciarPedido: Verificando se a estação ESTOQUE iniciou o pedido...");
-
-                // System.out.println("Flag: IniciarPedido: ESTOQUE iniciou o pedido...");
                 try {
-                    // System.out.println("Flag IniciarPedido: " + plcConnector.readBit(9, 62, 0));
-                    //System.out.println("colocando IniciarPedido em FALSE");
-                    //eventos.add("Seq " + seq++ + ": coloca IniciarPedido em FALSE");
                     plcConnectorEst.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE")); // coloca IniciarPedido em FALSE
-
-                    // System.out.println("Flag IniciarPedido: " + plcConnector.readBit(9, 62, 0));
-                    // System.out.println("Flag ocupadoEst: " + plcConnector.readBit(9, 100, 0));
                 } catch (Exception e) {
                     System.out.println(
                             "ERRO [iniciarPedido == true & ocupadoEst == true]: Atualização da Flag IniciarPedido [DB9:62.0] para FALSE");
                 }
             }
-
         }
+    }
 
-        // Se as três flags (StartOP, FinishOP e CancelOP) estão em FALSE, então a flag
-        // RecebidoOP fica em FALSE
+    /**
+     * StartOP, FinishOP e CancelOP todas em FALSE:
+     * baixa a flag RecebidoOP [DB9:0.0] para FALSE.
+     */
+    private void tratarResetRecebidoOp(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isStartOP() == false & estoqueInfoClp.isFinishOP() == false & estoqueInfoClp.isCancelOP() == false) {
-            //eventos.add("Seq " + seq++ + ": startOPEst == false & finishOPEst == false & cancelOPEst == false");
             if (appStateConfig.isReadOnly() == false) {
-
                 try {
-                    //System.out.println("Seq " + seq++ + ": colocando RecebidoOPEst em FALSE");
-                    //eventos.add("Seq " + seq++ + ": coloca RecebidoOPEst em FALSE");
                     plcConnectorEst.writeBit(9, 0, 0, Boolean.parseBoolean("FALSE")); // coloca RecebidoOPEst em FALSE
-
                 } catch (Exception e) {
                     System.out.println("ERRO: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para FALSE");
                 }
             }
         }
+    }
 
-        // Se a estação ESTOQUE sinalizou o início da operação e ficou OCUPADO, então a
-        // flag RecebidoOP fica em TRUE
+    /**
+     * startOP == true & recebidoOp == false:
+     * ESTOQUE sinalizou o início da operação -> statusEstoque = 1 (se há pedido em curso)
+     * e sobe a flag RecebidoOP [DB9:0.0] para TRUE.
+     */
+    private void tratarStartOp(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isStartOP() == true & estoqueInfoClp.isRecebidoOp() == false) {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
                 appStateConfig.setStatusEstoque((byte) 1);
             } else {
                 //statusEstoque = 0;
             }
-            // updateDisplayStation();
-            //eventos.add("Seq " + seq++ + ": startOPEst == true & recebidoOpEst == false");
             if (appStateConfig.isReadOnly() == false) {
-                //System.out.println("Flag: RecebidoOPEstoque_TRUE");
                 try {
-                    //System.out.println("StartOP: colocando RecebidoOPEstoque em TRUE");
-                    //eventos.add("Seq " + seq++ + ": coloca RecebidoOPEst em TRUE");
                     plcConnectorEst.writeBit(9, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPEst em TRUE
-
                 } catch (Exception e) {
                     System.out.println(
                             "ERRO [startOp]: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para TRUE");
                 }
             }
         }
+    }
 
-        // Se a estação ESTOQUE sinalizou o témino da operação e ficou OCUPADO, então a
-        // flag RecebidoOP fica em TRUE
+    /**
+     * finishOP == true & recebidoOp == false:
+     * ESTOQUE sinalizou o término da operação -> sobe a flag RecebidoOP [DB9:0.0] para
+     * TRUE e marca statusEstoque = 2 (se há pedido em curso).
+     */
+    private void tratarFinishOp(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isFinishOP() == true & estoqueInfoClp.isRecebidoOp() == false) {
-            //eventos.add("Seq " + seq++ + ": finishOPEst == true & recebidoOpEst == false");
             if (appStateConfig.isReadOnly() == false) {
-                //System.out.println("Flag: RecebidoOPEstoque_TRUE");
                 try {
-                    //System.out.println("FinishOP: colocando RecebidoOPEstoque em TRUE");
-                    //eventos.add("Seq " + seq++ + ": coloca RecebidoOPEst em TRUE");
                     plcConnectorEst.writeBit(9, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPEst em TRUE
-
                 } catch (Exception e) {
                     System.out.println(
                             "ERRO [finishOp]: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para TRUE");
@@ -175,24 +174,30 @@ public class EstoqueCommService implements PlcDataObserver {
                 }
             }
         }
+    }
 
-        // Se as flags de remover ou adicionar no estoque estão em FALSE então a flag RecebidoEstoque fica em FALSE
+    /**
+     * removerEstoque == false & adicionarEstoque == false:
+     * baixa a flag RecebidoEstoque [DB9:64.0] para FALSE.
+     */
+    private void tratarResetRecebidoEstoque(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isRemoverEstoque() == false & estoqueInfoClp.isAdicionarEstoque() == false) {
-            //eventos.add("Seq " + seq++ + ": removerEstoque == false & adicionarEstoque == false");
             if (appStateConfig.isReadOnly() == false) {
-
-                //System.out.println("colocando RecebidoEstoque em FALSEe");
                 try {
-                    //eventos.add("Seq " + seq++ + ": coloca RecebidoEstoquet em FALSE");
                     plcConnectorEst.writeBit(9, 64, 0, Boolean.parseBoolean("FALSE")); // coloca RecebidoEstoque em FALSE
-
                 } catch (Exception e) {
                     System.out.println("ERRO: Atualização da Flag RecebidoEstoque [DB9:64.0] para FALSE");
                 }
             }
         }
+    }
 
-        // Atualiza a posição removida na tabela Estoque e na memória do clp Estoque
+    /**
+     * posicaoEstoque > 0 & removerEstoque == true:
+     * sobe RecebidoEstoque [DB9:64.0], zera a cor da posição no CLP
+     * (offset = 68 + posicao - 1) e persiste a remoção na API.
+     */
+    private void tratarRemoverEstoque(PlcConnector plcConnectorEst) {
         if ((estoqueInfoClp.getPosicaoEstoque() > 0) && estoqueInfoClp.isRemoverEstoque() == true) {
             if (!appStateConfig.isReadOnly()) {
                 try {
@@ -208,117 +213,90 @@ public class EstoqueCommService implements PlcDataObserver {
                     System.out.println("\n\nREMOVENDO ESTOQUE NA POSIÇÃO: " + offset + " COR: " + estoqueInfoClp.getCorGuardarEstoque() + "\n\n");
                     plcConnectorEst.writeByte(9, offset, (byte) 0);
 
-                    // Cria mapa de dados com apenas uma posição
-                    Map<String, Integer> dadosMap = new HashMap<>();
-                    dadosMap.put("posicao:" + estoqueInfoClp.getPosicaoEstoque(), 0);
-
-                    // === Chama serviço de integração ===
-                    boolean sucesso = apiIntegrationService.salvarEstoque(dadosMap);
-
-                    if (sucesso) {
-                        System.out.println("Estoque salvo com sucesso na API.");
-                    } else {
-                        System.out.println("Falha ao salvar estoque na API.");
-                        // aqui você poderia lançar uma exceção ou marcar para tentar novamente
-                    }
-
+                    // Persiste a posição na API
+                    estoqueService.assignBlockColorByPosicaoFisica(estoqueInfoClp.getPosicaoEstoque(), CorEstoque.VAZIO);
                 } catch (Exception e) {
                     System.out.println("ERRO: Na tentativa de remover do Estoque");
                     e.printStackTrace();
                 }
             }
         }
+    }
 
-        // Atualiza na posição a cor do bloco adicionado na tabela Estoque e na memória do clp Estoque
+    /**
+     * posicaoEstoque > 0 & adicionarEstoque == true:
+     * sobe RecebidoEstoque [DB9:64.0], grava a cor do bloco na posição do CLP
+     * (offset = 68 + posicao - 1) e persiste a adição na API.
+     */
+    private void tratarAdicionarEstoque(PlcConnector plcConnectorEst) {
         if ((estoqueInfoClp.getPosicaoEstoque() > 0) && estoqueInfoClp.isAdicionarEstoque() == true) {
-            //eventos.add("Seq " + seq++ + ": (posicaoEstoque > 0) & adicionarEstoque == true");
             if (appStateConfig.isReadOnly() == false) {
-
-                //System.out.println("Flag: RecebidoEstoque_TRUE - ADICIONAR ESTOQUE");
                 // Coloca a flag RecebidoEstoque em TRUE
                 try {
-                    //eventos.add("Seq " + seq++ + ": coloca RecebidoEstoque em TRUE");
                     plcConnectorEst.writeBit(9, 64, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoEstoque em TRUE
                 } catch (Exception e) {
                     System.out.println("ERRO: Atualização da Flag RecebidoEstoque [DB9:64.0] para TRUE");
                 }
 
-                //eventos.add("Seq " + seq++ + ": Adicionando bloco na posição: " + posicaoEstoque);
                 byte offset = (byte) (68 + (estoqueInfoClp.getPosicaoEstoque() - 1));
 
                 try {
                     // Atualiza cor no CLP
                     plcConnectorEst.writeByte(9, offset, (byte) estoqueInfoClp.getCorGuardarEstoque());
 
-                    // Cria mapa de dados com apenas uma posição
-                    Map<String, Integer> dadosMap = new HashMap<>();
-                    dadosMap.put("posicao:" + estoqueInfoClp.getPosicaoEstoque(), estoqueInfoClp.getCorGuardarEstoque());
-
-                    // === Chama serviço de integração ===
-                    boolean sucesso = apiIntegrationService.salvarEstoque(dadosMap);
-
-                    if (sucesso) {
-                        System.out.println("Estoque salvo com sucesso na API.");
-                    } else {
-                        System.out.println("Falha ao salvar estoque na API.");
-                        // aqui você poderia lançar uma exceção ou marcar para tentar novamente
-                    }
-
+                    // Persiste a posição com a cor adicionada na API
+                    estoqueService.assignBlockColorByPosicaoFisica(
+                        estoqueInfoClp.getPosicaoEstoque(), 
+                        CorEstoque.fromValue(estoqueInfoClp.getCorGuardarEstoque())
+                    );
                 } catch (Exception e) {
                     System.out.println("ERRO: Na tentativa de adicionar no Estoque");
                     e.printStackTrace();
                 }
             }
         }
+    }
 
-        //--------------------------------------------------------------------------------------------------------------------------------------
-        // Se as flags ocupadoEst ou retornoEstoqueCheio estão em TRUE E a flag iniciarGuardarEst foi ativada então a flag iniciarGuardarEst fica em FALSE
+    /**
+     * (ocupadoEst == true | retornoEstoqueCheio == true) & iniciarGuardarEst == true:
+     * baixa a flag IniciarGuardar [DB9:64.1] para FALSE.
+     */
+    private void tratarResetIniciarGuardar(PlcConnector plcConnectorEst) {
         if ((estoqueInfoClp.isOcupado() == true | estoqueInfoClp.isRetornoEstoqueCheio() == true) & estoqueInfoClp.isIniciarGuardarEst() == true) {
-            //eventos.add("Seq " + seq++ + ": (ocupadoEst == true | retornoEstoqueCheio == true) & iniciarGuardarEst == true");
             if (appStateConfig.isReadOnly() == false) {
-                //System.out.println("Flag: IniciarGuardar_FALSE");
-
                 // Coloca a flag IniciarGuardar em FALSE
                 try {
-                    //eventos.add("Seq " + seq++ + ": Coloca iniciarGuardarEst em FALSE");
                     plcConnectorEst.writeBit(9, 64, 1, Boolean.parseBoolean("FALSE")); // Coloca iniciarGuardarEst em FALSE
-
                 } catch (Exception e) {
                     System.out.println(
                             "ERRO: Atualização da Flag IniciarGuardarEstoque [DB9:64.1] para FALSE");
                 }
             }
-
         }
+    }
 
-        // Verificar se a estação Estoque está livre E pede posição para guardar
-        // Aqui deve ser implementada/chamada a função que verifica qual a situação de ocupação de cada
-        // posição do Magazine de Estoque
+    /**
+     * pedirPosicaoEst == true & ocupadoEst == false:
+     * ESTOQUE está livre e pede posição para guardar. Localiza a primeira posição livre
+     * no Magazine (0-LIVRE 1-PRETO 2-VERMELHO 3-AZUL), grava em PosicaoGuardar [DB9:66]
+     * e sobe a flag IniciarGuardar [DB9:64.1] para TRUE.
+     */
+    private void tratarPedirPosicaoGuardar(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isPedirPosicaoEst() == true & estoqueInfoClp.isOcupado() == false) {
-            //System.out.println("ESTOU AQUI- (pedirPosicaoEst == true) & ocupadoEst == false");
-            //eventos.add("Seq " + seq++ + ": pedirPosicaoEst == true & ocupadoEst == false");
             // Rotina para verificar qual posição está disponível para guardar
             if (!appStateConfig.isReadOnly()) {
-                // Solicita posição disponível para guardar (0-LIVRE 1-PRETO 2-VERMELHO 3-AZUL)
-                // Certifique-se de que posEstoqueLivre é seguro para acesso
-                Set<Integer> posicoesUsadas = new HashSet<>(); // Para evitar duplicidade
-
-                int posEstoqueLivre = buscarPrimeiraPosicaoPorCor(0, posicoesUsadas) /*getPositionEstoque(0)*/;
-                // System.out.println("Posição disponível no Magazine Estoque: " + posEstoqueRequest);
-                if (posEstoqueLivre > 0) {
-
+                Estoque primeiraPosicaoLivre = estoqueService.findByCorEstoque(CorEstoque.VAZIO).get(0);
+                if (primeiraPosicaoLivre != null) {
                     try {
                         // Atualiza a variável PosicaoGuardar no CLP ESTOQUE
-                        //eventos.add("Seq " + seq++ + ": Atualiza a variável PosicaoGuardar no CLP ESTOQUE");
-                        plcConnectorEst.writeInt(9, 66, posEstoqueLivre);
+                        plcConnectorEst.writeInt(9, 66, primeiraPosicaoLivre.getPosicaoFisica());
                     } catch (Exception e) {
                         System.out.println("ERRO: Atualização da PosicaoGuardarEstoque [DB9:66]");
                     }
 
                     try {
                         // Coloca a flag IniciarGuardar em TRUE
-                        //eventos.add("Seq " + seq++ + ": Coloca a flag IniciarGuardar em TRUE");
-                        plcConnectorEst.writeBit(9, 64, 1, Boolean.parseBoolean("TRUE"));  // coloca IniciarGuardar em TRUE
+                        plcConnectorEst.writeBit(9, 64, 1, Boolean.parseBoolean("TRUE")); // coloca IniciarGuardar em TRUE
                     } catch (Exception e) {
                         System.out.println("ERRO: Atualização da Flag IniciarGuardarEstoque [DB9:64.1]");
                     }
@@ -327,6 +305,5 @@ public class EstoqueCommService implements PlcDataObserver {
                 }
             }
         }
-
     }
 }

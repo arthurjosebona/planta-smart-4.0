@@ -39,10 +39,10 @@ public class ClpReadingService {
 
     public ClpReadingService(PlcConnectionService plcConnectionService,
                              PlcDataStore dataStore,
-                             EstoqueCommService estoqueCommService,
-                             ProcessoCommService processoCommService,
-                             MontagemCommService montagemCommService,
-                             ExpedicaoCommService expedicaoCommService) {
+                             EstoqueComm estoqueCommService,
+                             ProcessoComm processoCommService,
+                             MontagemComm montagemCommService,
+                             ExpedicaoComm expedicaoCommService) {
         this.plcConnectionService = plcConnectionService;
         this.dataStore = dataStore;
         this.commServices = new EnumMap<>(Estacao.class);
@@ -52,10 +52,7 @@ public class ClpReadingService {
         this.commServices.put(Estacao.EXPEDICAO, expedicaoCommService);
     }
 
-    /**
-     * Inicia (ou ignora, se já em execução) a leitura de cada estação informada.
-     * @param ips mapa {@code nome da estação -> IP}
-     */
+    // Inicia (ou ignora, se já em execução)
     public void start(Map<String, String> ips) {
         ips.forEach((nome, ip) -> {
             Optional<Estacao> estacaoOpt = Estacao.fromNome(nome);
