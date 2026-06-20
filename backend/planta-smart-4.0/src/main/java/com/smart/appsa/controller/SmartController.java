@@ -6,12 +6,10 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +28,7 @@ import com.smart.appsa.dto.clp.ClpStatusPingDTO;
 import com.smart.appsa.model.enums.Estacao;
 import com.smart.appsa.service.clp.ClpReadingService;
 import com.smart.appsa.service.clp.PlcDataStore;
+import com.smart.appsa.service.clp.SseService;
 
 import lombok.AllArgsConstructor;
 
@@ -42,6 +41,7 @@ public class SmartController {
     private final PlcDataStore dataStore;
     private final AppStateConfig appStateConfig;
     private final ClpIpConfig clpIpConfig;
+    private final SseService sseService;
 
     @PostMapping("/start-readings")
     public ResponseEntity<String> startReadings(@RequestBody Map<String, String> ips) {
@@ -69,49 +69,20 @@ public class SmartController {
         return ResponseEntity.ok(hex);
     }
 
-    @GetMapping("/smartstream/{bancada}")
-    public SseEmitter smartStream(@PathVariable String bancada) {
-        SseEmitter emitter = new SseEmitter(0L);
-        ExecutorService sseExecutor = Executors.newSingleThreadExecutor();
-
-        sseExecutor.execute(() -> {
-            try {
-                while (true) {
-                    byte[] dados = dadosDoStream(bancada);
-
-                    if (dados != null) {
-                        try {
-                            emitter.send(SseEmitter.event()
-                                    .name("leitura")
-                                    .data(PlcDataStore.toHex(dados)));
-                        } catch (IOException | IllegalStateException ex) {
-                            emitter.complete();
-                            break;
-                        }
-                    }
-
-                    TimeUnit.MILLISECONDS.sleep(400);
-                }
-            } catch (InterruptedException e) {
-                emitter.completeWithError(e);
-                Thread.currentThread().interrupt();
-            }
-        });
-
-        emitter.onCompletion(() -> System.out.println("SSE finalizado para " + bancada));
-        emitter.onTimeout(emitter::complete);
-        emitter.onError(emitter::completeWithError);
-
-        return emitter;
+    // Stream multiplexado: uma única conexão SSE recebe eventos de todas as estações.
+    // Cada evento é nomeado pelo nome da estação
+    // e só é emitido quando algum campo do DTO daquela estação muda.
+    @GetMapping("/stream")
+    public SseEmitter stream() {
+        return sseService.subscribe(EnumSet.allOf(Estacao.class));
     }
 
-    private byte[] dadosDoStream(String bancada) {
-        if (Estacao.ESTOQUE.getNome().equalsIgnoreCase(bancada)) {
-            return dataStore.getEstoqueComStatus();
-        }
-        return Estacao.fromNome(bancada)
-                .map(dataStore::getRaw)
-                .orElse(null);
+    // Stream de uma única estação 
+    @GetMapping("/stream/{bancada}")
+    public SseEmitter stream(@PathVariable String bancada) {
+        Estacao estacao = Estacao.fromNome(bancada)
+                .orElseThrow(() -> new IllegalArgumentException("CLP inválido: " + bancada));
+        return sseService.subscribe(EnumSet.of(estacao));
     }
 
     @PostMapping("/smart/ping")

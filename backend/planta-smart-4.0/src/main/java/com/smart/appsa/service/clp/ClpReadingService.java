@@ -31,6 +31,7 @@ public class ClpReadingService {
 
     private final PlcConnectionService plcConnectionService;
     private final PlcDataStore dataStore;
+    private final SseService sseService;
     private final Map<Estacao, PlcDataObserver> commServices;
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
@@ -39,12 +40,14 @@ public class ClpReadingService {
 
     public ClpReadingService(PlcConnectionService plcConnectionService,
                              PlcDataStore dataStore,
+                             SseService sseService,
                              EstoqueComm estoqueCommService,
                              ProcessoComm processoCommService,
                              MontagemComm montagemCommService,
                              ExpedicaoComm expedicaoCommService) {
         this.plcConnectionService = plcConnectionService;
         this.dataStore = dataStore;
+        this.sseService = sseService;
         this.commServices = new EnumMap<>(Estacao.class);
         this.commServices.put(Estacao.ESTOQUE, estoqueCommService);
         this.commServices.put(Estacao.PROCESSO, processoCommService);
@@ -74,8 +77,13 @@ public class ClpReadingService {
 
             StationReadConfig config = configs.get(estacao);
             PlcReaderTask task = new PlcReaderTask(connector, ip, estacao, config.reads());
+            // Ordem importa: o CommService parseia o modelo primeiro; depois guardamos o
+            // raw e publicamos no SSE (que lê o modelo já atualizado e emite só se mudou).
             task.addObserver(commServices.get(estacao));
-            task.addObserver((origemIp, data) -> dataStore.update(estacao, data));
+            task.addObserver((origemIp, data) -> {
+                dataStore.update(estacao, data);
+                sseService.publicar(estacao);
+            });
 
             ScheduledFuture<?> future = executor.scheduleWithFixedDelay(
                     task, 0, config.delayMs(), TimeUnit.MILLISECONDS);
