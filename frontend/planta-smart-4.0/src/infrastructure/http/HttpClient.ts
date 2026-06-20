@@ -5,7 +5,7 @@ export class HttpClient {
   private readonly defaultHeaders: Record<string, string>;
 
   constructor() {
-    this.baseURL = 'http://localhost:8088';
+    this.baseURL = 'http://localhost:8080';
     this.defaultHeaders = {
       'Content-Type': 'application/json',
     };

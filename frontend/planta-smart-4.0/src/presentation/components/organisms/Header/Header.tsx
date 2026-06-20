@@ -44,6 +44,9 @@ const IconDashboard = (
     <rect x="14" y="14" width="7" height="7" rx="1" />
   </>
 );
+const IconMonitor = (
+  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+);
 
 interface NavItem {
   href: string;
@@ -58,6 +61,7 @@ const NAV_ITEMS: (NavItem | 'separator')[] = [
   'separator',
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/estacoes', label: 'Estações', icon: IconEstacoes },
+  { href: '/monitor', label: 'Monitor', icon: IconMonitor },
 ];
 
 export function Header() {

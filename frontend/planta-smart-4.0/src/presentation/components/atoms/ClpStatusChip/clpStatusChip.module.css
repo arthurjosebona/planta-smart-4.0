@@ -1,0 +1,38 @@
+@reference "@styles/global.css";
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.ocupado {
+  background: rgba(79, 142, 247, 0.12);
+  border-color: rgba(79, 142, 247, 0.35);
+  color: #4f8ef7;
+}
+
+.aguardando {
+  background: rgba(232, 160, 69, 0.12);
+  border-color: rgba(232, 160, 69, 0.35);
+  color: #e8a045;
+}
+
+.manual {
+  background: rgba(154, 153, 150, 0.1);
+  border-color: rgba(154, 153, 150, 0.3);
+  color: #9a9996;
+}
+
+.emergencia {
+  background: rgba(224, 91, 91, 0.12);
+  border-color: rgba(224, 91, 91, 0.4);
+  color: #e05b5b;
+}
