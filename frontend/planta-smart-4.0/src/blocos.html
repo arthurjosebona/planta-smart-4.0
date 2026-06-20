@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Montador de Blocos</title>
+</head>
+<body>
+
+<div style="display:flex; gap:40px; align-items:flex-end;">
+  <div>
+    <div id="pedido1"></div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+//  PATHS DAS IMAGENS
+// =============================================================
+var PATH = {
+  lamina1:   './assets/laminas/lamina1-2.png',
+  lamina2:   './assets/laminas/lamina2-1.png',
+  lamina3:   './assets/laminas/lamina3-3.png',
+  blocoCor1: './assets/bloco/rBlocoCor1.png',
+  blocoCor2: './assets/bloco/rBlocoCor2.png',
+  blocoCor3: './assets/bloco/rBlocoCor3.png',
+  tampa0:    './assets/bloco/rTampa0.png',
+  tampa1:    './assets/bloco/rTampa1.png',
+  tampa2:    './assets/bloco/rTampa2.png',
+};
+
+// =============================================================
+//  MEDIDAS (px) — canvas 320×145 para todas as imagens
+// =============================================================
+var CANVAS_W = 320;
+var CANVAS_H = 145;
+
+var BLOCO_BODY_TOP_COR1 = 75;
+var BLOCO_BODY_TOP_COR2 = 74;
+var BLOCO_BODY_TOP_COR3 = 74;
+
+var BLOCO_VIS_BOT_COR1  = 138;
+var BLOCO_VIS_BOT_COR2  = 138;
+var BLOCO_VIS_BOT_COR3  = 138;
+
+var TAMPA_VIS_TOP = 22;
+var TAMPA_VIS_BOT = 99;
+
+// =============================================================
+//  CONFIGURAÇÃO DO PEDIDO 1
+//
+//  Cada bloco aceita até 3 lâminas independentes via:
+//    lamina1: { src: 'lamina1', visivel: true }
+//    lamina2: { src: 'lamina2', visivel: false }
+//    lamina3: { src: 'lamina3', visivel: false }
+//
+//  Omitir uma lâmina ou setar visivel:false a oculta.
+// =============================================================
+var pedido1 = {
+  blocos: [
+    {
+      src: 'blocoCor2',
+      visivel: true,
+      lamina1: { src: 'lamina1', visivel: true },
+      lamina2: { src: 'lamina2', visivel: false },
+      lamina3: { src: 'lamina3', visivel: true },
+    },
+    {
+      src: 'blocoCor1',
+      visivel: false,
+      lamina1: { src: 'lamina1', visivel: false },
+      lamina2: { src: 'lamina2', visivel: false },
+      lamina3: { src: 'lamina3', visivel: true },
+    },
+    {
+      src: 'blocoCor3',
+      visivel: false,
+      lamina1: { src: 'lamina1', visivel: false },
+      lamina2: { src: 'lamina2', visivel: false },
+      lamina3: { src: 'lamina3', visivel: true  },
+    },
+  ],
+  tampa: { src: 'tampa2', visivel: true },
+};
+
+
+// =============================================================
+//  MOTOR DE RENDERIZAÇÃO
+// =============================================================
+
+function getBodyTop(src) {
+  if (src === 'blocoCor1') return BLOCO_BODY_TOP_COR1;
+  if (src === 'blocoCor2') return BLOCO_BODY_TOP_COR2;
+  if (src === 'blocoCor3') return BLOCO_BODY_TOP_COR3;
+  return 30;
+}
+
+function getVisBot(src) {
+  if (src === 'blocoCor1') return BLOCO_VIS_BOT_COR1;
+  if (src === 'blocoCor2') return BLOCO_VIS_BOT_COR2;
+  if (src === 'blocoCor3') return BLOCO_VIS_BOT_COR3;
+  return 138;
+}
+
+function imgTag(src, topPx, zIndex, title) {
+  return '<img src="' + PATH[src] + '" title="' + title + '"'
+    + ' width="' + CANVAS_W + '" height="' + CANVAS_H + '"'
+    + ' style="position:absolute; top:' + topPx + 'px; left:0;'
+    + ' z-index:' + zIndex + ';">';
+}
+
+function renderPedido(pedido, containerId) {
+  var blocos = pedido.blocos.filter(function(b) { return b.visivel; });
+  var n = blocos.length;
+  if (n === 0) return;
+
+  // Calcula offsets relativos acumulados (de baixo para cima)
+  var relOffsets = [0];
+  for (var k = 0; k < n - 1; k++) {
+    var bodyTopK   = getBodyTop(blocos[k].src);
+    var visBotNext = getVisBot(blocos[k + 1].src);
+    relOffsets.push(relOffsets[k] + bodyTopK - visBotNext);
+  }
+
+  // Normaliza para que o menor offset seja 0
+  var minOffset = Math.min.apply(null, relOffsets);
+  var shift = -minOffset;
+
+  var tops = [];
+  for (var k = 0; k < n; k++) {
+    tops[k] = relOffsets[k] + shift;
+  }
+
+  var containerH = tops[0] + CANVAS_H;
+
+  var html = '';
+  var z = 10;
+
+  // Renderiza blocos de baixo (k=0) para cima (k=n-1)
+  for (var k = 0; k < n; k++) {
+    var bloco = blocos[k];
+
+    html += imgTag(bloco.src, tops[k], z, 'Bloco ' + (k + 1));
+
+    // Lâminas do bloco k sobrepostas a ele (z+2, z+3, z+4)
+    if (bloco.lamina1 && bloco.lamina1.visivel) {
+      html += imgTag(bloco.lamina1.src, tops[k], z + 2, 'Bloco ' + (k + 1) + ' — Lâmina 1');
+    }
+    if (bloco.lamina2 && bloco.lamina2.visivel) {
+      html += imgTag(bloco.lamina2.src, tops[k], z + 3, 'Bloco ' + (k + 1) + ' — Lâmina 2');
+    }
+    if (bloco.lamina3 && bloco.lamina3.visivel) {
+      html += imgTag(bloco.lamina3.src, tops[k], z + 4, 'Bloco ' + (k + 1) + ' — Lâmina 3');
+    }
+
+    z += 10;
+  }
+
+  // Tampa: vis_bot da tampa alinha ao body_top do bloco do topo
+  if (pedido.tampa && pedido.tampa.visivel) {
+    var topoIdx     = n - 1;
+    var bodyTopTopo = getBodyTop(blocos[topoIdx].src);
+    var tampaTop    = tops[topoIdx] + bodyTopTopo - TAMPA_VIS_BOT;
+    html += imgTag(pedido.tampa.src, tampaTop, z + 5, 'Tampa');
+  }
+
+  var el = document.getElementById(containerId);
+  el.style.position = 'relative';
+  el.style.width    = CANVAS_W + 'px';
+  el.style.height   = containerH + 'px';
+  el.innerHTML = html;
+}
+
+renderPedido(pedido1, 'pedido1');
+</script>
+
+</body>
+</html>

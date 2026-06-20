@@ -46,7 +46,7 @@ public class Bloco {
     @ManyToOne
     @JoinColumn(
         name = "id_estoque",
-        nullable = false,
+        nullable = true,
         foreignKey = @ForeignKey(name = "fk_estoque_bloco")
     )
     private Estoque estoque;

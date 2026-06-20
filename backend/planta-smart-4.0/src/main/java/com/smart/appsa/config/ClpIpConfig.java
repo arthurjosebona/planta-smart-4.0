@@ -14,5 +14,10 @@ public class ClpIpConfig {
     public void setIps(Map<String, String> ips) { this.ips = ips; }
 
     public String getIp(String clpName) { return ips.get(clpName); }
-    public void setIp(String clpName, String ip) { ips.put(clpName, ip); }
+    public void setIp(String clpName, String ip) { ips.put(clpName, ip); }; 
+        
+    public String getEstoqueIp() { return ips.get("estoque"); };
+    public String getProcessoIp() { return ips.get("processo"); };
+    public String getMontagemIp() { return ips.get("montagem"); };
+    public String getExpedicaoIp() { return ips.get("expedicao"); };
 }
