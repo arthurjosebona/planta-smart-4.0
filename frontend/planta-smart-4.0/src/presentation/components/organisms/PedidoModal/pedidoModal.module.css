@@ -1,0 +1,59 @@
+@reference "@styles/global.css";
+
+.overlay {
+  @apply fixed inset-0 flex items-center justify-center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  padding: var(--spacing-5);
+}
+
+.modal {
+  @apply relative w-full overflow-hidden rounded-xl;
+  max-width: 1100px;
+  max-height: 90vh;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.closeBtn {
+  @apply absolute flex items-center justify-center rounded-lg cursor-pointer;
+  top: var(--spacing-3);
+  right: var(--spacing-3);
+  width: 32px;
+  height: 32px;
+  z-index: 1;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: all var(--ease-base);
+}
+
+.closeBtn:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+.content {
+  @apply flex flex-col md:flex-row;
+  max-height: 90vh;
+}
+
+.details {
+  @apply flex flex-col overflow-y-auto;
+  flex: 1 1 50%;
+  padding: var(--spacing-6);
+}
+
+.divider {
+  @apply border-none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--spacing-3) 0;
+}
+
+.viewer {
+  @apply flex flex-col;
+  flex: 1 1 50%;
+  min-height: 360px;
+}
