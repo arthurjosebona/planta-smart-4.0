@@ -85,7 +85,7 @@ public class SmartController {
         return sseService.subscribe(EnumSet.of(estacao));
     }
 
-    @PostMapping("/smart/ping")
+    @PostMapping("/ping")
     public ResponseEntity<List<ClpStatusPingDTO>> pingHosts() {
         List<ClpStatusPingDTO> statusClps = new ArrayList<>();
 
@@ -107,19 +107,19 @@ public class SmartController {
         return ResponseEntity.ok(statusClps);
     }
 
-    @PostMapping("/smart/reset-status")
+    @PostMapping("/reset-status")
     public ResponseEntity<String> resetarStatus() {
         appStateConfig.resetarStatus();
         return ResponseEntity.ok("Status zerados com sucesso.");
     }
 
-    @PostMapping("/smart/readonly")
+    @PostMapping("/readonly")
     public ResponseEntity<String> setReadOnly(@RequestParam boolean value) {
         appStateConfig.setReadOnly(value);
         return ResponseEntity.ok("Modo readOnly: " + value);
     }
 
-    @GetMapping("/smart/readonly")
+    @GetMapping("/readonly")
     public ResponseEntity<ClpReadOnlyDTO> getReadOnly() {
         return ResponseEntity.ok(ClpReadOnlyDTO.builder().readOnly(appStateConfig.isReadOnly()).build());
     }

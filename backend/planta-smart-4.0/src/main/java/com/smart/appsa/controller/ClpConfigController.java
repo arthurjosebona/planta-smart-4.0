@@ -7,7 +7,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/config/clp")
-@CrossOrigin(origins = "*")
 public class ClpConfigController {
 
     private final ClpIpConfig clpIpConfig;
