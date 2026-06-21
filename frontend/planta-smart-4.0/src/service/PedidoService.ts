@@ -18,6 +18,24 @@ interface PedidoCreateInput {
 
 const ANDARES = [AndarBloco.Primeiro, AndarBloco.Segundo, AndarBloco.Terceiro] as const;
 
+function montarBlocos(input: PedidoCreateInput): Bloco[] {
+  return input.blocos.slice(0, input.numBlocos).map(
+    (config, i): Bloco => ({
+      id: null,
+      cor: config.cor,
+      andar: ANDARES[i],
+      laminas: Object.entries(config.laminas).map(
+        ([posicao, lamina]): Lamina => ({
+          id: null,
+          posicao: posicao as PosicaoLamina,
+          cor: lamina.cor!,
+          padrao: lamina.padrao!,
+        })
+      ),
+    })
+  );
+}
+
 export class PedidoService {
   private readonly repository;
 
@@ -26,21 +44,7 @@ export class PedidoService {
   }
 
   async create(input: PedidoCreateInput): Promise<Pedido> {
-    const blocos: Bloco[] = input.blocos.slice(0, input.numBlocos).map(
-      (config, i): Bloco => ({
-        id: null,
-        cor: config.cor,
-        andar: ANDARES[i],
-        laminas: Object.entries(config.laminas).map(
-          ([posicao, lamina]): Lamina => ({
-            id: null,
-            posicao: posicao as PosicaoLamina,
-            cor: lamina.cor!,
-            padrao: lamina.padrao!,
-          })
-        ),
-      })
-    );
+    const blocos = montarBlocos(input);
 
     const pedido: Pedido = {
       ordemDeProducao: input.ordemDeProducao,
@@ -61,11 +65,37 @@ export class PedidoService {
     return await this.repository.findAll();
   }
 
+  async findById(id: number): Promise<Pedido> {
+    return await this.repository.findById(id);
+  }
+  
   async findByOrdemDeProducao(op: number): Promise<Pedido> {
     return await this.repository.findByOrdemDeProducao(op);
   }
 
   async iniciarProducao(id: number): Promise<Pedido> {
     return await this.repository.iniciarProducao(id);
+  }
+
+  async update(id: number, input: PedidoCreateInput): Promise<Pedido> {
+    const blocos = montarBlocos(input);
+
+    const pedido: Pedido = {
+      ordemDeProducao: input.ordemDeProducao,
+      tipo: IntToTipoPedido[input.numBlocos],
+      corTampa: input.corTampa,
+      blocos: blocos,
+      id: id,
+      status: StatusPedido.Pendente, // ignorado pelo backend no update, mas mantém o tipo Pedido coerente
+      registroCriacao: null,
+      registroEntradaExpedicao: null,
+      registroSaidaExpedicao: null,
+      expedicao: null,
+    };
+    return this.repository.update(id, pedido);
+  }
+
+  async delete(id: number): Promise<void> {
+    return this.repository.delete(id);
   }
 }

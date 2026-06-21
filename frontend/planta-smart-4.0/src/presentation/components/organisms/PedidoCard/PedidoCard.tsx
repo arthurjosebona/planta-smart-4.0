@@ -6,14 +6,12 @@ import styles from '@components/organisms/PedidoCard/pedidoCard.module.css';
 
 interface PedidoCardProps {
   pedido: Pedido;
-  onClick: () => void;
+  iniciarProducao: (id: number) => void;
+  onAtualizar: (id: number) => void;
+  onDeletar: (id: number) => void;
 }
 
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
-export function PedidoCard({ pedido, onClick }: PedidoCardProps) {
+export function PedidoCard({ pedido, iniciarProducao, onAtualizar, onDeletar }: PedidoCardProps) {
   return (
     <article
       className={styles.card}
@@ -26,6 +24,26 @@ export function PedidoCard({ pedido, onClick }: PedidoCardProps) {
     >
       <div aria-hidden="true" className={styles.accentLine} />
 
+      <PedidoCardHeader
+        id={pedido.id!}
+        ordemDeProducao={pedido.ordemDeProducao}
+        status={pedido.status}
+        iniciarProducao={iniciarProducao}
+        onAtualizar={onAtualizar}
+        onDeletar={onDeletar}
+      />
+
+      <hr className={styles.divider} />
+
+      <PedidoCardFields
+        tipo={pedido.tipo}
+        corTampa={pedido.corTampa}
+        blocos={pedido.blocos}
+        expedicaoId={pedido.expedicao?.id ?? null}
+        registroCriacao={pedido.registroCriacao!}
+        registroEntradaExpedicao={pedido.registroEntradaExpedicao}
+        registroSaidaExpedicao={pedido.registroSaidaExpedicao}
+      />
       <div className={styles.summary}>
         <span className={styles.idTag}>#{pedido.id}</span>
         <span className={styles.ordemDeProducao}>{pedido.ordemDeProducao}</span>
