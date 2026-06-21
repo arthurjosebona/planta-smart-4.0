@@ -17,7 +17,7 @@ export default function MonitorView() {
           </div>
         </div>
 
-        <ClpMonitorGrid model={model} />
+        <ClpMonitorGrid model={model} pingMap={model.pingMap} />
       </main>
     </AppTemplate>
   );

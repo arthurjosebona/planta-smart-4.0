@@ -1,0 +1,74 @@
+@reference "@styles/global.css";
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3) var(--spacing-5);
+  cursor: pointer;
+  transition:
+    border-color var(--ease-base),
+    box-shadow var(--ease-base);
+  font-family: var(--font-mono);
+}
+
+.card:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.card:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  flex-shrink: 0;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.op {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.04em;
+}
+
+.sep {
+  color: var(--color-border-hover);
+  font-size: 12px;
+}
+
+.elapsed {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+}
+
+.loading {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  animation: blink 0.8s ease-in-out infinite;
+}

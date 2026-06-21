@@ -1,14 +1,10 @@
-import type {
-  EstoqueStreamDTO,
-  ProcessoMontagemStreamDTO,
-  ExpedicaoStreamDTO,
-} from '@entities/ClpStream';
+import { EstoqueStream, ExpedicaoStream, ProcessoMontagemStream } from '@entities/EstacaoStream';
 
 export interface MonitorModel {
-  estoque: EstoqueStreamDTO | null;
-  processo: ProcessoMontagemStreamDTO | null;
-  montagem: ProcessoMontagemStreamDTO | null;
-  expedicao: ExpedicaoStreamDTO | null;
+  estoque: EstoqueStream | null;
+  processo: ProcessoMontagemStream | null;
+  montagem: ProcessoMontagemStream | null;
+  expedicao: ExpedicaoStream | null;
   conectado: boolean;
 }
 

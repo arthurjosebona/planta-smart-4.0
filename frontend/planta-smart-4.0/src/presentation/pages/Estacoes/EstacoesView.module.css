@@ -9,10 +9,12 @@
 }
 
 .layout {
-  @apply grid grid-rows-2 grid-cols-1;
-  align-items: flex-start;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-template-columns: 1fr;
+  align-items: start;
   justify-content: center;
-  gap: var(--spacing-6);
+  gap: var(--spacing-4);
   width: 100%;
 }
 

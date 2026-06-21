@@ -1,37 +1,9 @@
-import { useEffect, useState } from 'react';
-import type {
-  EstoqueStreamDTO,
-  ProcessoMontagemStreamDTO,
-  ExpedicaoStreamDTO,
-} from '@entities/ClpStream';
-import { MonitorModel, MonitorModelInitial } from './MonitorModel';
-
-const SSE_URL = 'http://localhost:8088/api/smart/stream';
+import { useMonitorContext } from '@contexts/MonitorContext';
+import { usePingContext } from '@contexts/PingContext';
 
 export function useMonitorViewModel() {
-  const [state, setState] = useState<MonitorModel>(MonitorModelInitial);
+  const monitor = useMonitorContext();
+  const { pingMap } = usePingContext();
 
-  useEffect(() => {
-    const source = new EventSource(SSE_URL);
-
-    source.onopen = () => setState((s) => ({ ...s, conectado: true }));
-    source.onerror = () => setState((s) => ({ ...s, conectado: false }));
-
-    source.addEventListener('estoque', (e) => {
-      setState((s) => ({ ...s, estoque: JSON.parse((e as MessageEvent).data) as EstoqueStreamDTO }));
-    });
-    source.addEventListener('processo', (e) => {
-      setState((s) => ({ ...s, processo: JSON.parse((e as MessageEvent).data) as ProcessoMontagemStreamDTO }));
-    });
-    source.addEventListener('montagem', (e) => {
-      setState((s) => ({ ...s, montagem: JSON.parse((e as MessageEvent).data) as ProcessoMontagemStreamDTO }));
-    });
-    source.addEventListener('expedicao', (e) => {
-      setState((s) => ({ ...s, expedicao: JSON.parse((e as MessageEvent).data) as ExpedicaoStreamDTO }));
-    });
-
-    return () => source.close();
-  }, []);
-
-  return state;
+  return { ...monitor, pingMap };
 }

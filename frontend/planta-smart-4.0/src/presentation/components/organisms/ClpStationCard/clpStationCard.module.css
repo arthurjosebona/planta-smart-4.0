@@ -47,6 +47,42 @@
   color: var(--color-text-muted);
 }
 
+.pingBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px var(--spacing-4) 5px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pingOnline {
+  color: var(--color-success);
+}
+
+.pingOffline {
+  color: var(--color-text-muted);
+}
+
+.pingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.pingOnline .pingDot {
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
 .body {
   display: flex;
   flex-direction: column;

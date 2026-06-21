@@ -227,4 +227,12 @@ public class PedidoService {
 
         validateDuplicateAndar(requestDTO.blocos());
     }
+    
+    @Transactional(readOnly = true)
+    public PedidoResponseDTO findByOp(Integer op) {
+        return PedidoMapper.mapDto(
+            pedidoRepository.findByOrdemDeProducao(op)
+                .orElseThrow(() -> new ResourceNotFoundException("pedido", "ordem de produção", op))
+        );
+    }
 }

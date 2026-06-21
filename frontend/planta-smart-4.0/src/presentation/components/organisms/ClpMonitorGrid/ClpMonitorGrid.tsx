@@ -1,4 +1,5 @@
 import type { MonitorModel } from '@pages/Monitor/MonitorModel';
+import type { PingMap } from '@contexts/PingContext';
 import { ClpStationCard } from '@components/organisms/ClpStationCard/ClpStationCard';
 import styles from './clpMonitorGrid.module.css';
 
@@ -11,9 +12,10 @@ const STATIONS = [
 
 interface ClpMonitorGridProps {
   model: MonitorModel;
+  pingMap: PingMap;
 }
 
-export function ClpMonitorGrid({ model }: ClpMonitorGridProps) {
+export function ClpMonitorGrid({ model, pingMap }: ClpMonitorGridProps) {
   return (
     <div className={styles.grid}>
       {STATIONS.map(({ key, label, color }) => (
@@ -22,6 +24,7 @@ export function ClpMonitorGrid({ model }: ClpMonitorGridProps) {
           label={label}
           color={color}
           data={model[key]}
+          online={pingMap[key]}
         />
       ))}
     </div>

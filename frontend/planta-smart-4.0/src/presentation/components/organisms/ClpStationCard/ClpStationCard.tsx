@@ -13,9 +13,10 @@ interface ClpStationCardProps {
   label: string;
   color: string;
   data: ClpStreamDTO | null;
+  online: boolean;
 }
 
-export function ClpStationCard({ label, color, data }: ClpStationCardProps) {
+export function ClpStationCard({ label, color, data, online }: ClpStationCardProps) {
   return (
     <div className={styles.card} style={{ '--station-color': color } as React.CSSProperties}>
       <div className={styles.accent} />
@@ -27,6 +28,11 @@ export function ClpStationCard({ label, color, data }: ClpStationCardProps) {
         ) : (
           <span className={styles.waiting}>Aguardando stream…</span>
         )}
+      </div>
+
+      <div className={`${styles.pingBadge} ${online ? styles.pingOnline : styles.pingOffline}`}>
+        <span className={styles.pingDot} aria-hidden="true" />
+        <span>{online ? 'Online' : 'Offline'}</span>
       </div>
 
       {data ? (

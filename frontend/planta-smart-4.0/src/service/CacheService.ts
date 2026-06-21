@@ -8,7 +8,7 @@ interface CacheConfig {
 }
 
 export class CacheService {
-  private readonly DEFAULT_TTL = 10000;
+  private readonly DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 horas
 
   get<T>(key: string): T | null {
     try {

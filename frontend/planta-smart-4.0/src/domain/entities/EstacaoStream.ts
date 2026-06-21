@@ -1,8 +1,8 @@
-export type ClpStatus = 'OCUPADO' | 'AGUARDANDO' | 'MANUAL' | 'EMERGENCIA';
+import { StatusEstacao } from '@enums/StatusEstacao';
 
-export interface EstoqueStreamDTO {
+export interface EstoqueStream {
   estacao: 'estoque';
-  status: ClpStatus;
+  status: StatusEstacao;
   numeroOP: number;
   ocupado: boolean;
   aguardando: boolean;
@@ -27,24 +27,9 @@ export interface EstoqueStreamDTO {
   pedidoEmCurso: boolean;
 }
 
-export interface ProcessoMontagemStreamDTO {
-  estacao: 'processo' | 'montagem';
-  status: ClpStatus;
-  numeroOP: number;
-  ocupado: boolean;
-  aguardando: boolean;
-  manual: boolean;
-  emergencia: boolean;
-  recebidoOp: boolean;
-  startOP: boolean;
-  finishOP: boolean;
-  cancelOP: boolean;
-  statusBancada: number;
-}
-
-export interface ExpedicaoStreamDTO {
+export interface ExpedicaoStream {
   estacao: 'expedicao';
-  status: ClpStatus;
+  status: StatusEstacao;
   numeroOP: number;
   ocupado: boolean;
   aguardando: boolean;
@@ -63,4 +48,17 @@ export interface ExpedicaoStreamDTO {
   statusExpedicao: number;
 }
 
-export type ClpStreamDTO = EstoqueStreamDTO | ProcessoMontagemStreamDTO | ExpedicaoStreamDTO;
+export interface ProcessoMontagemStream {
+  estacao: 'processo' | 'montagem';
+  status: StatusEstacao;
+  numeroOP: number;
+  ocupado: boolean;
+  aguardando: boolean;
+  manual: boolean;
+  emergencia: boolean;
+  recebidoOp: boolean;
+  startOP: boolean;
+  finishOP: boolean;
+  cancelOP: boolean;
+  statusBancada: number;
+}

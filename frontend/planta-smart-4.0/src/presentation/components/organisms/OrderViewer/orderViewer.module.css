@@ -1,6 +1,8 @@
 @reference "@styles/global.css";
 
 .canvas {
-  @apply flex-1;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
   background: linear-gradient(135deg, #1a1b1e 0%, #15161a 100%);
 }

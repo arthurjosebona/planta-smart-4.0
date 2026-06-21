@@ -1,5 +1,6 @@
 import { ConexaoRepository } from '@repositoriesImp/ConexaoRepository';
 import { ModuloIP } from '@entities/ModuloIP';
+import { ClpPingResponseDTO } from '@dtos/response/ClpPingResponseDTO';
 
 type Listener = () => void;
 
@@ -32,6 +33,10 @@ export class ConexaoService {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   };
+
+  async pingAll(): Promise<ClpPingResponseDTO[]> {
+    return this.repository.pingAll();
+  }
 
   private setConectado(value: boolean): void {
     if (this.conectado === value) return;

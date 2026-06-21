@@ -1,23 +1,33 @@
 @reference "@styles/global.css";
 
 .page {
-  @apply w-full flex flex-col;
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-4);
-  padding: 0 var(--spacing-6) var(--spacing-5);
-  background: var(--color-bg-page);
+  /* Preenche exatamente a área abaixo do header fixo */
+  height: calc(100dvh - var(--color-nav-height));
+  padding: var(--spacing-4) var(--spacing-6) var(--spacing-4);
   box-sizing: border-box;
+  overflow: hidden;
+  background: var(--color-bg-page);
 }
 
 .heading {
   font-family: var(--font-sans);
-  @apply font-bold tracking-tight;
+  font-weight: 700;
   font-size: 1.5rem;
-  color: var(--color-text-primary);
   letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
 }
 
 .configurator {
-  @apply flex flex-row w-full overflow-hidden rounded-xl;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0; /* obrigatório para flex children encolherem */
+  overflow: hidden;
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
 }

@@ -19,6 +19,8 @@ import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.service.PedidoService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/pedidos")
@@ -59,5 +61,11 @@ public class PedidoController {
             @RequestBody PedidoRequestDTO requestDTO) {
         return ResponseEntity.ok(pedidoService.update(id, requestDTO));
     }
+
+    @GetMapping("/op/{op}")
+    public ResponseEntity<PedidoResponseDTO> getMethodName(@RequestParam Integer op) {
+        return ResponseEntity.ok(pedidoService.findByOp(op));
+    }
+    
 
 }
