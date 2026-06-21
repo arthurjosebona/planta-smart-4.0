@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.dto.request.ExpedicaoRequestDTO;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
-import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
@@ -77,5 +76,11 @@ public class ExpedicaoService {
     public Expedicao findFirstPosicaoLivre() {
         return expedicaoRepository.findFirstByOrdemDeProducaoAtualOrderByPosicaoFisicaAsc(0)
                 .orElseThrow(() -> new ExpedicaoLotadaException());
+    }
+
+    @Transactional(readOnly = true) 
+    public Expedicao findByPosicaoFisica(Integer posicaoFisica) {
+        return expedicaoRepository.findByPosicaoFisica(posicaoFisica)
+            .orElseThrow(() -> new ResourceNotFoundException("Expedicao", "posicaoFisica", posicaoFisica));
     }
 }

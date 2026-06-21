@@ -247,4 +247,9 @@ public class PedidoService {
         return pedidoRepository.findByExpedicaoId(idExpedicao).stream().map(p -> PedidoMapper.mapDto(p)).toList();
     }
 
+    public void handleExitExpedicao(Pedido pedido) {
+        pedido.setRegistroSaidaExpedicao(LocalDateTime.now());
+        pedidoRepository.save(pedido);
+    }
+
 }  

@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.mapper.PedidoMapper;
+import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
 import com.smart.appsa.service.ExpedicaoService;
+import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
@@ -21,6 +24,7 @@ public class ExpedicaoComm implements PlcDataObserver {
     private ExpedicaoInfoClp expedicaoInfoClp;
     private AppStateConfig appStateConfig;
     private ExpedicaoService expedicaoService;
+    private PedidoService pedidoService;
 
     @Override
     public void onData(String ip, byte[] data) {
@@ -289,6 +293,16 @@ public class ExpedicaoComm implements PlcDataObserver {
                         // Persiste a posição liberada (OP 0) via API
                         Map<String, Integer> dadosMap = new HashMap<>();
                         dadosMap.put("OP:" + expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
+
+                        Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
+                            pedidoService.findByOp(
+                                expedicaoService.findByPosicaoFisica(
+                                    expedicaoInfoClp.getPosicaoRemovidoExpedicao()
+                                ).getOrdemDeProducaoAtual()
+                            )
+                        );
+
+                        pedidoService.handleExitExpedicao(expedido);
 
                         expedicaoService.assignOrdemAtPosicao(expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);;
                     } catch (Exception e) {
