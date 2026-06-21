@@ -8,6 +8,8 @@ interface PedidoCardHeaderProps {
   ordemDeProducao: number;
   status: StatusPedido;
   iniciarProducao: (id: number) => void;
+  onAtualizar: (id: number) => void;
+  onDeletar: (id: number) => void;
 }
 
 export function PedidoCardHeader({
@@ -15,6 +17,8 @@ export function PedidoCardHeader({
   ordemDeProducao,
   status,
   iniciarProducao,
+  onAtualizar,
+  onDeletar,
 }: PedidoCardHeaderProps) {
   return (
     <div className={styles.header}>
@@ -28,6 +32,10 @@ export function PedidoCardHeader({
         {status === StatusPedido.Pendente && (
           <ActionButton label="Iniciar Produção" onClick={() => iniciarProducao(id)} />
         )}
+        <ActionButton label="Atualizar" onClick={() => onAtualizar(id)} />
+        <button className={styles.deleteBtn} onClick={() => onDeletar(id)} title="Excluir pedido">
+          Excluir
+        </button>
       </div>
     </div>
   );

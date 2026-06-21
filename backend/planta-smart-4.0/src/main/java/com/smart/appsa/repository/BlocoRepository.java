@@ -1,6 +1,9 @@
+
 package com.smart.appsa.repository;
 
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
 
 import com.smart.appsa.model.Bloco;
 import com.smart.appsa.model.Pedido;

@@ -14,7 +14,6 @@ export class PedidoRepository implements IPedidoRepository {
 
   async createPedido(pedido: Pedido): Promise<Pedido> {
     const body = PedidoMapper.mapToCreateRequestDTO(pedido);
-    console.log('Enviando para a API: ' + JSON.stringify(body));
     const data: PedidoCreateResponseDTO = await this.httpClient.post<PedidoCreateResponseDTO>(
       '/api/pedidos',
       body
@@ -28,6 +27,13 @@ export class PedidoRepository implements IPedidoRepository {
     return PedidoMapper.mapToEntitiesByGetDTOs(data);
   }
 
+  async findById(id: number): Promise<Pedido> {
+    const data: PedidoGetResponseDTO = await this.httpClient.get<PedidoGetResponseDTO>(
+      '/api/pedidos/' + id
+    );
+    return PedidoMapper.mapToEntityByGetDTO(data);
+  }
+    
   async findByOrdemDeProducao(op: number): Promise<Pedido> {
     const data: PedidoGetResponseDTO = await this.httpClient.get<PedidoGetResponseDTO>(
       `/api/pedidos/op/${op}`
@@ -41,5 +47,18 @@ export class PedidoRepository implements IPedidoRepository {
       {}
     );
     return PedidoMapper.mapToEntityByGetDTO(data);
+  }
+
+  async update(id: number, pedido: Pedido): Promise<Pedido> {
+    const body = PedidoMapper.mapToCreateRequestDTO(pedido);
+    const data: PedidoGetResponseDTO = await this.httpClient.put<PedidoGetResponseDTO>(
+      '/api/pedidos/' + id,
+      body
+    );
+    return PedidoMapper.mapToEntityByGetDTO(data);
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.httpClient.delete<void>('/api/pedidos/' + id);
   }
 }
