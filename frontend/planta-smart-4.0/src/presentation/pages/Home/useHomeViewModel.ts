@@ -1,9 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StoreModel, StoreModelInitial } from '@pages/Home/HomeModel';
 import { conexaoService } from '@config/diContainer';
 
 export function useHomeViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
+
+  // Sincroniza o estado inicial do readOnly com o backend ao montar.
+  useEffect(() => {
+    conexaoService
+      .getReadOnly()
+      .then((readOnly) => setModel((s) => ({ ...s, readOnly })))
+      .catch(() => {
+        /* mantém o padrão (false) caso o backend esteja indisponível */
+      });
+  }, []);
+
+  async function toggleReadOnly(value: boolean) {
+    const anterior = model.readOnly;
+    // Atualização otimista — reverte se a chamada falhar.
+    setModel((s) => ({ ...s, readOnly: value, erro: null }));
+    try {
+      await conexaoService.setReadOnly(value);
+    } catch {
+      setModel((s) => ({
+        ...s,
+        readOnly: anterior,
+        erro: 'Não foi possível alterar o modo somente-leitura.',
+      }));
+    }
+  }
 
   function handleFaixaChange(value: string) {
     const octets = value.split('.');
@@ -36,13 +61,15 @@ export function useHomeViewModel() {
   async function conectar() {
     setModel((s) => ({ ...s, loading: true, erro: null, sucesso: null }));
     try {
+      // 1) Aplica os IPs configurados nos CLPs.
       await conexaoService.conectar(model.modulos);
-      await new Promise((res) => setTimeout(res, 1200)); // placeholder
+      // 2) Inicia as leituras dos CLPs, que passam a alimentar os streams da bancada.
+      await conexaoService.iniciarLeituras(model.modulos);
       setModel((s) => ({
         ...s,
         loading: false,
         conectado: true,
-        sucesso: 'Conexão estabelecida com sucesso.',
+        sucesso: 'Conexão estabelecida e streams da bancada iniciados.',
       }));
     } catch {
       setModel((s) => ({
@@ -67,6 +94,7 @@ export function useHomeViewModel() {
     handleFaixaChange,
     confirmarFaixa,
     conectar,
+    toggleReadOnly,
     dismissErro,
     dismissSucesso,
   };

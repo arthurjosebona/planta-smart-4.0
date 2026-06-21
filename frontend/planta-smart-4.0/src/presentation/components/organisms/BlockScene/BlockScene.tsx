@@ -1,6 +1,14 @@
 import { useMemo } from 'react';
 import { StoreModel } from '@pages/Store/StoreModel';
-import { BLOCK, COLUMN, BLADE, LID, COR_TAMPA_HEX, COR_TAMPA_FALLBACK } from '@config/blockModel';
+import {
+  BLOCK,
+  COLUMN,
+  BLADE,
+  LID,
+  COR_TAMPA_HEX,
+  COR_TAMPA_FALLBACK,
+  COR_BLOCO_BLUEPRINT,
+} from '@config/blockModel';
 import { Block } from '../Block/Block';
 import { Tampa } from '@components/atoms/Tampa/Tampa';
 
@@ -46,18 +54,16 @@ export function BlockScene({
 
   const blockDimProps = { blockW, blockD, blockH, baseT, colW, colRadius, bladeT, bladeRecess };
 
+  // Tampa sem cor escolhida → renderiza como blueprint (cinza claro sólido).
+  const tampaColor =
+    corTampa === null ? COR_BLOCO_BLUEPRINT : (COR_TAMPA_HEX[corTampa] ?? COR_TAMPA_FALLBACK);
+
   return (
     <group position={[0, centerY, 0]}>
       {Array.from({ length: numBlocos }, (_, i) => (
         <Block key={i} config={blocos[i]} blockY={blockOffsets[i]} {...blockDimProps} />
       ))}
-      <Tampa
-        color={COR_TAMPA_HEX[corTampa] ?? COR_TAMPA_FALLBACK}
-        y={totalH}
-        blockW={blockW}
-        blockD={blockD}
-        lidH={lidH}
-      />
+      <Tampa color={tampaColor} y={totalH} blockW={blockW} blockD={blockD} lidH={lidH} />
     </group>
   );
 }

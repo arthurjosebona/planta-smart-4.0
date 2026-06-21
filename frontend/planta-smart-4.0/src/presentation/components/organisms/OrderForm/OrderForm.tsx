@@ -72,6 +72,13 @@ export function OrderForm({
   setOrdemDeProducao,
   createPedido,
 }: OrderFormProps) {
+  // Só é possível enviar quando a tampa e todos os blocos visíveis têm cor
+  // definida (itens em modo blueprint têm cor === null).
+  const todosBlocosComCor = state.blocos
+    .slice(0, state.numBlocos)
+    .every((bloco) => bloco.cor !== null);
+  const podeEnviar = state.corTampa !== null && todosBlocosComCor;
+
   return (
     <div className={styles.root}>
 
@@ -203,15 +210,23 @@ export function OrderForm({
       })}
 
       <Divider />
-      <div className={styles.submitWrapper}>
-        <button
-          onClick={createPedido}
-          disabled={state.loading}
-          className={`${styles.submitBtn} ${state.loading ? styles.submitBtnLoading : ''}`}
-        >
-          {state.loading ? 'Criando…' : 'Criar pedido'}
-        </button>
-      </div>
+      {podeEnviar ? (
+        <div className={styles.submitWrapper}>
+          <button
+            onClick={createPedido}
+            disabled={state.loading}
+            className={`${styles.submitBtn} ${state.loading ? styles.submitBtnLoading : ''}`}
+          >
+            {state.loading ? 'Criando…' : 'Criar pedido'}
+          </button>
+        </div>
+      ) : (
+        <div className={styles.submitWrapper}>
+          <p className={styles.submitHint}>
+            Escolha a cor da tampa e de todos os blocos para criar o pedido.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

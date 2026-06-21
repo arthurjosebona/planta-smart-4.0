@@ -235,4 +235,9 @@ public class PedidoService {
                 .orElseThrow(() -> new ResourceNotFoundException("pedido", "ordem de produção", op))
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<PedidoResponseDTO> findPedidosByExpedicao(Long idExpedicao) {
+        return pedidoRepository.findByExpedicaoId(idExpedicao).stream().map(p -> PedidoMapper.mapDto(p)).toList();
+    }
 }

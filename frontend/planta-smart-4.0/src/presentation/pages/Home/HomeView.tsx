@@ -18,6 +18,7 @@ export default function HomeView() {
     handleFaixaChange,
     confirmarFaixa,
     conectar,
+    toggleReadOnly,
     dismissErro,
     dismissSucesso,
   } = useHomeViewModel();
@@ -86,6 +87,18 @@ export default function HomeView() {
               </button>
             </div>
           </div>
+
+          <label className={styles.readOnlyRow}>
+            <input
+              type="checkbox"
+              className={styles.readOnlyCheckbox}
+              checked={model.readOnly}
+              onChange={(e) => toggleReadOnly(e.target.checked)}
+            />
+            <span className={styles.readOnlyLabel}>
+              Modo readOnly
+            </span>
+          </label>
 
           <button
             type="button"

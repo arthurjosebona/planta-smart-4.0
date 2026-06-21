@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.smart.appsa.dto.request.ExpedicaoRequestDTO;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
-import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.service.ExpedicaoService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController

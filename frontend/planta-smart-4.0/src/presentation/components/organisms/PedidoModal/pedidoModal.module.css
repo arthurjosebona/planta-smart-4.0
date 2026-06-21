@@ -1,7 +1,10 @@
 @reference "@styles/global.css";
 
 .overlay {
-  @apply fixed inset-0 flex items-center justify-center;
+  /* Começa abaixo do header fixo (que tem z maior), para o modal nunca ficar
+     escondido atrás dele. */
+  @apply fixed left-0 right-0 bottom-0 flex items-start justify-center overflow-y-auto;
+  top: var(--header-h);
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(2px);
   z-index: 100;
@@ -9,9 +12,13 @@
 }
 
 .modal {
-  @apply relative w-full overflow-hidden rounded-xl;
+  @apply relative flex w-full flex-col overflow-hidden rounded-xl;
+  /* margin auto centraliza verticalmente quando cabe; quando o conteúdo é alto,
+     o overlay rola e o topo continua acessível (evita o corte do items-center). */
+  margin: auto;
   max-width: 1100px;
-  max-height: 90vh;
+  /* Altura disponível = viewport − header − padding do overlay. */
+  max-height: calc(100vh - var(--header-h) - 2 * var(--spacing-5));
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-lg);
@@ -37,12 +44,14 @@
 
 .content {
   @apply flex flex-col md:flex-row;
-  max-height: 90vh;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .details {
   @apply flex flex-col overflow-y-auto;
   flex: 1 1 50%;
+  min-height: 0;
   padding: var(--spacing-6);
 }
 

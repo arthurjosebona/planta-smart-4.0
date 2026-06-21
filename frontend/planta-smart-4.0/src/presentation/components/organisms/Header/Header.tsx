@@ -56,12 +56,17 @@ interface NavItem {
 }
 const NAV_ITEMS: (NavItem | 'separator')[] = [
   { href: '/', label: 'Home', icon: IconHome },
+  'separator',
   { href: '/store', label: 'Store', icon: IconStore },
+  'separator',
   { href: '/pedidos', label: 'Pedidos', icon: IconPedido },
   'separator',
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
+  'separator',
   { href: '/estacoes', label: 'Estações', icon: IconEstacoes },
+  'separator',
   { href: '/monitor', label: 'Monitor', icon: IconMonitor },
+  'separator',
 ];
 
 export function Header() {

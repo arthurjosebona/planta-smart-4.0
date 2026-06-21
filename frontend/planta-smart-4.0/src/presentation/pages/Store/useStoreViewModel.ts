@@ -88,9 +88,19 @@ export function useStoreViewModel() {
   }
 
   async function createPedido() {
+    // Itens em modo blueprint (cor === null) não podem ser enviados.
+    const blocosVisiveis = model.blocos.slice(0, model.numBlocos);
+    if (model.corTampa === null || blocosVisiveis.some((bloco) => bloco.cor === null)) {
+      setModel((s) => ({
+        ...s,
+        erro: 'Escolha a cor da tampa e de todos os blocos antes de criar o pedido.',
+      }));
+      return;
+    }
+
     setModel((s) => ({ ...s, loading: true, sucesso: false, erro: null }));
     try {
-      const blocos = model.blocos.slice(0, model.numBlocos).map((bloco) => ({
+      const blocos = blocosVisiveis.map((bloco) => ({
         ...bloco,
         laminas: Object.fromEntries(
           Object.entries(bloco.laminas)

@@ -156,6 +156,12 @@
   padding: var(--spacing-2) 0;
 }
 
+.submitHint {
+  @apply text-center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
 .submitBtn {
   @apply w-full rounded-lg font-bold cursor-pointer transition-all;
   padding: 10px 0;

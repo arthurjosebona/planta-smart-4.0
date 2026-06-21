@@ -16,27 +16,42 @@ export default function EstacoesView() {
   return (
     <AppTemplate>
       <main id="main-content" className={styles.main}>
+        <header className={styles.header}>
+          <h1 className={styles.heading}>Estações</h1>
+          <p className={styles.subheading}>
+            Monitoramento em tempo real da linha de produção
+          </p>
+        </header>
+
         {erro && <FeedbackBanner variant="error" message={erro} onDismiss={dismissErro} />}
 
         <div className={styles.layout}>
-          <Estacoes status={monitor} moduleStatus={moduleStatus} />
+          <section className={styles.estacoesSection}>
+            <Estacoes status={monitor} moduleStatus={moduleStatus} />
+          </section>
 
           <OpEmCursoCard numeroOP={numeroOP} pedidoEmCurso={pedidoEmCurso} />
 
           <div className={styles.inferiorEstoques}>
-            <ViewEstoque
-              estoque={estoque.estoque}
-              editMode={estoque.editMode}
-              selectedIds={estoque.selectedIds}
-              onToggle={estoque.toggleBlocoSelection}
-            />
+            <section className={styles.painel}>
+              <span className={styles.painelLabel}>Estoque</span>
+              <ViewEstoque
+                estoque={estoque.estoque}
+                editMode={estoque.editMode}
+                selectedIds={estoque.selectedIds}
+                onToggle={estoque.toggleBlocoSelection}
+              />
+            </section>
 
-            <ViewExpedicao
-              expedicao={expedicao.expedicao}
-              editMode={expedicao.editMode}
-              selectedId={expedicao.selectedId}
-              onToggle={expedicao.selectSlot}
-            />
+            <section className={styles.painel}>
+              <span className={styles.painelLabel}>Expedição</span>
+              <ViewExpedicao
+                expedicao={expedicao.expedicao}
+                editMode={expedicao.editMode}
+                selectedId={expedicao.selectedId}
+                onToggle={expedicao.selectSlot}
+              />
+            </section>
           </div>
         </div>
       </main>

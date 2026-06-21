@@ -23,6 +23,14 @@ export class ConexaoService {
     }
   }
 
+  /**
+   * Inicia o loop de leitura dos CLPs no backend (POST /api/smart/start-readings),
+   * o que passa a alimentar os streams SSE da bancada com dados em tempo real.
+   */
+  async iniciarLeituras(modulos: ModuloIP[]): Promise<void> {
+    return this.repository.iniciarLeituras(modulos);
+  }
+
   /** Snapshot atual do status — usado pelo useSyncExternalStore. */
   getSnapshot = (): boolean => {
     return this.conectado;
@@ -36,6 +44,14 @@ export class ConexaoService {
 
   async pingAll(): Promise<ClpPingResponseDTO[]> {
     return this.repository.pingAll();
+  }
+
+  async setReadOnly(value: boolean): Promise<void> {
+    return this.repository.setReadOnly(value);
+  }
+
+  async getReadOnly(): Promise<boolean> {
+    return this.repository.getReadOnly();
   }
 
   private setConectado(value: boolean): void {

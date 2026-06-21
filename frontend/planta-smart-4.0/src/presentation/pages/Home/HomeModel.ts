@@ -4,6 +4,7 @@ import { ModuloIP } from '@entities/ModuloIP';
     modulos: ModuloIP[];
     faixa: string;
     conectado: boolean;
+    readOnly: boolean;
     loading: boolean;
     erro: string | null;
     sucesso: string | null;
@@ -18,6 +19,7 @@ import { ModuloIP } from '@entities/ModuloIP';
     ],
     faixa: '10.74.241.0',
     conectado: false,
+    readOnly: false,
     loading: false,
     erro: null,
     sucesso: null,

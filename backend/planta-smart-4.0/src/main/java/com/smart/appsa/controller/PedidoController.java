@@ -61,9 +61,13 @@ public class PedidoController {
     }
 
     @GetMapping("/op/{op}")
-    public ResponseEntity<PedidoResponseDTO> getMethodName(@RequestParam Integer op) {
+    public ResponseEntity<PedidoResponseDTO> findPedidoByOp(@RequestParam Integer op) {
         return ResponseEntity.ok(pedidoService.findByOp(op));
     }
     
+    @GetMapping("/expedicao/{id}")
+    public ResponseEntity<List<PedidoResponseDTO>> findPedidosByExpedicao(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.findPedidosByExpedicao(id));
+    }
 
 }
