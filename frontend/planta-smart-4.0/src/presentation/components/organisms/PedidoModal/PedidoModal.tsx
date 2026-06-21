@@ -4,6 +4,8 @@ import { OrderViewer } from '@components/organisms/OrderViewer/OrderViewer';
 import { Pedido } from '@entities/Pedido';
 import { pedidoToStoreModel } from '@utils/pedidoToStoreModel';
 import styles from '@components/organisms/PedidoModal/pedidoModal.module.css';
+import { ActionButton } from '@components/atoms/ActionButton/ActionButton';
+import { StatusPedido } from '@enums/StatusPedido';
 
 interface PedidoModalProps {
   pedido: Pedido;
@@ -44,6 +46,15 @@ export function PedidoModal({ pedido, iniciarProducao, onClose }: PedidoModalPro
               registroEntradaExpedicao={pedido.registroEntradaExpedicao}
               registroSaidaExpedicao={pedido.registroSaidaExpedicao}
             />
+            { pedido.status == StatusPedido.Pendente &&
+              <> 
+                <hr className={styles.divider} />
+                <div className={styles.updateDeleteButtons}>
+                  <ActionButton label="Atualizar" onClick={() => alert("update")} />
+                  <ActionButton label="Deletar" onClick={() => alert("deletar")} />
+                </div> 
+              </>
+            }
           </div>
 
           <div className={styles.viewer}>
