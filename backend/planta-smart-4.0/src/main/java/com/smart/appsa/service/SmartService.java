@@ -10,6 +10,8 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
+import com.smart.appsa.exception.ClpComunicacaoException;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -37,17 +39,19 @@ public class SmartService {
         // 2. Obter a conexão única via seu Service
         PlcConnector connector = plcConnectionService.getConnection(config.getIpClp());
 
-        if (connector != null) {
-            try {
-                // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
-                connector.writeBlock(9, 2, 60, buffer);
-                System.out.println("Dados enviados para o CLP: " + config.getIpClp());
-                enviarTampa(config.getTampaPedido());
-                iniciarExecucaoPedido(config.getIpClp());
 
-            } catch (Exception ex) {
-                System.err.println("Erro ao enviar dados para o CLP: " + ex.getMessage());
-            }
+        if (connector == null) {
+            throw new ClpComunicacaoException(config.getIpClp(), "conexão indisponível");
+        }
+        try {
+            // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
+            connector.writeBlock(9, 2, 60, buffer);
+            System.out.println("Dados enviados para o CLP: " + config.getIpClp());
+            enviarTampa(config.getTampaPedido());
+            iniciarExecucaoPedido(config.getIpClp());
+
+        } catch (Exception ex) {
+            throw new ClpComunicacaoException(config.getIpClp(), ex);
         }
     }
 

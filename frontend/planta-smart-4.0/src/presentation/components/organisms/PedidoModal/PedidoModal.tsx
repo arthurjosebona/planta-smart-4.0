@@ -4,14 +4,17 @@ import { OrderViewer } from '@components/organisms/OrderViewer/OrderViewer';
 import { Pedido } from '@entities/Pedido';
 import { pedidoToStoreModel } from '@utils/pedidoToStoreModel';
 import styles from '@components/organisms/PedidoModal/pedidoModal.module.css';
+import { ActionButton } from '@components/atoms/ActionButton/ActionButton';
+import { StatusPedido } from '@enums/StatusPedido';
 
 interface PedidoModalProps {
   pedido: Pedido;
   iniciarProducao: (id: number) => void;
+  deletarPedido: (id: number) => void;
   onClose: () => void;
 }
 
-export function PedidoModal({ pedido, iniciarProducao, onClose }: PedidoModalProps) {
+export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose }: PedidoModalProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -44,6 +47,14 @@ export function PedidoModal({ pedido, iniciarProducao, onClose }: PedidoModalPro
               registroEntradaExpedicao={pedido.registroEntradaExpedicao}
               registroSaidaExpedicao={pedido.registroSaidaExpedicao}
             />
+            { pedido.status == StatusPedido.Pendente &&
+              <>
+                <hr className={styles.divider} />
+                <div className={styles.updateDeleteButtons}>
+                  <ActionButton label="Deletar" onClick={() => deletarPedido(pedido.id!)} />
+                </div>
+              </>
+            }
           </div>
 
           <div className={styles.viewer}>

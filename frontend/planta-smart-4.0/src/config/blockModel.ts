@@ -192,6 +192,12 @@ export const COR_TAMPA_HEX: Record<CorTampa, string> = {
   [CorTampa.Azul]: '#1A55CC',
 };
 
+/**
+ * Aparência "blueprint" do bloco/tampa quando a cor ainda não foi escolhida
+ * (cor === null): cinza claro sólido, mantendo a mesma geometria da peça real.
+ */
+export const COR_BLOCO_BLUEPRINT = '#9FB3C8';
+
 /** Cor de fallback caso a chave não exista no mapa. */
 export const COR_BLOCO_FALLBACK = '#252527';
 export const COR_LAMINA_FALLBACK = '#F0F0EE';

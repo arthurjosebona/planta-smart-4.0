@@ -1,0 +1,26 @@
+export interface EstoqueStreamDTO {
+  estacao: 'estoque';
+  status: string;
+  numeroOP: number;
+  ocupado: boolean;
+  aguardando: boolean;
+  manual: boolean;
+  emergencia: boolean;
+  iniciarPedido: boolean;
+  pedirPosicaoEst: boolean;
+  adicionarEstoque: boolean;
+  removerEstoque: boolean;
+  retornoEstoqueCheio: boolean;
+  recebidoEstoque: boolean;
+  iniciarGuardarEst: boolean;
+  posicaoEstoque: number;
+  posicaoGuardarEst: number;
+  corGuardarEstoque: number;
+  posicoesOcupadas: number[];
+  statusEstoque: number;
+  statusProcesso: number;
+  statusMontagem: number;
+  statusExpedicao: number;
+  statusProducao: number;
+  pedidoEmCurso: boolean;
+}

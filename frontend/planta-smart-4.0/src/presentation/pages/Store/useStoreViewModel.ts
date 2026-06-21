@@ -1,17 +1,43 @@
-import { useState } from 'react';
-import { StoreModel, StoreModelInitial } from './StoreModel';
+import { useEffect, useState } from 'react';
+import {
+  StoreModel,
+  StoreModelInitial,
+  PedidoConfig,
+  PEDIDO_CONFIG_CACHE_KEY,
+  defaultPedidoConfig,
+} from './StoreModel';
 import { CorTampa } from '@enums/CorTampa';
 import { CorBloco } from '@enums/CorBloco';
 import { PosicaoLamina } from '@enums/PosicaoLamina';
 import { CorLamina } from '@enums/CorLamina';
 import { PadraoLamina } from '@enums/PadraoLamina';
 import { ConfigBloco } from '@valueObjects/ConfigBloco';
-import { pedidoService } from '@config/diContainer';
+import { pedidoService, cacheService } from '@config/diContainer';
 import { Pedido } from '@entities/Pedido';
 import { HttpError } from '@error/HttpError';
 
+function loadInitialModel(): StoreModel {
+  const cached = cacheService.get<PedidoConfig>(PEDIDO_CONFIG_CACHE_KEY);
+  if (cached) {
+    return { ...StoreModelInitial, ...cached };
+  }
+  return StoreModelInitial;
+}
+
 export function useStoreViewModel() {
-  const [model, setModel] = useState<StoreModel>(StoreModelInitial);
+  const [model, setModel] = useState<StoreModel>(loadInitialModel);
+
+  // Persiste a config no cache sempre que os campos editáveis mudam.
+  // Campos transientes (loading, erro, sucesso, pedidoCriado) são excluídos.
+  useEffect(() => {
+    const config: PedidoConfig = {
+      ordemDeProducao: model.ordemDeProducao,
+      numBlocos: model.numBlocos,
+      corTampa: model.corTampa,
+      blocos: model.blocos,
+    };
+    cacheService.set<PedidoConfig>(PEDIDO_CONFIG_CACHE_KEY, config);
+  }, [model.ordemDeProducao, model.numBlocos, model.corTampa, model.blocos]);
 
   function setNumBlocos(n: 1 | 2 | 3) {
     setModel((s) => ({ ...s, numBlocos: n }));
@@ -62,9 +88,19 @@ export function useStoreViewModel() {
   }
 
   async function createPedido() {
+    // Itens em modo blueprint (cor === null) não podem ser enviados.
+    const blocosVisiveis = model.blocos.slice(0, model.numBlocos);
+    if (model.corTampa === null || blocosVisiveis.some((bloco) => bloco.cor === null)) {
+      setModel((s) => ({
+        ...s,
+        erro: 'Escolha a cor da tampa e de todos os blocos antes de criar o pedido.',
+      }));
+      return;
+    }
+
     setModel((s) => ({ ...s, loading: true, sucesso: false, erro: null }));
     try {
-      const blocos = model.blocos.slice(0, model.numBlocos).map((bloco) => ({
+      const blocos = blocosVisiveis.map((bloco) => ({
         ...bloco,
         laminas: Object.fromEntries(
           Object.entries(bloco.laminas)
@@ -92,15 +128,19 @@ export function useStoreViewModel() {
         corTampa: model.corTampa,
       });
 
-      setModel((s) => ({ ...s, loading: false, sucesso: true, erro: null, pedidoCriado: pedido }));
+      // Pedido criado → limpa cache e reseta o formulário para o estado padrão
+      cacheService.clear(PEDIDO_CONFIG_CACHE_KEY);
+      setModel({
+        ...StoreModelInitial,
+        ...defaultPedidoConfig,
+        loading: false,
+        sucesso: true,
+        erro: null,
+        pedidoCriado: pedido,
+      });
     } catch (error: unknown) {
       const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
-      setModel((s) => ({
-        ...s,
-        loading: false,
-        sucesso: false,
-        erro: mensagem,
-      }));
+      setModel((s) => ({ ...s, loading: false, sucesso: false, erro: mensagem }));
     }
   }
 

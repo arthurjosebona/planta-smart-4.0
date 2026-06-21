@@ -1,7 +1,7 @@
-import { useHomeViewModel } from '@pages/Home/useHomeViewModel';
+import { useIpsViewModel } from '@pages/Ips/useIpsViewModel';
 import { AppTemplate } from '@components/template/AppTemplate';
 import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
-import styles from './homeView.module.css';
+import styles from './ipsView.module.css';
 import image from '@assets/bancada/Smart40.png';
 
 
@@ -12,15 +12,16 @@ const MODULE_CLASSES: Record<string, string> = {
   expedicao: 'expedicao',
 };
 
-export default function HomeView() {
+export default function IpsView() {
   const {
     model,
     handleFaixaChange,
     confirmarFaixa,
     conectar,
+    toggleReadOnly,
     dismissErro,
     dismissSucesso,
-  } = useHomeViewModel();
+  } = useIpsViewModel();
 
   return (
     <AppTemplate>
@@ -86,6 +87,18 @@ export default function HomeView() {
               </button>
             </div>
           </div>
+
+          <label className={styles.readOnlyRow}>
+            <input
+              type="checkbox"
+              className={styles.readOnlyCheckbox}
+              checked={model.readOnly}
+              onChange={(e) => toggleReadOnly(e.target.checked)}
+            />
+            <span className={styles.readOnlyLabel}>
+              Modo readOnly
+            </span>
+          </label>
 
           <button
             type="button"

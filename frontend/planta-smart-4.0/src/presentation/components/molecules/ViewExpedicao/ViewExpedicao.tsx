@@ -7,6 +7,7 @@ interface ViewExpedicaoProps {
   editMode?: boolean;
   selectedId?: number | null;
   onToggle?: (id: number) => void;
+  onSelect?: (id: number) => void;
 }
 
 export const ViewExpedicao: React.FC<ViewExpedicaoProps> = ({
@@ -14,6 +15,7 @@ export const ViewExpedicao: React.FC<ViewExpedicaoProps> = ({
   editMode = false,
   selectedId = null,
   onToggle,
+  onSelect,
 }) => {
   return (
     <div className={styles['view-expedicao']}>
@@ -24,6 +26,7 @@ export const ViewExpedicao: React.FC<ViewExpedicaoProps> = ({
           editMode={editMode}
           selected={selectedId === slot.id}
           onClick={() => onToggle?.(slot.id)}
+          onSelect={() => onSelect?.(slot.id)}
         />
       ))}
     </div>

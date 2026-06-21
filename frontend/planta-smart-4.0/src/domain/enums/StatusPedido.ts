@@ -12,6 +12,6 @@ export const StatusPedidoToInt: Record<StatusPedido, number> = {
 
 export const StatusPedidoStringToEnum: Record<string, StatusPedido> = {
   PENDENTE: StatusPedido.Pendente,
-  EM_PRODUCAO: StatusPedido.Producao,
+  PRODUCAO: StatusPedido.Producao,
   CONCLUIDO: StatusPedido.Concluido,
 };

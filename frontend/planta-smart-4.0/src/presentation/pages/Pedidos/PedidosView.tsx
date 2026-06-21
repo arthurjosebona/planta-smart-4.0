@@ -6,8 +6,14 @@ import styles from './pedidosView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 
 export default function PedidosView() {
-  const { model, pedidosFiltrados, iniciarProducao, dismissErro, setStatusPedidoFiltro } =
-    usePedidosViewModel();
+  const {
+    model,
+    pedidosFiltrados,
+    iniciarProducao,
+    deletarPedido,
+    dismissErro,
+    setStatusPedidoFiltro,
+  } = usePedidosViewModel();
 
   return (
     <AppTemplate>
@@ -25,6 +31,7 @@ export default function PedidosView() {
           filtroStatus={model.filtroStatus}
           onFiltroStatus={setStatusPedidoFiltro}
           iniciarProducao={iniciarProducao}
+          deletarPedido={deletarPedido}
         />
       </main>
     </AppTemplate>

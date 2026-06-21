@@ -9,6 +9,7 @@ import {
   COR_LAMINA_HEX,
   COR_BLOCO_FALLBACK,
   COR_LAMINA_FALLBACK,
+  COR_BLOCO_BLUEPRINT,
 } from '@config/blockModel';
 import { PlasticMat } from '@components/atoms/PlasticMat/PlasticMat';
 import { BaseFloor } from '@components/atoms/BaseFloor/BaseFloor';
@@ -49,7 +50,11 @@ export function Block({
   bladeT = BLADE.thickness,
   bladeRecess = BLADE.recess,
 }: BlockProps) {
-  const hex = COR_BLOCO_HEX[config.cor] ?? COR_BLOCO_FALLBACK;
+  // Bloco sem cor escolhida → renderiza como blueprint (cinza claro sólido).
+  const isBlueprint = config.cor === null;
+  const hex = isBlueprint
+    ? COR_BLOCO_BLUEPRINT
+    : (COR_BLOCO_HEX[config.cor] ?? COR_BLOCO_FALLBACK);
   const bodyH = blockH - baseT;
   const bodyCenterY = blockY + baseT + bodyH / 2;
   const floorTopY = blockY + baseT;

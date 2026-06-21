@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.appsa.dto.request.ExpedicaoRequestDTO;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
+import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;

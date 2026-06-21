@@ -2,7 +2,6 @@
 
 .main {
   @apply mx-auto flex flex-row items-center justify-center;
-  max-width: 1200px;
   min-height: calc(100vh - 64px);
   padding: 0 var(--spacing-8);
   gap: var(--spacing-12);
@@ -157,6 +156,28 @@
   border-color: #378ADD;
   color: var(--color-text-primary);
   background: rgba(55, 138, 221, 0.05); /* Feedback sutil de hover */
+}
+
+/* ── Modo somente-leitura ── */
+.readOnlyRow {
+  @apply flex flex-row items-center;
+  gap: var(--spacing-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.readOnlyCheckbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #185FA5;
+  cursor: pointer;
+}
+
+.readOnlyLabel {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 /* ── Botão conectar ── */

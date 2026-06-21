@@ -3,7 +3,6 @@ package com.smart.appsa.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/estoque")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class EstoqueController {
 
     private final EstoqueService estoqueService;

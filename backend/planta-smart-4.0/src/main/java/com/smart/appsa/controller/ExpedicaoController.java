@@ -3,7 +3,6 @@ package com.smart.appsa.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+
 @RestController
 @RequestMapping("/api/expedicao")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ExpedicaoController {
     private final ExpedicaoService service;
 
@@ -38,5 +37,5 @@ public class ExpedicaoController {
     public ResponseEntity<Void> updateAll(@RequestBody List<ExpedicaoRequestDTO> entity) {
         service.updateAll(entity);
         return ResponseEntity.noContent().build();
-    }
+    }    
 }

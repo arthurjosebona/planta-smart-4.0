@@ -145,14 +145,18 @@ public class PedidoService {
     private Pedido saveWithExpedition(Pedido pedido) {
         Expedicao nextFree = expedicaoService.findFirstPosicaoLivre();
         pedido.setExpedicao(nextFree);
-        // Antes a OP já era escrita no banco nessa etapa, agora fica quando receber via EstoqueComm
-        // expedicaoService.assignOrdemAtPosicao(pedido.getOrdemDeProducao(), nextFree.getPosicaoFisica());
+        // Antes a OP já era escrita no banco nessa etapa, agora fica quando receber via
+        // EstoqueComm
+        // expedicaoService.assignOrdemAtPosicao(pedido.getOrdemDeProducao(),
+        // nextFree.getPosicaoFisica());
         return pedidoRepository.save(pedido);
     }
 
-    //  Verifica a disponibilidade física no estoque e vincula cada bloco a uma posição
-    //  realmente ocupada da sua cor. Só aqui a quantidade é validada, a criação do pedido
-    //  é independente do estoque. 
+    // Verifica a disponibilidade física no estoque e vincula cada bloco a uma
+    // posição
+    // realmente ocupada da sua cor. Só aqui a quantidade é validada, a criação do
+    // pedido
+    // é independente do estoque.
     private void assignEstoqueSlots(Pedido pedido) {
         Map<CorEstoque, List<Bloco>> blocosPorCor = pedido.getBlocos().stream()
                 .collect(Collectors.groupingBy(b -> CorEstoque.fromValue(b.getCor().getValue())));
@@ -179,6 +183,8 @@ public class PedidoService {
         if (pedido.getStatus() != StatusPedido.PENDENTE)
             throw new PedidoNaoPendenteException("excluir", pedido.getStatus());
 
+        blocoService.deleteAllByPedido(pedido);
+
         // O estado físico do estoque é de responsabilidade do CLP (EstoqueCommService),
         // por isso o delete não restaura cor de estoque — evita estoque fantasma.
         pedidoRepository.delete(pedido);
@@ -194,7 +200,8 @@ public class PedidoService {
 
         validatePedidoForUpdate(requestDTO, id);
 
-        // Remove os blocos antigos (estoque físico é gerido pelo CLP, não restaurado aqui)
+        // Remove os blocos antigos (estoque físico é gerido pelo CLP, não restaurado
+        // aqui)
         blocoService.deleteAllByPedido(existing);
 
         // Atualiza os campos do pedido
@@ -227,4 +234,17 @@ public class PedidoService {
 
         validateDuplicateAndar(requestDTO.blocos());
     }
-}
+
+    @Transactional(readOnly = true)
+    public PedidoResponseDTO findByOp(Integer op) {
+        return PedidoMapper.mapDto(
+                pedidoRepository.findByOrdemDeProducao(op)
+                        .orElseThrow(() -> new ResourceNotFoundException("pedido", "ordem de produção", op)));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PedidoResponseDTO> findPedidosByExpedicao(Long idExpedicao) {
+        return pedidoRepository.findByExpedicaoId(idExpedicao).stream().map(p -> PedidoMapper.mapDto(p)).toList();
+    }
+
+}  

@@ -1,32 +1,59 @@
-import React, { useState } from 'react';
 import styles from './EstacoesView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
-import {
-  Estacoes,
-  BancadaStatus,
-  BANCADA_STATUS_DEFAULT,
-} from '@components/organisms/EstacoesSection/Estacoes';
+import { Estacoes } from '@components/organisms/EstacoesSection/Estacoes';
+import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
+import { ViewEstoque } from '@components/molecules/ViewEstoque/ViewEstoque';
+import { ViewExpedicao } from '@components/molecules/ViewExpedicao/ViewExpedicao';
+import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard';
+import { useEstacoesViewModel } from './useEstacoesViewModel';
 
-/**
- * MonitorView
- *
- * Exibe a bancada Smart 4.0 centralizada na tela.
- * O estado de cada módulo (estoque, processo, montagem, expedição)
- * é controlado externamente — futuramente via CLP (WebSocket / MQTT / polling).
- *
- * Para integrar com o CLP substitua o `useState` local por um hook
- * que leia os dados em tempo real, ex:
- *
- *   const status = usePlcStatus();   // hook que retorna BancadaStatus
- */
-export default function MonitorView() {
-  // Placeholder: status inicial. Será substituído pelo hook do CLP.
-  const [status] = useState<BancadaStatus>(BANCADA_STATUS_DEFAULT);
+export default function EstacoesView() {
+  const { estoque, expedicao, monitor, moduleStatus, erro, dismissErro } = useEstacoesViewModel();
+
+  const numeroOP = monitor.estoque?.numeroOP ?? 0;
+  const pedidoEmCurso = monitor.estoque?.pedidoEmCurso ?? false;
 
   return (
     <AppTemplate>
       <main id="main-content" className={styles.main}>
-        <Estacoes status={status} />
+        <header className={styles.header}>
+          <h1 className={styles.heading}>Estações</h1>
+          <p className={styles.subheading}>
+            Monitoramento em tempo real da linha de produção
+          </p>
+        </header>
+
+        {erro && <FeedbackBanner variant="error" message={erro} onDismiss={dismissErro} />}
+
+        <div className={styles.layout}>
+          <section className={styles.estacoesSection}>
+            <Estacoes status={monitor} moduleStatus={moduleStatus} />
+          </section>
+
+          <OpEmCursoCard numeroOP={numeroOP} pedidoEmCurso={pedidoEmCurso} />
+
+          <div className={styles.inferiorEstoques}>
+            <section className={styles.painel}>
+              <span className={styles.painelLabel}>Estoque</span>
+              <ViewEstoque
+                estoque={estoque.estoque}
+                editMode={estoque.editMode}
+                selectedIds={estoque.selectedIds}
+                onToggle={estoque.toggleBlocoSelection}
+              />
+            </section>
+
+            <section className={styles.painel}>
+              <span className={styles.painelLabel}>Expedição</span>
+              <ViewExpedicao
+                expedicao={expedicao.expedicao}
+                editMode={expedicao.editMode}
+                selectedId={expedicao.selectedId}
+                onToggle={expedicao.selectSlot}
+              />
+            </section>
+          </div>
+        </div>
       </main>
     </AppTemplate>
   );

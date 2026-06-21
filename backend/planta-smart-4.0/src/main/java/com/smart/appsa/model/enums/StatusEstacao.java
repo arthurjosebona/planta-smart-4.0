@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.EnumeratedValue;
 
 public enum StatusEstacao {
+    PARADO(0),
     OCUPADO(1),
     AGUARDANDO(2),
     MANUAL(3),

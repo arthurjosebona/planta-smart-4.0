@@ -11,6 +11,7 @@ interface ExpedicaoSectionProps {
   onEnterEdit: () => void;
   onCancel: () => void;
   onToggleSlot: (id: number) => void;
+  onSelectSlot: (id: number) => void;
   onOpInputChange: (value: string) => void;
   onSave: () => void;
 }
@@ -24,6 +25,7 @@ export const ExpedicaoSection: React.FC<ExpedicaoSectionProps> = ({
   onEnterEdit,
   onCancel,
   onToggleSlot,
+  onSelectSlot,
   onOpInputChange,
   onSave,
 }) => {
@@ -36,6 +38,7 @@ export const ExpedicaoSection: React.FC<ExpedicaoSectionProps> = ({
         editMode={editMode}
         selectedId={selectedId}
         onToggle={onToggleSlot}
+        onSelect={onSelectSlot}
       />
 
       {editMode && selectedId !== null && (
