@@ -17,8 +17,13 @@
   background: var(--color-bg-raised);
 }
 
-.slot--edit {
+.slot--edit,
+.slot--clickable {
   cursor: pointer;
+}
+
+.slot--clickable:hover {
+  border-color: var(--color-accent);
 }
 
 .slot--edit:hover {

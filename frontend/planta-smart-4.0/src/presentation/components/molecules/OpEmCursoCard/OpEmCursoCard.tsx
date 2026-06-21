@@ -85,6 +85,10 @@ export function OpEmCursoCard({ numeroOP, pedidoEmCurso }: OpEmCursoCardProps) {
           iniciarProducao={async (id) => {
             await pedidoService.iniciarProducao(id);
           }}
+          deletarPedido={async (id) => {
+            await pedidoService.delete(id);
+            setPedidoSelecionado(null);
+          }}
           onClose={() => setPedidoSelecionado(null)}
         />
       )}

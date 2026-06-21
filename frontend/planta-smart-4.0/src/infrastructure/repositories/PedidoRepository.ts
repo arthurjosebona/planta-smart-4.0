@@ -41,11 +41,19 @@ export class PedidoRepository implements IPedidoRepository {
     return PedidoMapper.mapToEntityByGetDTO(data);
   }
 
+  async findByExpedicao(expedicaoId: number): Promise<Pedido[]> {
+    const data: PedidoGetResponseDTO[] = await this.httpClient.get<PedidoGetResponseDTO[]>(
+      `/api/pedidos/expedicao/${expedicaoId}`
+    );
+    return PedidoMapper.mapToEntitiesByGetDTOs(data);
+  }
+
   async iniciarProducao(id: number): Promise<Pedido> {
     const data: PedidoGetResponseDTO = await this.httpClient.put(
-      '/api/pedidos/' + id + '/status',
+      '/api/pedidos/start-production/' + id,
       {}
     );
+    console.log(PedidoMapper.mapToEntityByGetDTO(data))
     return PedidoMapper.mapToEntityByGetDTO(data);
   }
 

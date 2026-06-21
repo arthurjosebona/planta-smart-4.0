@@ -1,10 +1,29 @@
+import { useState } from 'react';
 import { useEstoqueContext } from '@contexts/EstoqueContext';
 import { useExpedicaoContext } from '@contexts/ExpedicaoContext';
 import { StoreModel } from '@pages/Dashboard/DashboardModel';
+import { Expedicao } from '@entities/Expedicao';
+import { pedidoService } from '@config/diContainer';
 
 export function useDashboardViewModel() {
   const estoque = useEstoqueContext();
   const expedicao = useExpedicaoContext();
+
+  // Slot de expedição aberto no modal de detalhe (clique fora do modo de edição).
+  const [detalheSlot, setDetalheSlot] = useState<Expedicao | null>(null);
+
+  function abrirDetalheExpedicao(id: number) {
+    const slot = expedicao.expedicao.find((s) => s.id === id) ?? null;
+    setDetalheSlot(slot);
+  }
+
+  function fecharDetalheExpedicao() {
+    setDetalheSlot(null);
+  }
+
+  async function iniciarProducao(id: number) {
+    await pedidoService.iniciarProducao(id);
+  }
 
   const model: StoreModel = {
     estoque: estoque.estoque,
@@ -26,6 +45,11 @@ export function useDashboardViewModel() {
 
   return {
     model,
+    // detalhe expedição
+    detalheSlot,
+    abrirDetalheExpedicao,
+    fecharDetalheExpedicao,
+    iniciarProducao,
     // estoque
     enterEditMode: estoque.enterEditMode,
     cancelEditMode: estoque.cancelEditMode,

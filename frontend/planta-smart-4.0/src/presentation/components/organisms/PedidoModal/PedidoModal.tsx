@@ -10,10 +10,11 @@ import { StatusPedido } from '@enums/StatusPedido';
 interface PedidoModalProps {
   pedido: Pedido;
   iniciarProducao: (id: number) => void;
+  deletarPedido: (id: number) => void;
   onClose: () => void;
 }
 
-export function PedidoModal({ pedido, iniciarProducao, onClose }: PedidoModalProps) {
+export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose }: PedidoModalProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -47,12 +48,11 @@ export function PedidoModal({ pedido, iniciarProducao, onClose }: PedidoModalPro
               registroSaidaExpedicao={pedido.registroSaidaExpedicao}
             />
             { pedido.status == StatusPedido.Pendente &&
-              <> 
+              <>
                 <hr className={styles.divider} />
                 <div className={styles.updateDeleteButtons}>
-                  <ActionButton label="Atualizar" onClick={() => alert("update")} />
-                  <ActionButton label="Deletar" onClick={() => alert("deletar")} />
-                </div> 
+                  <ActionButton label="Deletar" onClick={() => deletarPedido(pedido.id!)} />
+                </div>
               </>
             }
           </div>

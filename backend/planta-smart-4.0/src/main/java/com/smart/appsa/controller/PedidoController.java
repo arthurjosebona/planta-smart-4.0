@@ -71,7 +71,7 @@ public class PedidoController {
     }
 
     @GetMapping("/op/{op}")
-    public ResponseEntity<PedidoResponseDTO> findPedidoByOp(@RequestParam Integer op) {
+    public ResponseEntity<PedidoResponseDTO> findPedidoByOp(@PathVariable Integer op) {
         return ResponseEntity.ok(pedidoService.findByOp(op));
     }
     
