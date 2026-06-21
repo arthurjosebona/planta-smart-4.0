@@ -68,6 +68,10 @@ export class PedidoService {
   async findById(id: number): Promise<Pedido> {
     return await this.repository.findById(id);
   }
+  
+  async findByOrdemDeProducao(op: number): Promise<Pedido> {
+    return await this.repository.findByOrdemDeProducao(op);
+  }
 
   async iniciarProducao(id: number): Promise<Pedido> {
     return await this.repository.iniciarProducao(id);

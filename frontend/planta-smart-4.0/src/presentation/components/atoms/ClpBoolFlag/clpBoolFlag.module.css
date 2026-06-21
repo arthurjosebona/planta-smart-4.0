@@ -1,0 +1,43 @@
+@reference "@styles/global.css";
+
+.flag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  transition: background var(--ease-fast), border-color var(--ease-fast);
+}
+
+.flag.active {
+  background: rgba(76, 175, 125, 0.08);
+  border-color: rgba(76, 175, 125, 0.3);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-text-muted);
+  transition: background var(--ease-fast);
+}
+
+.flag.active .dot {
+  background: var(--color-success);
+  box-shadow: 0 0 5px rgba(76, 175, 125, 0.6);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  transition: color var(--ease-fast);
+}
+
+.flag.active .label {
+  color: var(--color-text-secondary);
+}

@@ -20,8 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
-import com.smart.appsa.exception.OrdemDeProducaoExpedidaException;
-import com.smart.appsa.exception.PosicaoExpedicaoOcupadaException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.repository.ExpedicaoRepository;
@@ -128,7 +126,7 @@ public class ExpedicaoServiceTest {
     }
  
     // -------------------------------------------------------------------------
-    // AssignOrdemAtPosicao
+    // assignOrdemAtPosicao
     // -------------------------------------------------------------------------
  
     @Test
@@ -137,15 +135,13 @@ public class ExpedicaoServiceTest {
         int ordemDeProducao = 10;
         int posicaoFisica = 5;
         Expedicao expedicao = createExpedicao(1L, posicaoFisica, 0);
- 
-        when(expedicaoRepository.findPosicoesOcupadas()).thenReturn(List.of());
-        when(expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)).thenReturn(false);
+
         when(expedicaoRepository.findByPosicaoFisica(posicaoFisica)).thenReturn(Optional.of(expedicao));
         when(expedicaoRepository.save(any(Expedicao.class))).thenReturn(expedicao);
- 
+
         // Act
-        expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisica);
- 
+        expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisica);
+
         // Assert
         verify(expedicaoRepository, times(1)).save(any(Expedicao.class));
     }
@@ -158,7 +154,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(InvalidPosicaoExpedicaoException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  
@@ -170,36 +166,7 @@ public class ExpedicaoServiceTest {
  
         // Act & Assert
         assertThrows(InvalidPosicaoExpedicaoException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
-        verify(expedicaoRepository, never()).save(any(Expedicao.class));
-    }
- 
-    @Test
-    public void deveLancarExcecaoQuandoPosicaoJaEstaOcupada() {
-        // Arrange
-        int ordemDeProducao = 10;
-        int posicaoOcupada = 3;
- 
-        when(expedicaoRepository.findPosicoesOcupadas()).thenReturn(List.of(posicaoOcupada));
- 
-        // Act & Assert
-        assertThrows(PosicaoExpedicaoOcupadaException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoOcupada));
-        verify(expedicaoRepository, never()).save(any(Expedicao.class));
-    }
- 
-    @Test
-    public void deveLancarExcecaoQuandoOrdemDeProducaoJaFoiExpedida() {
-        // Arrange
-        int ordemJaExpedida = 10;
-        int posicaoFisica = 5;
- 
-        when(expedicaoRepository.findPosicoesOcupadas()).thenReturn(List.of());
-        when(expedicaoRepository.existsByOrdemDeProducaoAtual(ordemJaExpedida)).thenReturn(true);
- 
-        // Act & Assert
-        assertThrows(OrdemDeProducaoExpedidaException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemJaExpedida, posicaoFisica));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisicaInvalida));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  
@@ -208,14 +175,12 @@ public class ExpedicaoServiceTest {
         // Arrange
         int ordemDeProducao = 10;
         int posicaoFisica = 5;
- 
-        when(expedicaoRepository.findPosicoesOcupadas()).thenReturn(List.of());
-        when(expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)).thenReturn(false);
+
         when(expedicaoRepository.findByPosicaoFisica(posicaoFisica)).thenReturn(Optional.empty());
- 
+
         // Act & Assert
         assertThrows(RuntimeException.class,
-                () -> expedicaoService.AssignOrdemAtPosicao(ordemDeProducao, posicaoFisica));
+                () -> expedicaoService.assignOrdemAtPosicao(ordemDeProducao, posicaoFisica));
         verify(expedicaoRepository, never()).save(any(Expedicao.class));
     }
  

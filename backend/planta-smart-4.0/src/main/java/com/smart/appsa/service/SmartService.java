@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
-import com.smart.appsa.exception.core.BusinessException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -25,6 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SmartService {
     private final PlcConnectionService plcConnectionService;
+    private final AppStateConfig appStateConfig;
     
     public void enviarParaProducao(PedidoConfigDTO config, PedidoInfoDTO detalhes) {
         // 1. Converter o DTO para um bloco de bytes (byte[])
@@ -145,12 +148,15 @@ public class SmartService {
 
             // 4. Tente ler a resposta primeiro como String para ver o que o ESP32 está
             // realmente enviando
-            ResponseEntity<String> rawResponse = apiSeletorTampa.postForEntity(url, request, String.class);
-            System.out.println("Resposta Bruta do ESP32: " + rawResponse.getBody());
+            ResponseEntity<Map<String, Object>> response = apiSeletorTampa.exchange(
+                url,
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
 
-            // 5. Agora, para a sua lógica de negócio, usamos o Map
-            ResponseEntity<Map> response = apiSeletorTampa.postForEntity(url, request, Map.class);
             Map<String, Object> body = response.getBody();
+            System.out.println("Resposta do ESP32: " + body);
 
             // Verificação robusta
             if (body == null || body.get("status") == null) {
@@ -171,5 +177,24 @@ public class SmartService {
             System.out.println("Deu erro");
             return;
         }
+    }
+
+    public boolean sendBlockBytesToClp(String ipClp, int db, int offset, byte[] dados, int size) {
+        PlcConnector plcConnector = plcConnectionService.getConnection(ipClp);
+        if (plcConnector == null) {
+            System.out.println("Sem conexão com CLP " + ipClp);
+            return false;
+        }
+        if (!appStateConfig.isReadOnly()) {
+            try {
+                plcConnector.writeBlock(db, offset, size, dados); // escreve no bloco de dados
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        // se for readOnly ou nada a fazer, considere sucesso
+        return true;
     }
 }

@@ -23,6 +23,8 @@ import com.smart.appsa.service.PedidoService;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -50,10 +52,9 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.findAll());
     }
 
-
-    @PutMapping("/{id}/status")
-    public ResponseEntity<PedidoResponseDTO> updateStatusToConcluido(@PathVariable Long id) {
-        return ResponseEntity.ok(pedidoService.updateStatusAsCompleted(id));
+    @PutMapping("/start-production/{id}")
+    public ResponseEntity<PedidoResponseDTO> startProduction(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.startProduction(id));
     }
 
 

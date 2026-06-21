@@ -33,6 +33,13 @@ export class PedidoRepository implements IPedidoRepository {
     );
     return PedidoMapper.mapToEntityByGetDTO(data);
   }
+    
+  async findByOrdemDeProducao(op: number): Promise<Pedido> {
+    const data: PedidoGetResponseDTO = await this.httpClient.get<PedidoGetResponseDTO>(
+      `/api/pedidos/op/${op}`
+    );
+    return PedidoMapper.mapToEntityByGetDTO(data);
+  }
 
   async iniciarProducao(id: number): Promise<Pedido> {
     const data: PedidoGetResponseDTO = await this.httpClient.put(

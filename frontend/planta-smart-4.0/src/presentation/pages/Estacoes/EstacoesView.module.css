@@ -1,7 +1,23 @@
+@reference "@styles/global.css";
+
 .main {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100dvh;
+  gap: var(--spacing-4);
   padding: var(--spacing-6);
+}
+
+.layout {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-template-columns: 1fr;
+  align-items: start;
+  justify-content: center;
+  gap: var(--spacing-4);
+  width: 100%;
+}
+
+.inferiorEstoques {
+  @apply grid grid-cols-2 grid-rows-1;
 }

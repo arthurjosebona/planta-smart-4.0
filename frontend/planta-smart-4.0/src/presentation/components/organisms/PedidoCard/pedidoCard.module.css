@@ -1,10 +1,10 @@
 @reference "@styles/global.css";
 
 .card {
-  @apply relative rounded-xl transition-all;
+  @apply relative rounded-xl transition-all cursor-pointer;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  padding: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4);
   transition:
     border-color var(--ease-base),
     box-shadow var(--ease-base);
@@ -27,8 +27,36 @@
   opacity: 0.55;
 }
 
-.divider {
-  @apply border-none;
-  border-top: 1px solid var(--color-border);
-  margin: var(--spacing-3) 0;
+.summary {
+  @apply flex items-center flex-wrap;
+  gap: var(--spacing-3);
+}
+
+.idTag {
+  font-family: var(--font-mono);
+  @apply text-[11px] rounded;
+  color: var(--color-text-muted);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  padding: 2px 7px;
+}
+
+.ordemDeProducao {
+  font-family: var(--font-mono);
+  @apply text-[14px] font-semibold;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.tipo {
+  font-family: var(--font-mono);
+  @apply text-[12px];
+  color: var(--color-text-muted);
+}
+
+.blocosCount {
+  font-family: var(--font-mono);
+  @apply text-[12px];
+  color: var(--color-text-muted);
+  margin-left: auto;
 }

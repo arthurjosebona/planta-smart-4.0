@@ -67,6 +67,15 @@ public class EstoqueService {
     }
 
     @Transactional
+    public Estoque assignBlockColorByPosicaoFisica(Integer posicaoFisica, CorEstoque novaCor) {
+        Estoque estoque = estoqueRepository.findByPosicaoFisica(posicaoFisica)
+                .orElseThrow(() -> new ResourceNotFoundException("Estoque", "posicaoFisica", posicaoFisica));
+
+        estoque.setCorEstoque(novaCor);
+        return estoqueRepository.save(estoque);
+    }
+
+    @Transactional
     public void updateAllEstoque(List<EstoqueRequestDTO> estoque) {
         for (EstoqueRequestDTO e : estoque) {
             assignBlockColor(e.id(), e.corEstoque());
