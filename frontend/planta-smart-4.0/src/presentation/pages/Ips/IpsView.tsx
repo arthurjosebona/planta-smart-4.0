@@ -1,7 +1,7 @@
-import { useHomeViewModel } from '@pages/Home/useHomeViewModel';
+import { useIpsViewModel } from '@pages/Ips/useIpsViewModel';
 import { AppTemplate } from '@components/template/AppTemplate';
 import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
-import styles from './homeView.module.css';
+import styles from './ipsView.module.css';
 import image from '@assets/bancada/Smart40.png';
 
 
@@ -12,7 +12,7 @@ const MODULE_CLASSES: Record<string, string> = {
   expedicao: 'expedicao',
 };
 
-export default function HomeView() {
+export default function IpsView() {
   const {
     model,
     handleFaixaChange,
@@ -21,7 +21,7 @@ export default function HomeView() {
     toggleReadOnly,
     dismissErro,
     dismissSucesso,
-  } = useHomeViewModel();
+  } = useIpsViewModel();
 
   return (
     <AppTemplate>

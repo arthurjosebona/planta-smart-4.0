@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { StoreModel, StoreModelInitial } from '@pages/Home/HomeModel';
+import { StoreModel, StoreModelInitial } from '@pages/Ips/IpsModel';
 import { conexaoService } from '@config/diContainer';
 
-export function useHomeViewModel() {
+export function useIpsViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
 
   // Sincroniza o estado inicial do readOnly com o backend ao montar.
