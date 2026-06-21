@@ -23,6 +23,7 @@
       "@styles/*": ["./src/styles/*"],
       "@assets/*": ["./src/assets/*"],
       "@utils/*": ["./src/presentation/utils/*"],
+      "@contexts/*": ["./src/contexts/*"],
     }
   },
   "include": ["src", "src/vite-env.d.ts"],
