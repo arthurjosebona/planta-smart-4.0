@@ -1,3 +1,4 @@
+import HomeView from '@pages/Home/HomeView';
 import DashboardView from '@pages/Dashboard/DashboardView';
 import IpsView from '@pages/Ips/IpsView';
 import PedidosView from '@pages/Pedidos/PedidosView';
@@ -7,7 +8,8 @@ import MonitorView from '@pages/Monitor/MonitorView';
 import { Navigate } from 'react-router-dom';
 
 export const routes = [
-  { path: '/', element: <Navigate to="/ips/" replace /> },
+  { path: '/', element: <Navigate to="/home" replace /> },
+  { path: '/home', element: <HomeView /> },
   { path: '/store', element: <StoreView /> },
   { path: '/dashboard', element: <DashboardView /> },
   { path: '/pedidos', element: <PedidosView /> },
