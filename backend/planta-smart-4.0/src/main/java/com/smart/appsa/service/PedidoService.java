@@ -252,4 +252,9 @@ public class PedidoService {
         pedidoRepository.save(pedido);
     }
 
+    public void updateToConcluido(Pedido pedido) {
+        pedido.setStatus(StatusPedido.CONCLUIDO);
+        pedidoRepository.save(pedido);
+    }
+
 }  

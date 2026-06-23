@@ -1,6 +1,7 @@
 import { ConexaoRepository } from '@repositoriesImp/ConexaoRepository';
 import { ModuloIP } from '@entities/ModuloIP';
 import { ClpPingResponseDTO } from '@dtos/response/ClpPingResponseDTO';
+import { StartReadingsResponseDTO } from '@dtos/response/StartReadingsResponseDTO';
 
 type Listener = () => void;
 
@@ -13,22 +14,35 @@ export class ConexaoService {
     this.repository = repository;
   }
 
+  /**
+   * Grava os IPs configurados no backend (PUT /api/config/clp/ips).
+   * NÃO define o status de conectado: persistir IPs não abre conexão com os CLPs.
+   * O status só é determinado pelo resultado real de {@link iniciarLeituras}.
+   */
   async conectar(modulos: ModuloIP[]): Promise<void> {
     try {
       await this.repository.conectar(modulos);
-      this.setConectado(true);
     } catch (error) {
       this.setConectado(false);
-      throw error; // mantém o comportamento atual: quem chamou continua tratando o erro
+      throw error;
     }
   }
 
   /**
    * Inicia o loop de leitura dos CLPs no backend (POST /api/smart/start-readings),
    * o que passa a alimentar os streams SSE da bancada com dados em tempo real.
+   * O status global de conectado reflete `todasConectadas` — só fica verde quando
+   * TODAS as estações solicitadas responderam de fato.
    */
-  async iniciarLeituras(modulos: ModuloIP[]): Promise<void> {
-    return this.repository.iniciarLeituras(modulos);
+  async iniciarLeituras(modulos: ModuloIP[]): Promise<StartReadingsResponseDTO> {
+    try {
+      const resultado = await this.repository.iniciarLeituras(modulos);
+      this.setConectado(resultado.todasConectadas);
+      return resultado;
+    } catch (error) {
+      this.setConectado(false);
+      throw error;
+    }
   }
 
   /** Snapshot atual do status — usado pelo useSyncExternalStore. */

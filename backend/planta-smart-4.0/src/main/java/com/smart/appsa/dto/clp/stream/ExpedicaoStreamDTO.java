@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.smart.appsa.model.enums.StatusEstacao;
 
-/** DTO de stream da estação EXPEDICAO. */
+// DTO de stream da estação EXPEDICAO.
 public record ExpedicaoStreamDTO(
         String estacao,
         StatusEstacao status,
