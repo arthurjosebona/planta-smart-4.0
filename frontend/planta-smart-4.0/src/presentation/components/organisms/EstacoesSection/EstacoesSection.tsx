@@ -65,12 +65,40 @@ interface EstacoesProps {
 export function Estacoes({ status, moduleStatus }: EstacoesProps) {
   const st = status.estoque;
 
+  // Status de produção (0/1/2) de cada estação, calculado no backend a partir das
+  // flags do CLP (startOP -> 1, finishOP -> 2) e trafegado no stream da estação ESTOQUE.
   const pipelineValues: Record<StationKey, number | undefined> = {
     estoque:   st?.statusEstoque,
     processo:  st?.statusProcesso,
     montagem:  st?.statusMontagem,
     expedicao: st?.statusExpedicao,
   };
+
+  // Flag "OPInCourse": indica que ainda há uma ordem de produção em andamento na bancada.
+  // Enquanto verdadeira, uma estação que já finalizou sua etapa permanece em St2.
+  // pedidoEmCurso sobe ao iniciar a ordem; statusProducao vira 1 quando a ordem é
+  // concluída na expedição (e volta a 0 no início da próxima), encerrando o St2.
+  const opInCourse = (st?.pedidoEmCurso ?? false) && (st?.statusProducao ?? 0) === 0;
+
+  // Flag de ocupação (estação em uso no momento) de cada estação.
+  const ocupadoValues: Record<StationKey, boolean> = {
+    estoque:   status.estoque?.ocupado ?? false,
+    processo:  status.processo?.ocupado ?? false,
+    montagem:  status.montagem?.ocupado ?? false,
+    expedicao: status.expedicao?.ocupado ?? false,
+  };
+
+  // Decide qual overlay de pipeline exibir (0/1/2) ou nenhum, com base nas flags do CLP:
+  //  - desconectada            -> nenhum overlay de pipeline (só o de conexão "off");
+  //  - ocupada (em uso)        -> St1;
+  //  - finalizou (status 2) e ordem ainda em curso (opInCourse) -> St2;
+  //  - conectada e em aguardo  -> St0.
+  function pipelineIndex(station: StationKey): number | null {
+    if (moduleStatus[station] === 'off') return null;
+    if (ocupadoValues[station]) return 1;
+    if (pipelineValues[station] === 2 && opInCourse) return 2;
+    return 0;
+  }
 
   const stations: StationKey[] = ['estoque', 'processo', 'montagem', 'expedicao'];
 
@@ -85,9 +113,9 @@ export function Estacoes({ status, moduleStatus }: EstacoesProps) {
 
       {/* Camada 1: status de produção (pipeline 0/1/2) */}
       {stations.map((station) => {
-        const value = pipelineValues[station];
+        const value = pipelineIndex(station);
+        if (value === null) return null;
         const overlays = pipelineOverlays[station];
-        if (value === undefined || overlays[value] === undefined) return null;
         return (
           <img
             key={`pipeline-${station}`}
