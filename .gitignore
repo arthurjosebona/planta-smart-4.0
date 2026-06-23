@@ -34,3 +34,8 @@ build/
 
 ### .env ###
 .env
+
+build.log
+CLAUDE.md
+*.log
+*.zip
