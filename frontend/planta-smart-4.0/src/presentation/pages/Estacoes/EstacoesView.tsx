@@ -8,7 +8,8 @@ import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard
 import { useEstacoesViewModel } from './useEstacoesViewModel';
 
 export default function EstacoesView() {
-  const { estoque, expedicao, monitor, moduleStatus, erro, dismissErro } = useEstacoesViewModel();
+  const { estoque, expedicao, monitor, moduleStatus, bancada, erro, dismissErro } =
+    useEstacoesViewModel();
 
   const numeroOP = monitor.estoque?.numeroOP ?? 0;
   const pedidoEmCurso = monitor.estoque?.pedidoEmCurso ?? false;
@@ -51,6 +52,23 @@ export default function EstacoesView() {
                 selectedId={expedicao.selectedId}
                 onToggle={expedicao.selectSlot}
               />
+            </section>
+          </div>
+
+          <div className={styles.inferiorEstoques}>
+            <section className={styles.painel}>
+              <span className={styles.painelLabel}>Estoque (Bancada)</span>
+              <ViewEstoque
+                estoque={bancada.estoque}
+                editMode={false}
+                selectedIds={[]}
+                onToggle={() => {}}
+              />
+            </section>
+
+            <section className={styles.painel}>
+              <span className={styles.painelLabel}>Expedição (Bancada)</span>
+              <ViewExpedicao expedicao={bancada.expedicao} editMode={false} />
             </section>
           </div>
         </div>
