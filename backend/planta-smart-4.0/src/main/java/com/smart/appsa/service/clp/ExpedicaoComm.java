@@ -1,10 +1,14 @@
 package com.smart.appsa.service.clp;
 
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.config.ClpIpConfig;
+import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
@@ -37,6 +41,7 @@ public class ExpedicaoComm implements PlcDataObserver {
     private static final int OFFSET_POSICAO_GUARDAR = 4;
     // Offset (int) inicial do magazine de expedição (12 posições, 2 bytes cada).
     private static final int OFFSET_MAGAZINE = 6;
+    private final ClpIpConfig clpIpConfig;
 
     private static final int BIT_RECEBIDO_OP = 0;
     private static final int BIT_RECEBIDO_EXPEDICAO = 0;
@@ -236,6 +241,7 @@ public class ExpedicaoComm implements PlcDataObserver {
     // posição do magazine (offset = 6 + (posicaoGuardarExp - 1) * 2) e persiste a
     // adição na API.
     private void adicionarOpNaExpedicao(PlcConnector plcConnectorExp) {
+        System.out.println("[adicionarOpNaExpedicao] adicionarExepdicão: " + expedicaoInfoClp.isAdicionarExpedicao());
         if (expedicaoInfoClp.isAdicionarExpedicao() & !appStateConfig.isAux_expedicao()) {
             appStateConfig.setAux_expedicao(true);
 
@@ -332,6 +338,25 @@ public class ExpedicaoComm implements PlcDataObserver {
             pedidoService.updateToConcluido(
                 PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
             );
+        }
+    }
+
+    @Async("plcWriteExpedicaoExecutor")
+    @EventListener
+    public void atualizarPosicaoExpedicao(UpdateExpedicaoEvent event) {
+        System.out.println("Evento de atualizar posição expedição");
+        PlcConnector connector = plcConnectionService.getConnection(clpIpConfig.getIp("expedicao"));
+        if (connector == null) {
+            System.out.println("AVISO: CLP expedicao desconectado, reserva pos "  + event.getPosicao() + " pedido " + event.getCodPedido() + " descartada");
+            return;
+        }
+        synchronized (connector) {
+            try {
+                connector.writeInt(DB_EXPEDICAO, 6 + (event.getPosicao() - 1) * 2, event.getCodPedido());
+            } catch (Exception e) {
+                System.out.println("ERRO: write reserva expedicao posicao " + event.getPosicao());
+                e.printStackTrace();
+            }
         }
     }
 }
