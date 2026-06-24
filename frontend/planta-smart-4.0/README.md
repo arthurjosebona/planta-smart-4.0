@@ -120,7 +120,7 @@ Visualização das 28 posições físicas do estoque com a cor de cada bloco arm
 
 - **Node.js 22.x** (versão exigida no `package.json`)
 - **npm** ou **yarn**
-- Backend em execução em `http://localhost:8080`
+- Backend em execução em `http://localhost:8088`
 
 ---
 

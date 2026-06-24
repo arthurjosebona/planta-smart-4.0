@@ -53,9 +53,7 @@ public class ExpedicaoComm implements PlcDataObserver {
     private final ExpedicaoService expedicaoService;
     private final PedidoService pedidoService;
 
-    // Última OP já concluída por {@link #concluirPedido()}. Evita reconcluir o mesmo
-    // pedido (e chamar a API) a cada ciclo de leitura enquanto a OP permanece no magazine.
-    private int opConcluidaAnterior = 0;
+    private int opAntiga = 0;
 
     @Override
     public void onData(String ip, byte[] data) {
@@ -68,6 +66,9 @@ public class ExpedicaoComm implements PlcDataObserver {
         if (plcConnectorExp == null) {
             return;
         }
+
+        printHex(dadosExpedicao);
+
 
         lerVariaveis(dadosExpedicao);
 
@@ -241,8 +242,9 @@ public class ExpedicaoComm implements PlcDataObserver {
     // posição do magazine (offset = 6 + (posicaoGuardarExp - 1) * 2) e persiste a
     // adição na API.
     private void adicionarOpNaExpedicao(PlcConnector plcConnectorExp) {
-        System.out.println("[adicionarOpNaExpedicao] adicionarExepdicão: " + expedicaoInfoClp.isAdicionarExpedicao());
+        
         if (expedicaoInfoClp.isAdicionarExpedicao() & !appStateConfig.isAux_expedicao()) {
+            System.out.println("[adicionarOpNaExpedicao] Adicionando o pedido na expedição.");
             appStateConfig.setAux_expedicao(true);
 
             if (!appStateConfig.isReadOnly()) {
@@ -330,13 +332,11 @@ public class ExpedicaoComm implements PlcDataObserver {
     // mais com a OP recebida). O guarda {@link #opConcluidaAnterior} garante que cada
     // OP seja concluída uma única vez, evitando chamadas repetidas à API a cada ciclo.
     private void concluirPedido() {
-        int opAtual = expedicaoInfoClp.getOpGuardadoExpedicao();
-
-        boolean operacaoConcluida = expedicaoInfoClp.isFinishOP() || !expedicaoInfoClp.isRecebidoOp();
-        if (operacaoConcluida && opAtual > 0 && opAtual != opConcluidaAnterior) {
-            opConcluidaAnterior = opAtual;
+        if (((expedicaoInfoClp.isFinishOP() || !expedicaoInfoClp.isRecebidoExpedicao())
+                && (expedicaoInfoClp.getOpGuardadoExpedicao() > 0 && expedicaoInfoClp.getOpGuardadoExpedicao() != opAntiga))) {
+            opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
             pedidoService.updateToConcluido(
-                PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
+                PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(expedicaoInfoClp.getOpGuardadoExpedicao()))
             );
         }
     }
@@ -358,5 +358,23 @@ public class ExpedicaoComm implements PlcDataObserver {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void printHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        System.out.println("--- BLOCO DE BYTES (HEXADECIMAL) ---");
+
+        for (int i = 0; i < bytes.length; i++) {
+            // Converte o byte para Hex e garante que tenha 2 dígitos (ex: 0A em vez de A)
+            sb.append(String.format("%02X ", bytes[i]));
+
+            // Opcional: Quebra de linha a cada 10 bytes para facilitar a leitura
+            if ((i + 1) % 10 == 0) {
+                sb.append("\n");
+            }
+        }
+
+        System.out.println(sb.toString());
+        System.out.println("------------------------------------");
     }
 }
