@@ -1,5 +1,6 @@
 package com.smart.appsa.service.clp;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,8 @@ public class ExpedicaoComm implements PlcDataObserver {
     private final AppStateConfig appStateConfig;
     private final ExpedicaoService expedicaoService;
     private final PedidoService pedidoService;
+    
+    private final ApplicationEventPublisher eventPublisher;
 
     private int opAntiga = 0;
 
@@ -66,9 +69,6 @@ public class ExpedicaoComm implements PlcDataObserver {
         if (plcConnectorExp == null) {
             return;
         }
-
-        printHex(dadosExpedicao);
-
 
         lerVariaveis(dadosExpedicao);
 
@@ -274,16 +274,6 @@ public class ExpedicaoComm implements PlcDataObserver {
         }
     }
 
-    // Operação que consegue ser executada de acordo com as flags que são
-    // lidas, utilizada para finalizar o pedido que está rolando, e escrever 
-    // na expedição somente quando o pedido foi guardado realmente
-    private void handleEstoqueGuardado() {
-        int opAtual = pedidoService.findByOp(expedicaoInfoClp.getNumeroOP()).ordemDeProducao();
-        if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAtual) {
-            System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
-        }
-    }
-
     // removerExpedicao == true & aux_expedicao == false:
     // confirma a movimentação (RecebidoExpedicao = TRUE), zera a OP na posição
     // removida do magazine (offset = 6 + (posicaoRemovidoExpedicao - 1) * 2),
@@ -340,18 +330,45 @@ public class ExpedicaoComm implements PlcDataObserver {
         }
     }
 
+    // Operação que consegue ser executada de acordo com as flags que são
+    // lidas, utilizada para finalizar o pedido que está rolando, e escrever 
+    // na expedição somente quando o pedido foi guardado realmente
+    private void handleEstoqueGuardado() {
+        if (expedicaoInfoClp.getOpGuardadoExpedicao() <= 0) {
+            System.out.println("[handleEstoqueGuardado()] caiu no op guardado <= 0");
+            return;
+        }
+        if (!appStateConfig.isPedidoEmCurso()) {
+            System.out.println("[handleEstoqueGuardado()] pedido em curso");
+            return;
+        }
+        if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAntiga) {
+            System.out.println("[handleEstoqueGuardado()] caiu no op guardado == opAntiga");
+            return;
+        }
+        int opAtual = expedicaoInfoClp.getNumeroOP();
+        System.out.printf("\n\n\nPASSOU DAS VERIFICAÇÕES INICIAIS DE handleEstoqueGuardado, OP: " + opAtual + "\n\n\n\n");
+        if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAtual) {
+            System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
+            System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");
+            appStateConfig.setPedidoEmCurso(false);
+            // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
+            opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
+        }
+    }
+
     // Conclui o pedido no domínio quando a OP foi finalizada (ou o CLP já não está
     // mais com a OP recebida). O guarda {@link #opConcluidaAnterior} garante que cada
     // OP seja concluída uma única vez, evitando chamadas repetidas à API a cada ciclo.
-    private void concluirPedido() {
-        if (((expedicaoInfoClp.isFinishOP() || !expedicaoInfoClp.isRecebidoExpedicao())
-                && (expedicaoInfoClp.getOpGuardadoExpedicao() > 0 && expedicaoInfoClp.getOpGuardadoExpedicao() != opAntiga))) {
-            opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
-            pedidoService.updateToConcluido(
-                PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(expedicaoInfoClp.getOpGuardadoExpedicao()))
-            );
-        }
-    }
+    // private void concluirPedido() {
+    //     if (((expedicaoInfoClp.isFinishOP() || !expedicaoInfoClp.isRecebidoExpedicao())
+    //             && (expedicaoInfoClp.getOpGuardadoExpedicao() > 0 && expedicaoInfoClp.getOpGuardadoExpedicao() != opAntiga))) {
+    //         opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
+    //         pedidoService.updateToConcluido(
+    //             PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(expedicaoInfoClp.getOpGuardadoExpedicao()))
+    //         );
+    //     }
+    // }
 
     @Async("plcWriteExpedicaoExecutor")
     @EventListener

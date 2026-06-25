@@ -114,8 +114,13 @@ public class EstoqueComm implements PlcDataObserver {
     // o ESTOQUE confirmou o início do pedido e ficou OCUPADO. Marca pedidoEmCurso,
     // zera os status de estoque/produção e baixa a flag IniciarPedido para FALSE.
     private void confirmarInicioPedido(PlcConnector plcConnectorEst) {
-        if (estoqueInfoClp.isIniciarPedido() && estoqueInfoClp.isOcupado()) {
+        // Antes monitorava a flag ocupado, porém essa flag nunca fica true ao mesmo tempo que o 
+        // iniciarPedido, e com um pooling >200ms ele só lê um tick dessa flag, então não tem perigo
+        // de cair no if duas vezes, mas mesmo assim verifica a flag do pedido em curso para garantir 
+        // que não está sendo feito 2 vezes
+        if (estoqueInfoClp.isIniciarPedido() && !appStateConfig.isPedidoEmCurso()) {
             appStateConfig.setPedidoEmCurso(true);
+            System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
             if (!appStateConfig.isReadOnly()) {

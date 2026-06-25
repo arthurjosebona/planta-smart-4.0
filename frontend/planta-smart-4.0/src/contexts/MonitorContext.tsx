@@ -49,7 +49,7 @@ export function MonitorProvider({ children }: { children: ReactNode }) {
 
     source.addEventListener('expedicao', (e) => {
       try {
-        const dto = JSON.parse((e as MessageEvent).data) as ExpedicaoStreamDTO;
+        const dto = JSON.parse((e as MessageEvent).data) as ExpedicaoStreamDTO  ;
         setState((s) => ({ ...s, expedicao: EstacaoStreamMapper.mapExpedicaoByDTO(dto) }));
       } catch (err) {
         console.error('Erro ao parsear evento expedicao:', err);
