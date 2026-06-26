@@ -46,7 +46,7 @@ public class SmartService {
             throw new ClpComunicacaoException(config.getIpClp(), "conexão indisponível");
         }
 
-        eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, detalhes.getPosicaoExpedicao(), detalhes.getNumeroPedido()));
+        // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, detalhes.getPosicaoExpedicao(), detalhes.getNumeroPedido()));
 
         try {
             // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)

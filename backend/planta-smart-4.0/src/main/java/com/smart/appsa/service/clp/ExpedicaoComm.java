@@ -82,6 +82,7 @@ public class ExpedicaoComm implements PlcDataObserver {
         removerOpDaExpedicao(plcConnectorExp);
         marcarOperacaoFinalizada();
         concluirPedido();
+        handleEstoqueGuardado();
     }
 
     // Mapeia o bloco bruto do CLP EXPEDIÇÃO para o {@link ExpedicaoInfoClp}.
@@ -244,7 +245,8 @@ public class ExpedicaoComm implements PlcDataObserver {
     private void adicionarOpNaExpedicao(PlcConnector plcConnectorExp) {
         
         if (expedicaoInfoClp.isAdicionarExpedicao() & !appStateConfig.isAux_expedicao()) {
-            System.out.println("[adicionarOpNaExpedicao] Adicionando o pedido na expedição.");
+            System.out.printf("\n\n\n\n-------------------\nCHEGOU NO adicionarOpNaExpepdicao\n-----------------------\n\n\n\n\n");
+
             appStateConfig.setAux_expedicao(true);
 
             if (!appStateConfig.isReadOnly()) {
@@ -269,6 +271,16 @@ public class ExpedicaoComm implements PlcDataObserver {
                     }
                 }
             }
+        }
+    }
+
+    // Operação que consegue ser executada de acordo com as flags que são
+    // lidas, utilizada para finalizar o pedido que está rolando, e escrever 
+    // na expedição somente quando o pedido foi guardado realmente
+    private void handleEstoqueGuardado() {
+        int opAtual = pedidoService.findByOp(expedicaoInfoClp.getNumeroOP()).ordemDeProducao();
+        if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAtual) {
+            System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
         }
     }
 
