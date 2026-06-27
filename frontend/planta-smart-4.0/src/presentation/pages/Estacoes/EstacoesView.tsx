@@ -8,7 +8,7 @@ import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard
 import { useEstacoesViewModel } from './useEstacoesViewModel';
 
 export default function EstacoesView() {
-  const { monitor, moduleStatus, bancada, erro, dismissErro } = useEstacoesViewModel();
+  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro } = useEstacoesViewModel();
 
   const numeroOP = monitor.estoque?.numeroOP ?? 0;
   const statusProducao = monitor.estoque?.statusProducao ?? 0;
@@ -34,7 +34,7 @@ export default function EstacoesView() {
 
         <div className={styles.layout}>
           <section className={styles.estacoesSection}>
-            <Estacoes status={monitor} moduleStatus={moduleStatus} />
+            <Estacoes status={monitor} statusEstacoes={statusEstacoes} statusPipelines={statusPipelines} />
           </section>
 
           <OpEmCursoCard numeroOP={numeroOP} pedidoEmCurso={pedidoEmCurso} />

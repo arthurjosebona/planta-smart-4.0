@@ -1,6 +1,8 @@
-export interface ExpedicaoStreamDTO {
+import { StatusEstacao } from "@enums/StatusEstacao";
+
+export interface ExpedicaoStream {
   estacao: 'expedicao';
-  status: string;
+  status: StatusEstacao;
   numeroOP: number;
   ocupado: boolean;
   aguardando: boolean;
@@ -17,4 +19,8 @@ export interface ExpedicaoStreamDTO {
   opGuardadoExpedicao: number;
   orderExpedicao: number[];
   statusExpedicao: number;
+  recebidoOp: boolean;
+  startOP: boolean;
+  finishOP: boolean;
+  cancelOP: boolean;
 }

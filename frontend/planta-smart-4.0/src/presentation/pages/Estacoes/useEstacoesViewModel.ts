@@ -6,15 +6,10 @@ import { StatusEstacao } from '@enums/StatusEstacao';
 import { CorEstoque } from '@enums/CorEstoque';
 import type { Estoque } from '@entities/Estoque';
 import type { Expedicao } from '@entities/Expedicao';
-import type { ModuleStatus } from '@components/organisms/EstacoesSection/types';
-
-type StationKey = 'estoque' | 'processo' | 'montagem' | 'expedicao';
-
-function deriveModuleStatus(online: boolean, status: StatusEstacao | undefined): ModuleStatus {
-  if (!online) return 'off';
-  if (status === StatusEstacao.Ocupado) return 'on';
-  return 'pause';
-}
+import { useEffect, useState } from 'react';
+import { Estacao } from '@enums/Estacao';
+import { EstacaoStatusModule } from '@enums/EstacaoStatusModule';
+import { EstacaoStatusPipe } from '@enums/EstacaoStatusPipe';
 
 // Converte o vetor de cores do magazine de estoque recebido via SSE
 // (posicoesOcupadas) em entidades Estoque para exibição somente-leitura.
@@ -37,18 +32,27 @@ function mapBancadaExpedicao(orderExpedicao: number[] | undefined): Expedicao[] 
   }));
 }
 
+function useLatch(trigger: boolean | undefined, reset: boolean | undefined): boolean {
+  const [latched, setLatched] = useState(false);
+
+  // Liga o latch quando a flag de início dispara
+  useEffect(() => {
+    if (trigger) setLatched(true);
+  }, [trigger]);
+
+  // Desliga o latch quando a condição de reset ocorre
+  useEffect(() => {
+    if (reset) setLatched(false);
+  }, [reset]);
+
+  return latched;
+}
+
 export function useEstacoesViewModel() {
   const estoque = useEstoqueContext();
   const expedicao = useExpedicaoContext();
   const monitor = useMonitorContext();
   const { pingMap } = usePingContext();
-
-  const moduleStatus: Record<StationKey, ModuleStatus> = {
-    estoque:   deriveModuleStatus(pingMap.estoque,   monitor.estoque?.status),
-    processo:  deriveModuleStatus(pingMap.processo,  monitor.processo?.status),
-    montagem:  deriveModuleStatus(pingMap.montagem,  monitor.montagem?.status),
-    expedicao: deriveModuleStatus(pingMap.expedicao, monitor.expedicao?.status),
-  };
 
   function dismissErro() {
     estoque.dismissErro();
@@ -61,11 +65,33 @@ export function useEstacoesViewModel() {
     expedicao: mapBancadaExpedicao(monitor.expedicao?.orderExpedicao),
   };
 
+  const finalizadoEstoque   = useLatch(monitor.estoque?.startOP,   !monitor.estoque?.pedidoEmCurso);
+  const finalizadoProcesso  = useLatch(monitor.processo?.startOP,  !monitor.estoque?.pedidoEmCurso);
+  const finalizadoMontagem  = useLatch(monitor.montagem?.startOP,  !monitor.estoque?.pedidoEmCurso);
+  const finalizadoExpedicao = useLatch(monitor.expedicao?.startOP, !monitor.estoque?.pedidoEmCurso);
+
+  // Map para os status das estações que são manipulados pelo latch
+  const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
+    [Estacao.Estoque]: EstacaoStatusModule.Desligado,
+    [Estacao.Processo]: EstacaoStatusModule.Desligado,
+    [Estacao.Montagem]: EstacaoStatusModule.Desligado,
+    [Estacao.Expedicao]: EstacaoStatusModule.Desligado
+  }
+
+  const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
+    [Estacao.Estoque]: EstacaoStatusPipe.Desligado,
+    [Estacao.Processo]: EstacaoStatusPipe.Desligado,
+    [Estacao.Montagem]: EstacaoStatusPipe.Desligado,
+    [Estacao.Expedicao]: EstacaoStatusPipe.Desligado
+  }
+
+
   return {
     estoque,
     expedicao,
     monitor,
-    moduleStatus,
+    statusEstacoes,
+    statusPipelines,
     bancada,
     erro: estoque.erro ?? expedicao.erro,
     dismissErro,
