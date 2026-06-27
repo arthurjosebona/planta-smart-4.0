@@ -13,6 +13,7 @@ export default function PedidosView() {
     deletarPedido,
     dismissErro,
     setStatusPedidoFiltro,
+    conectado,
   } = usePedidosViewModel();
 
   return (
@@ -32,6 +33,7 @@ export default function PedidosView() {
           onFiltroStatus={setStatusPedidoFiltro}
           iniciarProducao={iniciarProducao}
           deletarPedido={deletarPedido}
+          conectado={conectado}
         />
       </main>
     </AppTemplate>

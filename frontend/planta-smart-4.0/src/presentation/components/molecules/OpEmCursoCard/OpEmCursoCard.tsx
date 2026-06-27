@@ -90,6 +90,7 @@ export function OpEmCursoCard({ numeroOP, pedidoEmCurso }: OpEmCursoCardProps) {
             setPedidoSelecionado(null);
           }}
           onClose={() => setPedidoSelecionado(null)}
+          conectado={false} // passa false pq não será possível mandar em produção se já está em produção
         />
       )}
     </>

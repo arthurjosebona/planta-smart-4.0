@@ -12,9 +12,10 @@ interface PedidoModalProps {
   iniciarProducao: (id: number) => void;
   deletarPedido: (id: number) => void;
   onClose: () => void;
+  conectado: boolean;
 }
 
-export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose }: PedidoModalProps) {
+export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose, conectado }: PedidoModalProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -34,6 +35,7 @@ export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose }:
               ordemDeProducao={pedido.ordemDeProducao}
               status={pedido.status}
               iniciarProducao={iniciarProducao}
+              conectado={conectado}
             />
 
             <hr className={styles.divider} />

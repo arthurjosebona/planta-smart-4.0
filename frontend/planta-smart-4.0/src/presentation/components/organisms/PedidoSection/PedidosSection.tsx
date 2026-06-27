@@ -12,6 +12,7 @@ interface PedidosSectionProps {
   onFiltroStatus: (tipo: StatusPedido | null) => void;
   iniciarProducao: (id: number) => void;
   deletarPedido: (id: number) => void;
+  conectado: boolean;
 }
 
 function capitalize(str: string): string {
@@ -30,6 +31,7 @@ export function PedidosSection({
   onFiltroStatus,
   iniciarProducao,
   deletarPedido,
+  conectado,
 }: PedidosSectionProps) {
   const [pedidoSelecionadoId, setPedidoSelecionadoId] = useState<number | null>(null);
   const pedidoSelecionado = pedidos.find((p) => p.id === pedidoSelecionadoId) ?? null;
@@ -81,6 +83,7 @@ export function PedidosSection({
             setPedidoSelecionadoId(null);
           }}
           onClose={() => setPedidoSelecionadoId(null)}
+          conectado={conectado}
         />
       )}
     </section>
