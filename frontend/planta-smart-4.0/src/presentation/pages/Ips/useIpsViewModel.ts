@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StoreModel, StoreModelInitial } from '@pages/Ips/IpsModel';
 import { conexaoService } from '@config/diContainer';
+import { useStatusContext } from '@contexts/StatusContext';
 
 export function useIpsViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
@@ -71,7 +72,6 @@ export function useIpsViewModel() {
         setModel((s) => ({
           ...s,
           loading: false,
-          conectado: true,
           erro: null,
           sucesso: 'Conexão estabelecida e streams da bancada iniciados.',
         }));
@@ -82,7 +82,6 @@ export function useIpsViewModel() {
         setModel((s) => ({
           ...s,
           loading: false,
-          conectado: false,
           sucesso: null,
           erro: `Falha ao conectar nas estações: ${falhas.join(', ')}. Verifique a rede e os IPs.`,
         }));
@@ -91,7 +90,6 @@ export function useIpsViewModel() {
       setModel((s) => ({
         ...s,
         loading: false,
-        conectado: false,
         erro: 'Falha ao conectar. Verifique a rede e tente novamente.',
       }));
     }

@@ -14,6 +14,11 @@ export class ConexaoService {
     this.repository = repository;
   }
 
+  getConectado = (): boolean => {
+    return this.conectado;
+  };
+
+
   /**
    * Grava os IPs configurados no backend (PUT /api/config/clp/ips).
    * NÃO define o status de conectado: persistir IPs não abre conexão com os CLPs.
@@ -44,11 +49,6 @@ export class ConexaoService {
       throw error;
     }
   }
-
-  /** Snapshot atual do status — usado pelo useSyncExternalStore. */
-  getSnapshot = (): boolean => {
-    return this.conectado;
-  };
 
   /** Inscreve um listener para mudanças de status; retorna a função de unsubscribe. */
   subscribe = (listener: Listener): (() => void) => {

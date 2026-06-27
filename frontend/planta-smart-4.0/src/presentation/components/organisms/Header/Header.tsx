@@ -6,7 +6,7 @@ import { NavSeparator } from '@components/atoms/NavSeparator/NavSeparator';
 import { HamburgerButton } from '@components/atoms/HamburgerButton/HamburgerButton';
 import { StatusIndicator } from '@components/atoms/StatusIndicator/StatusIndicator';
 import styles from '@components/organisms/Header/header.module.css';
-import { useConexaoStatus } from '../../../hook/useConexaoStatus';
+import { useStatusContext } from '@contexts/StatusContext';
 
 const IconHome = (  
   <>
@@ -72,7 +72,7 @@ const NAV_ITEMS: (NavItem | 'separator')[] = [
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
-  const conectado = useConexaoStatus();
+  const { conectado } = useStatusContext();
   const navRef = useRef<HTMLElement>(null);
   const btnWrapRef = useRef<HTMLDivElement>(null);
 
