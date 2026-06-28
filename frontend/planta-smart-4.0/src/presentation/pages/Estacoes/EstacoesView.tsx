@@ -8,17 +8,11 @@ import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard
 import { useEstacoesViewModel } from './useEstacoesViewModel';
 
 export default function EstacoesView() {
-  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro } = useEstacoesViewModel();
+  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro, pedidoAtual, tempoDecorrido } = useEstacoesViewModel();
 
   const numeroOP = monitor.estoque?.numeroOP ?? 0;
   const statusProducao = monitor.estoque?.statusProducao ?? 0;
 
-  // "Pedido em curso" = há uma OP carregada na bancada que ainda não foi concluída.
-  // Não usamos a flag pedidoEmCurso do CLP porque o backend só a seta para true
-  // (em EstoqueComm.confirmarInicioPedido) e nunca a reseta. Em vez disso, derivamos
-  // pela OP corrente (numeroOP > 0) enquanto a produção não foi finalizada na expedição
-  // (statusProducao vira 1 ao concluir e volta a 0 no início da próxima ordem).
-  const pedidoEmCurso = numeroOP > 0 && statusProducao !== 1;
 
   return (
     <AppTemplate>
@@ -37,7 +31,7 @@ export default function EstacoesView() {
             <Estacoes status={monitor} statusEstacoes={statusEstacoes} statusPipelines={statusPipelines} />
           </section>
 
-          <OpEmCursoCard numeroOP={numeroOP} pedidoEmCurso={pedidoEmCurso} />
+          <OpEmCursoCard pedido={pedidoAtual} pedidoEmCurso={!!monitor.estoque?.pedidoEmCurso} tempoDecorrido={tempoDecorrido} />
 
           <div className={styles.inferiorEstoques}>
             <section className={styles.painel}>

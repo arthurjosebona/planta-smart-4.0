@@ -15,4 +15,5 @@ export interface Pedido {
   registroCriacao: string | null;
   registroEntradaExpedicao: string | null;
   registroSaidaExpedicao: string | null;
+  registroEntradaEstoque: string | null;
 }

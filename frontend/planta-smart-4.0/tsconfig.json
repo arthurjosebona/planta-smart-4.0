@@ -25,6 +25,7 @@
       "@utils/*": ["./src/presentation/utils/*"],
       "@mappers/*": ["./src/infrastructure/mappers/*"],
       "@contexts/*": ["./src/contexts/*"],
+      "@hooks/*": ["./src/utils/hooks/*"],
     }
   },
   "include": ["src", "src/vite-env.d.ts"],

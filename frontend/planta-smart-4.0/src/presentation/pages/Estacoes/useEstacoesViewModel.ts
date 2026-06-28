@@ -6,10 +6,13 @@ import { StatusEstacao } from '@enums/StatusEstacao';
 import { CorEstoque } from '@enums/CorEstoque';
 import type { Estoque } from '@entities/Estoque';
 import type { Expedicao } from '@entities/Expedicao';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Estacao } from '@enums/Estacao';
 import { EstacaoStatusModule } from '@enums/EstacaoStatusModule';
 import { EstacaoStatusPipe } from '@enums/EstacaoStatusPipe';
+import { Pedido } from '@entities/Pedido';
+import { pedidoService } from '@config/diContainer';
+import { useTempoDecorrido } from '@hooks/useTempoDecorrido';
 
 // Converte o vetor de cores do magazine de estoque recebido via SSE
 // (posicoesOcupadas) em entidades Estoque para exibição somente-leitura.
@@ -48,11 +51,43 @@ function useLatch(trigger: boolean | undefined, reset: boolean | undefined): boo
   return latched;
 }
 
+function computeOverlayStatus(
+  ligado: boolean,
+  pedidoEmCurso: boolean,
+  ocupado: boolean,
+  finalizado: boolean
+): EstacaoStatusModule {
+  if (!ligado) return EstacaoStatusModule.Desligado;
+  if (!pedidoEmCurso) return EstacaoStatusModule.Aguardando;
+  if (ocupado) return EstacaoStatusModule.Ocupado;
+  if (finalizado) return EstacaoStatusModule.Finalizado;
+  return EstacaoStatusModule.Aguardando; // fallback enquanto não ocupou nem finalizou
+}
+
+function computePipelineStatus(ligado: boolean, ocupado: boolean): EstacaoStatusPipe {
+  if (!ligado) return EstacaoStatusPipe.Desligado;
+  if (ocupado) return EstacaoStatusPipe.Ocupado;
+  return EstacaoStatusPipe.Ligado;
+}
+
 export function useEstacoesViewModel() {
   const estoque = useEstoqueContext();
   const expedicao = useExpedicaoContext();
   const monitor = useMonitorContext();
   const { pingMap } = usePingContext();
+  const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(null);
+  const ultimaOpBuscada = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!monitor.estoque?.numeroOP || monitor.estoque?.numeroOP == 0 || monitor.estoque?.numeroOP === ultimaOpBuscada.current) return;
+
+    ultimaOpBuscada.current = monitor.estoque?.numeroOP;
+
+    pedidoService.findByOrdemDeProducao(monitor.estoque?.numeroOP)
+      .then(setPedidoAtual)
+  }, [monitor.estoque?.numeroOP]);
+
+  const tempoDecorrido = useTempoDecorrido(pedidoAtual?.registroEntradaEstoque);
 
   function dismissErro() {
     estoque.dismissErro();
@@ -72,10 +107,30 @@ export function useEstacoesViewModel() {
 
   // Map para os status das estações que são manipulados pelo latch
   const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
-    [Estacao.Estoque]: EstacaoStatusModule.Desligado,
-    [Estacao.Processo]: EstacaoStatusModule.Desligado,
-    [Estacao.Montagem]: EstacaoStatusModule.Desligado,
-    [Estacao.Expedicao]: EstacaoStatusModule.Desligado
+    [Estacao.Estoque]: computeOverlayStatus(
+      !!pingMap[Estacao.Estoque],
+      !!monitor.estoque?.pedidoEmCurso,
+      !!monitor.estoque?.ocupado,
+      finalizadoEstoque
+    ),
+    [Estacao.Processo]: computeOverlayStatus(
+      !!pingMap[Estacao.Processo],
+      !!monitor.estoque?.pedidoEmCurso,
+      !!monitor.processo?.ocupado,
+      finalizadoProcesso
+    ),
+    [Estacao.Montagem]: computeOverlayStatus(
+      !!pingMap[Estacao.Montagem],
+      !!monitor.estoque?.pedidoEmCurso,
+      !!monitor.montagem?.ocupado,
+      finalizadoMontagem
+    ),
+    [Estacao.Expedicao]: computeOverlayStatus(
+      !!pingMap[Estacao.Processo],
+      !!monitor.estoque?.pedidoEmCurso,
+      !!monitor.expedicao?.ocupado,
+      finalizadoExpedicao
+    ),
   }
 
   const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
@@ -95,5 +150,7 @@ export function useEstacoesViewModel() {
     bancada,
     erro: estoque.erro ?? expedicao.erro,
     dismissErro,
+    pedidoAtual,
+    tempoDecorrido,
   };
 }
