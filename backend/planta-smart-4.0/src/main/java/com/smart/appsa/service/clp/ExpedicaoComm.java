@@ -80,6 +80,7 @@ public class ExpedicaoComm implements PlcDataObserver {
         resetarRecebidoExpedicao(plcConnectorExp);
         adicionarOpNaExpedicao(plcConnectorExp);
         removerOpDaExpedicao(plcConnectorExp);
+        verifyOpAntiga();
         marcarOperacaoFinalizada();
         // concluirPedido();
         handleEstoqueGuardado();
@@ -313,6 +314,14 @@ public class ExpedicaoComm implements PlcDataObserver {
             }
         }
     }
+
+
+    private void verifyOpAntiga() {
+        if (!appStateConfig.isPedidoEmCurso() && expedicaoInfoClp.getOpGuardadoExpedicao() != opAntiga) {
+            opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
+        }
+    }
+
 
     // posicaoGuardadoExpedicao == posicaoGuardarExp & ocupado == false & finishOP == true:
     // a operação foi guardada na posição correta com a estação livre. Marca
