@@ -27,6 +27,9 @@ public class PedidoMapper {
             .registroEntradaExpedicao(pedido.getRegistroEntradaExpedicao())
             .registroSaidaExpedicao(pedido.getRegistroSaidaExpedicao())
             .expedicao(pedido.getExpedicao())
+            .registroEntradaEstoque(pedido.getRegistroEntradaEstoque())
+            .registroEntradaProcesso(pedido.getRegistroEntradaProcesso())
+            .registroEntradaMontagem(pedido.getRegistroEntradaMontagem())
             .build();
     }
 

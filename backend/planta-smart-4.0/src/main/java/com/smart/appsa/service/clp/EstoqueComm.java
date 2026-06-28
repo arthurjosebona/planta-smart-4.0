@@ -125,7 +125,7 @@ public class EstoqueComm implements PlcDataObserver {
             System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
-            pedidoService.handleEntradaExpedicao(estoqueInfoClp.getNumeroOP());
+            pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_INICIAR_PEDIDO, BIT_INICIAR_PEDIDO, false);

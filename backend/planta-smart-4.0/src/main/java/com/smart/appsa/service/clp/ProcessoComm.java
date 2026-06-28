@@ -6,6 +6,7 @@ import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.clp.ProcessoInfo;
+import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
@@ -32,6 +33,7 @@ public class ProcessoComm implements PlcDataObserver {
     private PlcConnectionService plcConnectionService;
     private ProcessoInfo processoInfo;
     private AppStateConfig appStateConfig;
+    private PedidoService pedidoService;
 
     @Override
     public void onData(String ip, byte[] data) {
@@ -89,6 +91,8 @@ public class ProcessoComm implements PlcDataObserver {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusProcesso((byte) 1);
             }
+
+            pedidoService.handleEntradaProcesso(processoInfo.getNumeroOP());
 
             if (!appStateConfig.isReadOnly()) {
                 try {

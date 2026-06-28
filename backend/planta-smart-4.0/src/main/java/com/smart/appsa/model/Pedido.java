@@ -1,6 +1,5 @@
 package com.smart.appsa.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,6 +56,10 @@ public class Pedido {
     private LocalDateTime registroSaidaExpedicao;
     @Column(name = "rg_entrada_estoque")
     private LocalDateTime registroEntradaEstoque;
+    @Column(name = "rg_entrada_processo")
+    private LocalDateTime registroEntradaProcesso;
+    @Column(name = "rg_entrada_montagem")
+    private LocalDateTime registroEntradaMontagem;
     @ManyToOne
     @JoinColumn(
         name = "id_expedicao",
