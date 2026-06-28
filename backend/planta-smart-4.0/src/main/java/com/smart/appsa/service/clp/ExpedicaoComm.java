@@ -81,7 +81,7 @@ public class ExpedicaoComm implements PlcDataObserver {
         adicionarOpNaExpedicao(plcConnectorExp);
         removerOpDaExpedicao(plcConnectorExp);
         marcarOperacaoFinalizada();
-        concluirPedido();
+        // concluirPedido();
         handleEstoqueGuardado();
     }
 

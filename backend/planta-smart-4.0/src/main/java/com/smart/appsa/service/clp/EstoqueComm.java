@@ -9,6 +9,7 @@ import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.service.EstoqueService;
+import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
@@ -48,6 +49,7 @@ public class EstoqueComm implements PlcDataObserver {
     private EstoqueInfoClp estoqueInfoClp;
     private AppStateConfig appStateConfig;
     private EstoqueService estoqueService;
+    private PedidoService pedidoService;
 
     @Override
     public void onData(String ip, byte[] data) {
@@ -123,6 +125,7 @@ public class EstoqueComm implements PlcDataObserver {
             System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
+            pedidoService.handleEntradaExpedicao(estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_INICIAR_PEDIDO, BIT_INICIAR_PEDIDO, false);

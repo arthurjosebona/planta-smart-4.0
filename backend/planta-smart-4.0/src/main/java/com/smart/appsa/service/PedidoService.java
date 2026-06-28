@@ -247,13 +247,23 @@ public class PedidoService {
         return pedidoRepository.findByExpedicaoId(idExpedicao).stream().map(p -> PedidoMapper.mapDto(p)).toList();
     }
 
+    @Transactional
     public void handleExitExpedicao(Pedido pedido) {
         pedido.setRegistroSaidaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
 
+    @Transactional
     public void updateToConcluido(Pedido pedido) {
         pedido.setStatus(StatusPedido.CONCLUIDO);
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void handleEntradaExpedicao(Integer op) {
+        Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
+        pedido.setRegistroEntradaEstoque(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
 
