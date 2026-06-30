@@ -83,7 +83,7 @@ public class ExpedicaoComm implements PlcDataObserver {
         verifyOpAntiga();
         marcarOperacaoFinalizada();
         // concluirPedido();
-        handleEstoqueGuardado();
+        handleExpedicaoGuardado();
     }
 
     // Mapeia o bloco bruto do CLP EXPEDIÇÃO para o {@link ExpedicaoInfoClp}.
@@ -144,6 +144,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusExpedicao((byte) 1);
             }
+            pedidoService.handleEntradaExpedicao(appStateConfig.getOrdemDeProducaoEmProducao);
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
@@ -294,17 +295,21 @@ public class ExpedicaoComm implements PlcDataObserver {
                 if (expedicaoInfoClp.getPosicaoRemovidoExpedicao() > 0) {
                     int offset = OFFSET_MAGAZINE + (expedicaoInfoClp.getPosicaoRemovidoExpedicao() - 1) * 2;
                     try {
+                        // A flag removerExpedicao permanece TRUE por vários ciclos de leitura, mas
+                        // aux_expedicao é compartilhada e pode ser resetada por gerenciarPosicaoGuardar.
+                        // Se a ordem da posição já foi zerada em um ciclo anterior, não há nada a remover:
+                        // evita findByOp(0) -> ResourceNotFoundException.
+                        int ordemAtual = expedicaoService.findByPosicaoFisica(
+                            expedicaoInfoClp.getPosicaoRemovidoExpedicao()
+                        ).getOrdemDeProducaoAtual();
+
+                        if (ordemAtual <= 0) {
+                            return;
+                        }
+
                         plcConnectorExp.writeInt(DB_EXPEDICAO, offset, 0);
 
-                        Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
-                            pedidoService.findByOp(
-                                expedicaoService.findByPosicaoFisica(
-                                    expedicaoInfoClp.getPosicaoRemovidoExpedicao()
-                                ).getOrdemDeProducaoAtual()
-                            )
-                        );
-
-                        pedidoService.handleExitExpedicao(expedido);
+                        pedidoService.handleExitExpedicao(ordemAtual);
                         expedicaoService.assignOrdemAtPosicao(expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
                     } catch (Exception e) {
                         System.out.println("ERRO: Na tentativa de remover da Expedição");
@@ -342,7 +347,7 @@ public class ExpedicaoComm implements PlcDataObserver {
     // Operação que consegue ser executada de acordo com as flags que são
     // lidas, utilizada para finalizar o pedido que está rolando, e escrever 
     // na expedição somente quando o pedido foi guardado realmente
-    private void handleEstoqueGuardado() {
+    private void handleExpedicaoGuardado() {
         if (expedicaoInfoClp.getOpGuardadoExpedicao() <= 0) {
             return;
         }
@@ -353,7 +358,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             return;
         }
         int opAtual = expedicaoInfoClp.getNumeroOP();
-        System.out.printf("\n\n\nPASSOU DAS VERIFICAÇÕES INICIAIS DE handleEstoqueGuardado, OP: " + opAtual + "\n\n\n\n");
+        System.out.printf("\n\n\nPASSOU DAS VERIFICAÇÕES INICIAIS DE handleExpedicaoGuardado, OP: " + opAtual + "\n\n\n\n");
         if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAtual) {
             System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
             System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");

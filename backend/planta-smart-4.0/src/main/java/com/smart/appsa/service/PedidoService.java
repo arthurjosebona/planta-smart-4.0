@@ -249,7 +249,10 @@ public class PedidoService {
     }
 
     @Transactional
-    public void handleExitExpedicao(Pedido pedido) {
+    public void handleExitExpedicao(Integer op) {
+        Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
+        if (pedido.getRegistroSaidaExpedicao() != null) return;
         pedido.setRegistroSaidaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
@@ -284,6 +287,15 @@ public class PedidoService {
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
         if (pedido.getRegistroEntradaMontagem() != null) return;
         pedido.setRegistroEntradaMontagem(LocalDateTime.now());
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void handleEntradaExpedicao(Integer op) {
+        Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
+        if (pedido.getRegistroEntradaExpedicao() != null) return;
+        pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
 
