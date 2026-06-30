@@ -7,9 +7,7 @@ import jakarta.persistence.EnumeratedValue;
 public enum StatusEstacao {
     PARADO(0),
     OCUPADO(1),
-    AGUARDANDO(2),
-    MANUAL(3),
-    EMERGENCIA(4);
+    AGUARDANDO(2);
 
     @EnumeratedValue
     int value;

@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { MonitorModel, MonitorModelInitial } from '@pages/Monitor/MonitorModel';
-import { EstoqueStreamDTO } from '@dtos/response/EstoqueStreamDTO';
-import { ProcessoMontagemStreamDTO } from '@dtos/response/ProcessoMontagemStreamDTO';
-import { ExpedicaoStreamDTO } from '@dtos/response/ExpedicaoStreamDTO';
+import { EstoqueStreamDTO } from '@dtos/response/stream/EstoqueStreamDTO';
+import { ProcessoMontagemStreamDTO } from '@dtos/response/stream/ProcessoMontagemStreamDTO';
+import { ExpedicaoStreamDTO } from '@dtos/response/stream/ExpedicaoStreamDTO';
 import { EstacaoStreamMapper } from '@mappers/EstacaoStreamMapper';
 
-const SSE_URL = import.meta.env.VITE_SSE_URL ?? 'http://localhost:8088/api/smart/stream';
+const SSE_URL = 'http://localhost:8088/api/smart/stream';
 
 type MonitorContextValue = MonitorModel;
 
@@ -49,7 +49,7 @@ export function MonitorProvider({ children }: { children: ReactNode }) {
 
     source.addEventListener('expedicao', (e) => {
       try {
-        const dto = JSON.parse((e as MessageEvent).data) as ExpedicaoStreamDTO;
+        const dto = JSON.parse((e as MessageEvent).data) as ExpedicaoStreamDTO  ;
         setState((s) => ({ ...s, expedicao: EstacaoStreamMapper.mapExpedicaoByDTO(dto) }));
       } catch (err) {
         console.error('Erro ao parsear evento expedicao:', err);

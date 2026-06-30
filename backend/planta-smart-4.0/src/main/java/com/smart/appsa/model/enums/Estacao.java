@@ -2,10 +2,8 @@ package com.smart.appsa.model.enums;
 
 import java.util.Optional;
 
-/**
- * Estações da planta que possuem um CLP dedicado.
- * O {@code nome} corresponde à chave recebida no payload de {@code /start-readings}.
- */
+// Estações da planta que possuem um CLP dedicado.
+// O {@code nome} corresponde à chave recebida no payload de {@code /start-readings}.
 public enum Estacao {
     ESTOQUE("estoque"),
     PROCESSO("processo"),

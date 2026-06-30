@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StoreModel, StoreModelInitial } from '@pages/Ips/IpsModel';
 import { conexaoService } from '@config/diContainer';
+import { useStatusContext } from '@contexts/StatusContext';
 
 export function useIpsViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
@@ -64,18 +65,31 @@ export function useIpsViewModel() {
       // 1) Aplica os IPs configurados nos CLPs.
       await conexaoService.conectar(model.modulos);
       // 2) Inicia as leituras dos CLPs, que passam a alimentar os streams da bancada.
-      await conexaoService.iniciarLeituras(model.modulos);
-      setModel((s) => ({
-        ...s,
-        loading: false,
-        conectado: true,
-        sucesso: 'Conexão estabelecida e streams da bancada iniciados.',
-      }));
+      //    O resultado informa quais estações realmente conectaram.
+      const resultado = await conexaoService.iniciarLeituras(model.modulos);
+
+      if (resultado.todasConectadas) {
+        setModel((s) => ({
+          ...s,
+          loading: false,
+          erro: null,
+          sucesso: 'Conexão estabelecida e streams da bancada iniciados.',
+        }));
+      } else {
+        const falhas = Object.entries(resultado.resultados)
+          .filter(([, ok]) => !ok)
+          .map(([nome]) => nome);
+        setModel((s) => ({
+          ...s,
+          loading: false,
+          sucesso: null,
+          erro: `Falha ao conectar nas estações: ${falhas.join(', ')}. Verifique a rede e os IPs.`,
+        }));
+      }
     } catch {
       setModel((s) => ({
         ...s,
         loading: false,
-        conectado: false,
         erro: 'Falha ao conectar. Verifique a rede e tente novamente.',
       }));
     }

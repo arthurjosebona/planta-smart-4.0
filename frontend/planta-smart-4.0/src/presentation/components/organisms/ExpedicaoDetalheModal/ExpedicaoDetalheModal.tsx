@@ -127,6 +127,7 @@ export function ExpedicaoDetalheModal({
           iniciarProducao={iniciarProducao}
           deletarPedido={deletarPedido}
           onClose={() => setPedidoSelecionadoId(null)}
+          conectado={false} // Se já está na expedição já foi concluído, então não irá para produção
         />
       )}
     </>

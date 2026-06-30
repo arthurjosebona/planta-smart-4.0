@@ -29,6 +29,7 @@ export const PedidoMapper = {
       registroSaidaExpedicao: null,
       blocos: [],
       expedicao: dto.expedicao,
+      registroEntradaEstoque: null,
     };
   },
 
@@ -44,6 +45,7 @@ export const PedidoMapper = {
       registroCriacao: dto.registroCriacao,
       registroEntradaExpedicao: dto.registroEntradaExpedicao,
       registroSaidaExpedicao: dto.registroSaidaExpedicao,
+      registroEntradaEstoque: dto.registroEntradaEstoque,
     };
   },
 

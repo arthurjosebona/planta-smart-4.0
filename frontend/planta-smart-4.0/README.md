@@ -165,11 +165,9 @@ O estado compartilhado é provido por Contexts compostos em `App.tsx`:
 
 ## ⚙️ Pré-requisitos
 
-- **Node.js 22.x** (versão exigida em `engines` no `package.json`)
-- **npm**
-- Backend em execução, com:
-  - API REST em `http://localhost:8080`
-  - Stream SSE em `http://localhost:8088/api/smart/stream` (configurável)
+- **Node.js 22.x** (versão exigida no `package.json`)
+- **npm** ou **yarn**
+- Backend em execução em `http://localhost:8088`
 
 ---
 

@@ -1,6 +1,8 @@
-export interface EstoqueStreamDTO {
+import { StatusEstacao } from "@enums/StatusEstacao";
+
+export interface EstoqueStream {
   estacao: 'estoque';
-  status: string;
+  status: StatusEstacao;
   numeroOP: number;
   ocupado: boolean;
   aguardando: boolean;
@@ -23,4 +25,8 @@ export interface EstoqueStreamDTO {
   statusExpedicao: number;
   statusProducao: number;
   pedidoEmCurso: boolean;
+  recebidoOp: boolean;
+  startOP: boolean;
+  finishOP: boolean;
+  cancelOP: boolean;
 }

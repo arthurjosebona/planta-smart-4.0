@@ -3,7 +3,6 @@ import { ModuloIP } from '@entities/ModuloIP';
   export interface StoreModel {
     modulos: ModuloIP[];
     faixa: string;
-    conectado: boolean;
     readOnly: boolean;
     loading: boolean;
     erro: string | null;
@@ -18,7 +17,6 @@ import { ModuloIP } from '@entities/ModuloIP';
       { key: 'expedicao', label: 'Expedição', ip: '10.74.241.40' },
     ],
     faixa: '10.74.241.0',
-    conectado: false,
     readOnly: false,
     loading: false,
     erro: null,

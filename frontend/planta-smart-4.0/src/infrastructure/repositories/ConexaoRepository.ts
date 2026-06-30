@@ -3,6 +3,7 @@ import { IConexaoRepository } from '@repositories/IConexaoRepository';
 import { ModuloIP } from '@entities/ModuloIP';
 import { ClpPingResponseDTO } from '@dtos/response/ClpPingResponseDTO';
 import { ClpReadOnlyResponseDTO } from '@dtos/response/ClpReadOnlyResponseDTO';
+import { StartReadingsResponseDTO } from '@dtos/response/StartReadingsResponseDTO';
 import { ConexaoMapper } from '../mappers/ConexaoMapper';
 
 export class ConexaoRepository implements IConexaoRepository {
@@ -17,11 +18,12 @@ export class ConexaoRepository implements IConexaoRepository {
     await this.httpClient.put<void>('/api/config/clp/ips', body);
   }
 
-  async iniciarLeituras(modulos: ModuloIP[]): Promise<void> {
+  async iniciarLeituras(modulos: ModuloIP[]): Promise<StartReadingsResponseDTO> {
     // Rota: POST /api/smart/start-readings — inicia o loop de leitura dos CLPs,
     // alimentando os streams SSE da bancada. Body: { estoque, processo, montagem, expedicao }.
+    // Responde com o resultado real da conexão por estação (ver StartReadingsResponseDTO).
     const body = ConexaoMapper.mapToIpsMap(modulos);
-    await this.httpClient.post<void>('/api/smart/start-readings', body);
+    return this.httpClient.post<StartReadingsResponseDTO>('/api/smart/start-readings', body);
   }
 
   async pingAll(): Promise<ClpPingResponseDTO[]> {

@@ -18,16 +18,14 @@ import com.smart.appsa.model.clp.MontagemInfo;
 import com.smart.appsa.model.clp.ProcessoInfo;
 import com.smart.appsa.model.enums.Estacao;
 
-/**
- * Camada SSE no padrão Observer. É notificada (via {@link #publicar(Estacao)}) ao final de
- * cada ciclo de leitura de um CLP, monta o DTO da estação e <b>só emite quando o conteúdo
- * mudou</b> em relação ao último ciclo. Uma única conexão pode receber eventos de várias
- * estações (multiplexação): cada evento é nomeado pelo {@code nome} da estação.
- */
+// Camada SSE no padrão Observer. É notificada (via {@link #publicar(Estacao)}) ao final de
+// cada ciclo de leitura de um CLP, monta o DTO da estação e <b>só emite quando o conteúdo
+// mudou</b> em relação ao último ciclo. Uma única conexão pode receber eventos de várias
+// estações (multiplexação): cada evento é nomeado pelo {@code nome} da estação.
 @Service
 public class SseService {
 
-    /** Um assinante e o conjunto de estações que ele quer receber. */
+    // Um assinante e o conjunto de estações que ele quer receber.
     private record Subscriber(SseEmitter emitter, Set<Estacao> estacoes) {
     }
 
@@ -67,10 +65,8 @@ public class SseService {
         return emitter;
     }
 
-    /**
-     * Notifica a chegada de novos dados de uma estação. Monta o DTO e só propaga aos
-     * assinantes se ele difere do último emitido para essa estação.
-     */
+    // Notifica a chegada de novos dados de uma estação. Monta o DTO e só propaga aos
+    // assinantes se ele difere do último emitido para essa estação.
     public void publicar(Estacao estacao) {
         Object novo = build(estacao);
         Object anterior = ultimoDto.put(estacao, novo);

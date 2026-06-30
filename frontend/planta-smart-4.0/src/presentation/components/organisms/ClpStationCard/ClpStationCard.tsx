@@ -1,18 +1,15 @@
-import type {
-  EstoqueStreamDTO,
-  ProcessoMontagemStreamDTO,
-  ExpedicaoStreamDTO,
-  ClpStreamDTO,
-} from '@entities/ClpStream';
 import { ClpStatusChip } from '@components/atoms/ClpStatusChip/ClpStatusChip';
 import { ClpFlagGroup } from '@components/molecules/ClpFlagGroup/ClpFlagGroup';
 import { ClpValueField } from '@components/atoms/ClpValueField/ClpValueField';
 import styles from './clpStationCard.module.css';
+import { EstoqueStream } from '@entities/stream/EstoqueStream';
+import { ExpedicaoStream } from '@entities/stream/ExpedicaoStream';
+import { ProcessoMontagemStream } from '@entities/stream/ProcessoMontagemStream';
 
 interface ClpStationCardProps {
   label: string;
   color: string;
-  data: ClpStreamDTO | null;
+  data: EstoqueStream | ExpedicaoStream | ProcessoMontagemStream | null;
   online: boolean;
 }
 
@@ -52,6 +49,16 @@ export function ClpStationCard({ label, color, data, online }: ClpStationCardPro
             ]}
           />
 
+          <ClpFlagGroup
+            title="Ações"
+            flags={[
+              { label: 'recebidoOp', value: data.recebidoOp },
+              { label: 'startOP', value: data.startOP },
+              { label: 'finishOP', value: data.finishOP },
+              { label: 'cancelOP', value: data.cancelOP },
+            ]}
+          />
+
           {data.estacao === 'estoque' && <EstoqueFields data={data} />}
           {(data.estacao === 'processo' || data.estacao === 'montagem') && (
             <ProcessoFields data={data} />
@@ -67,7 +74,7 @@ export function ClpStationCard({ label, color, data, online }: ClpStationCardPro
   );
 }
 
-function EstoqueFields({ data }: { data: EstoqueStreamDTO }) {
+function EstoqueFields({ data }: { data: EstoqueStream }) {
   return (
     <>
       <ClpFlagGroup
@@ -98,18 +105,9 @@ function EstoqueFields({ data }: { data: EstoqueStreamDTO }) {
   );
 }
 
-function ProcessoFields({ data }: { data: ProcessoMontagemStreamDTO }) {
+function ProcessoFields({ data }: { data: ProcessoMontagemStream }) {
   return (
     <>
-      <ClpFlagGroup
-        title="Ações"
-        flags={[
-          { label: 'recebidoOp', value: data.recebidoOp },
-          { label: 'startOP', value: data.startOP },
-          { label: 'finishOP', value: data.finishOP },
-          { label: 'cancelOP', value: data.cancelOP },
-        ]}
-      />
       <div className={styles.values}>
         <ClpValueField label="statusBancada" value={data.statusBancada} />
       </div>
@@ -117,7 +115,7 @@ function ProcessoFields({ data }: { data: ProcessoMontagemStreamDTO }) {
   );
 }
 
-function ExpedicaoFields({ data }: { data: ExpedicaoStreamDTO }) {
+function ExpedicaoFields({ data }: { data: ExpedicaoStream }) {
   return (
     <>
       <ClpFlagGroup

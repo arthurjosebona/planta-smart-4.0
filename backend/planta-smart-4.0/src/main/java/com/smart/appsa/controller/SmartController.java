@@ -7,6 +7,7 @@ import java.net.SocketAddress;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
 import com.smart.appsa.dto.clp.ClpReadOnlyDTO;
 import com.smart.appsa.dto.clp.ClpStatusPingDTO;
+import com.smart.appsa.dto.clp.StartReadingsResponseDTO;
 import com.smart.appsa.model.enums.Estacao;
 import com.smart.appsa.service.clp.ClpReadingService;
 import com.smart.appsa.service.clp.PlcDataStore;
@@ -44,9 +46,19 @@ public class SmartController {
     private final SseService sseService;
 
     @PostMapping("/start-readings")
-    public ResponseEntity<String> startReadings(@RequestBody Map<String, String> ips) {
-        clpReadingService.start(ips);
-        return ResponseEntity.ok("Leituras iniciadas.");
+    public ResponseEntity<StartReadingsResponseDTO> startReadings(@RequestBody Map<String, String> ips) {
+        Map<Estacao, Boolean> resultados = clpReadingService.start(ips);
+
+        Map<String, Boolean> porNome = new LinkedHashMap<>();
+        resultados.forEach((estacao, conectado) -> porNome.put(estacao.getNome(), conectado));
+
+        boolean todasConectadas = !resultados.isEmpty()
+                && resultados.values().stream().allMatch(Boolean::booleanValue);
+
+        return ResponseEntity.ok(StartReadingsResponseDTO.builder()
+                .resultados(porNome)
+                .todasConectadas(todasConectadas)
+                .build());
     }
 
     @PostMapping("/stop-readings")
@@ -100,8 +112,23 @@ public class SmartController {
                 isClpOnline = false;
             }
 
-            System.out.println(nome + ": " + isClpOnline);
+            System.out.println(nome + "(" + ip + ")" + ": " + isClpOnline);
             statusClps.add(ClpStatusPingDTO.builder().nome(nome).ip(ip).online(isClpOnline).verifiedAt(LocalDateTime.now().toString()).build());
+        });
+        
+        clpIpConfig.getEndpoints().forEach((nome, endpoint) -> {
+            boolean isOnline = false;
+
+            try (Socket socket = new Socket()) {
+                SocketAddress address = new InetSocketAddress(endpoint.getIp(), endpoint.getPorta());
+                socket.connect(address, 2000);
+                isOnline = true;
+            } catch (IOException e) {
+                isOnline = false;
+            }
+
+            System.out.println(nome + "(" + endpoint.getIp() + ":" + endpoint.getPorta() + ")" + ": " + isOnline);
+            statusClps.add(ClpStatusPingDTO.builder().nome(nome).ip(endpoint.getIp()).online(isOnline).verifiedAt(LocalDateTime.now().toString()).build());
         });
 
         return ResponseEntity.ok(statusClps);

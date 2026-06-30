@@ -6,116 +6,116 @@ import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.clp.MontagemInfo;
+import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
 
+// Handler da estação MONTAGEM (CLP 3 / DB57).
+//
+// <p>Registrado como {@link PlcDataObserver} no {@code PlcReaderTask} da estação,
+// recebe a cada ciclo o bloco bruto lido do CLP, atualiza o {@link MontagemInfo}
+// e reage às flags de operação (start/finish/cancel), sincronizando de volta a
+// flag {@code RecebidoOP} e o status de produção em {@link AppStateConfig}.
+//
+// <p>Toda escrita no CLP é condicionada a {@code !appStateConfig.isReadOnly()}:
+// em modo somente-leitura a aplicação observa, mas nunca escreve de volta.
 @Service
 @AllArgsConstructor
 public class MontagemComm implements PlcDataObserver {
+    // Data Block da estação MONTAGEM.
+    private static final int DB_MONTAGEM = 57;
+    // Offset (byte) da palavra de StatusOP, onde fica a flag RecebidoOP no bit 0.
+    private static final int OFFSET_STATUS_OP = 0;
+    // Bit, dentro de {@link #OFFSET_STATUS_OP}, da flag RecebidoOP.
+    private static final int BIT_RECEBIDO_OP = 0;
+
     private PlcConnectionService plcConnectionService;
     private MontagemInfo montagemInfo;
     private AppStateConfig appStateConfig;
+    private PedidoService pedidoService;
 
     @Override
     public void onData(String ip, byte[] data) {
-        processData(ip, data);
+        processarLeitura(ip, data);
     }
 
-    public void processData(String ip, byte[] dadosClp3) {
-        logLeitura(dadosClp3);
-
+    // Atualiza o estado da estação a partir do bloco bruto e aplica as regras de negócio.
+    public void processarLeitura(String ip, byte[] dadosMontagem) {
         PlcConnector plcConnectorMon = plcConnectionService.getConnection(ip);
         if (plcConnectorMon == null) {
             return;
         }
 
-        lerVariaveis(dadosClp3);
+        lerVariaveis(dadosMontagem);
 
-        // Regras de negócio da estação MONTAGEM
-        tratarResetRecebidoOp(plcConnectorMon);
-        tratarStartOp(plcConnectorMon);
-        tratarFinishOp(plcConnectorMon);
+        // Encadeamento das regras de negócio da estação MONTAGEM.
+        resetarRecebidoOp(plcConnectorMon);
+        tratarInicioOperacao(plcConnectorMon);
+        tratarFimOperacao(plcConnectorMon);
     }
 
-    /** Apresentação no console da leitura bruta (em hexadecimal). */
-    private void logLeitura(byte[] dadosClp3) {
-        StringBuilder leituraClp3 = new StringBuilder();
-        for (byte b : dadosClp3) {
-            leituraClp3.append(String.format("%02X ", b));
-        }
+    // Mapeia o bloco bruto do CLP MONTAGEM para o {@link MontagemInfo}.
+    private void lerVariaveis(byte[] dadosMontagem) {
+        montagemInfo.setRecebidoOp((dadosMontagem[0] & 0x01) != 0);
+
+        montagemInfo.setNumeroOP(((dadosMontagem[2] & 0xFF) << 8) | (dadosMontagem[3] & 0xFF));
+        montagemInfo.setCancelOP((dadosMontagem[4] & 0x01) != 0);
+        montagemInfo.setFinishOP((dadosMontagem[4] & 0x02) != 0);
+        montagemInfo.setStartOP((dadosMontagem[4] & 0x04) != 0);
+
+        montagemInfo.setOcupado((dadosMontagem[6] & 0x01) != 0);
+        montagemInfo.setAguardando((dadosMontagem[6] & 0x02) != 0);
+        montagemInfo.setManual((dadosMontagem[6] & 0x04) != 0);
+        montagemInfo.setEmergencia((dadosMontagem[6] & 0x08) != 0);
     }
 
-    /** Lê as variáveis do bloco bruto do CLP MONTAGEM para {@link MontagemInfo}. */
-    private void lerVariaveis(byte[] dadosClp3) {
-        montagemInfo.setRecebidoOp((dadosClp3[0] & 0x01) != 0);
-
-        montagemInfo.setNumeroOP(((dadosClp3[2] & 0xFF) << 8) | (dadosClp3[3] & 0xFF));
-        montagemInfo.setCancelOP((dadosClp3[4] & 0x01) != 0);
-        montagemInfo.setFinishOP((dadosClp3[4] & 0x02) != 0);
-        montagemInfo.setStartOP((dadosClp3[4] & 0x04) != 0);
-
-        montagemInfo.setOcupado((dadosClp3[6] & 0x01) != 0);
-        montagemInfo.setAguardando((dadosClp3[6] & 0x02) != 0);
-        montagemInfo.setManual((dadosClp3[6] & 0x04) != 0);
-        montagemInfo.setEmergencia((dadosClp3[6] & 0x08) != 0);
-    }
-
-    /**
-     * StartOPMon, FinishOPMon e CancelOPMon todas em FALSE:
-     * baixa a flag RecebidoOPMon [DB57:0.0] para FALSE.
-     */
-    private void tratarResetRecebidoOp(PlcConnector plcConnectorMon) {
-        if (montagemInfo.isStartOP() == false && montagemInfo.isFinishOP() == false && montagemInfo.isCancelOP() == false) {
-            if (appStateConfig.isReadOnly() == false) {
+    // Nenhuma operação em andamento (start, finish e cancel todas em FALSE):
+    // baixa a flag RecebidoOP para FALSE, deixando a estação pronta para a próxima OP.
+    private void resetarRecebidoOp(PlcConnector plcConnectorMon) {
+        if (!montagemInfo.isStartOP() && !montagemInfo.isFinishOP() && !montagemInfo.isCancelOP()) {
+            if (!appStateConfig.isReadOnly()) {
                 try {
-                    plcConnectorMon.writeBit(57, 0, 0, Boolean.parseBoolean("FALSE")); // coloca RecebidoOPMon em FALSE
+                    plcConnectorMon.writeBit(DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, false);
                 } catch (Exception ex) {
                 }
             }
         }
     }
 
-    /**
-     * startOP == true & recebidoOp == false:
-     * MONTAGEM sinalizou o início da operação -> statusMontagem = 1 (se há pedido em curso)
-     * e sobe a flag RecebidoOPMon [DB57:0.0] para TRUE.
-     */
-    private void tratarStartOp(PlcConnector plcConnectorMon) {
-        if (montagemInfo.isStartOP() == true && montagemInfo.isRecebidoOp() == false) {
-            if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+    // Início da operação (startOP == true e recebidoOp == false):
+    // marca statusMontagem = 1 (se há pedido em curso) e confirma a recepção da OP
+    // subindo a flag RecebidoOP para TRUE.
+    private void tratarInicioOperacao(PlcConnector plcConnectorMon) {
+        if (montagemInfo.isStartOP() && !montagemInfo.isRecebidoOp()) {
+            if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusMontagem((byte) 1);
-            } else {
-                //statusMontagem = 0;
             }
 
-            // updateDisplayStation();
-            if (appStateConfig.isReadOnly() == false) {
+            pedidoService.handleEntradaMontagem(montagemInfo.getNumeroOP());
+            
+            if (!appStateConfig.isReadOnly()) {
                 try {
-                    plcConnectorMon.writeBit(57, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPMon em TRUE
+                    plcConnectorMon.writeBit(DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception ex) {
                 }
             }
         }
     }
 
-    /**
-     * finishOP == true & recebidoOp == false:
-     * MONTAGEM sinalizou o término da operação -> sobe a flag RecebidoOPMon [DB57:0.0]
-     * para TRUE e marca statusMontagem = 2 (se há pedido em curso).
-     */
-    private void tratarFinishOp(PlcConnector plcConnectorMon) {
-        if (montagemInfo.isFinishOP() == true && montagemInfo.isRecebidoOp() == false) {
-            if (appStateConfig.isReadOnly() == false) {
+    // Fim da operação (finishOP == true e recebidoOp == false):
+    // confirma a recepção subindo RecebidoOP para TRUE e marca statusMontagem = 2
+    // (se há pedido em curso).
+    private void tratarFimOperacao(PlcConnector plcConnectorMon) {
+        if (montagemInfo.isFinishOP() && !montagemInfo.isRecebidoOp()) {
+            if (!appStateConfig.isReadOnly()) {
                 try {
-                    plcConnectorMon.writeBit(57, 0, 0, Boolean.parseBoolean("TRUE")); // coloca RecebidoOPMon em TRUE
+                    plcConnectorMon.writeBit(DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
                     e.printStackTrace();
-                } // RecebidoOPMon
-                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso() == true) {
+                }
+                if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                     appStateConfig.setStatusMontagem((byte) 2);
-                } else {
-                    //statusMontagem = 0;
                 }
             }
         }

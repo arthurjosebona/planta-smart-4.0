@@ -1,7 +1,9 @@
-import { EstoqueStreamDTO } from '@dtos/response/EstoqueStreamDTO';
-import { ExpedicaoStreamDTO } from '@dtos/response/ExpedicaoStreamDTO';
-import { ProcessoMontagemStreamDTO } from '@dtos/response/ProcessoMontagemStreamDTO';
-import { EstoqueStream, ExpedicaoStream, ProcessoMontagemStream } from '@entities/EstacaoStream';
+import { EstoqueStreamDTO } from '@dtos/response/stream/EstoqueStreamDTO';
+import { ExpedicaoStreamDTO } from '@dtos/response/stream/ExpedicaoStreamDTO';
+import { ProcessoMontagemStreamDTO } from '@dtos/response/stream/ProcessoMontagemStreamDTO';
+import { EstoqueStream } from '@entities/stream/EstoqueStream';
+import { ExpedicaoStream } from '@entities/stream/ExpedicaoStream';
+import { ProcessoMontagemStream } from '@entities/stream/ProcessoMontagemStream';
 import { StatusEstacao } from '@enums/StatusEstacao';
 
 export const EstacaoStreamMapper = {
