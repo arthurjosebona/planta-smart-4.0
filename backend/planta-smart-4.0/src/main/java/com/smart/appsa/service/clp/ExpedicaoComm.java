@@ -344,15 +344,12 @@ public class ExpedicaoComm implements PlcDataObserver {
     // na expedição somente quando o pedido foi guardado realmente
     private void handleEstoqueGuardado() {
         if (expedicaoInfoClp.getOpGuardadoExpedicao() <= 0) {
-            System.out.println("[handleEstoqueGuardado()] caiu no op guardado <= 0");
             return;
         }
         if (!appStateConfig.isPedidoEmCurso()) {
-            System.out.println("[handleEstoqueGuardado()] pedido em curso");
             return;
         }
         if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAntiga) {
-            System.out.println("[handleEstoqueGuardado()] caiu no op guardado == opAntiga");
             return;
         }
         int opAtual = expedicaoInfoClp.getNumeroOP();
@@ -361,8 +358,12 @@ public class ExpedicaoComm implements PlcDataObserver {
             System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
             System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");
             appStateConfig.setPedidoEmCurso(false);
-            // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
+            eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
             opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
+            pedidoService.updateToConcluido(
+                PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
+            );
+            appStateConfig.resetarStatus();
         }
     }
 

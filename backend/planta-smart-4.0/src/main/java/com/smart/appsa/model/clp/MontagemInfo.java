@@ -13,4 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MontagemInfo extends EstacaoInfoClp {
 
+    @Override
+    protected byte getStatusByte() {
+        return appStateConfig.getStatusMontagem();
+    }
 }

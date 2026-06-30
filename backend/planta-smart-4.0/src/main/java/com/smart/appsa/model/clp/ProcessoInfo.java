@@ -12,4 +12,9 @@ import lombok.NoArgsConstructor;
 @Component
 @NoArgsConstructor
 public class ProcessoInfo extends EstacaoInfoClp {
+
+    @Override
+    protected byte getStatusByte() {
+        return appStateConfig.getStatusProcesso();
+    }
 }

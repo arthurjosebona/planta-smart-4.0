@@ -8,11 +8,12 @@ import type { Estoque } from '@entities/Estoque';
 import type { Expedicao } from '@entities/Expedicao';
 import { useEffect, useRef, useState } from 'react';
 import { Estacao } from '@enums/Estacao';
-import { EstacaoStatusModule } from '@enums/EstacaoStatusModule';
+import { EstacaoStatusModule, IntToEstacaoStatusModule } from '@enums/EstacaoStatusModule';
 import { EstacaoStatusPipe } from '@enums/EstacaoStatusPipe';
 import { Pedido } from '@entities/Pedido';
 import { pedidoService } from '@config/diContainer';
 import { useTempoDecorrido } from '@hooks/useTempoDecorrido';
+import { MonitorModel } from '@pages/Monitor/MonitorModel';
 
 // Converte o vetor de cores do magazine de estoque recebido via SSE
 // (posicoesOcupadas) em entidades Estoque para exibição somente-leitura.
@@ -51,18 +52,18 @@ function useLatch(trigger: boolean | undefined, reset: boolean | undefined): boo
   return latched;
 }
 
-function computeOverlayStatus(
-  ligado: boolean,
-  pedidoEmCurso: boolean,
-  ocupado: boolean,
-  finalizado: boolean
-): EstacaoStatusModule {
-  if (!ligado) return EstacaoStatusModule.Desligado;
-  if (!pedidoEmCurso) return EstacaoStatusModule.Aguardando;
-  if (ocupado) return EstacaoStatusModule.Ocupado;
-  if (finalizado) return EstacaoStatusModule.Finalizado;
-  return EstacaoStatusModule.Aguardando; // fallback enquanto não ocupou nem finalizou
-}
+// function computeOverlayStatus(
+//   ligado: boolean,
+//   pedidoEmCurso: boolean,
+//   ocupado: boolean,
+//   finalizado: boolean
+// ): EstacaoStatusModule {
+//   if (!ligado) return EstacaoStatusModule.Desligado;
+//   if (!pedidoEmCurso) return EstacaoStatusModule.Aguardando;
+//   if (ocupado) return EstacaoStatusModule.Ocupado;
+//   if (finalizado) return EstacaoStatusModule.Finalizado;
+//   return EstacaoStatusModule.Aguardando; // fallback enquanto não ocupou nem finalizou
+// }
 
 function computePipelineStatus(ligado: boolean, ocupado: boolean): EstacaoStatusPipe {
   if (!ligado) return EstacaoStatusPipe.Desligado;
@@ -73,7 +74,7 @@ function computePipelineStatus(ligado: boolean, ocupado: boolean): EstacaoStatus
 export function useEstacoesViewModel() {
   const estoque = useEstoqueContext();
   const expedicao = useExpedicaoContext();
-  const monitor = useMonitorContext();
+  const monitor: MonitorModel = useMonitorContext();
   const { pingMap } = usePingContext();
   const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(null);
   const ultimaOpBuscada = useRef<number | null>(null);
@@ -100,44 +101,51 @@ export function useEstacoesViewModel() {
     expedicao: mapBancadaExpedicao(monitor.expedicao?.orderExpedicao),
   };
 
-  const finalizadoEstoque   = useLatch(monitor.estoque?.startOP,   !monitor.estoque?.pedidoEmCurso);
-  const finalizadoProcesso  = useLatch(monitor.processo?.startOP,  !monitor.estoque?.pedidoEmCurso);
-  const finalizadoMontagem  = useLatch(monitor.montagem?.startOP,  !monitor.estoque?.pedidoEmCurso);
-  const finalizadoExpedicao = useLatch(monitor.expedicao?.startOP, !monitor.estoque?.pedidoEmCurso);
+  // const finalizadoEstoque   = useLatch(monitor.estoque?.startOP,   !monitor.estoque?.pedidoEmCurso);
+  // const finalizadoProcesso  = useLatch(monitor.processo?.startOP,  !monitor.estoque?.pedidoEmCurso);
+  // const finalizadoMontagem  = useLatch(monitor.montagem?.startOP,  !monitor.estoque?.pedidoEmCurso);
+  // const finalizadoExpedicao = useLatch(monitor.expedicao?.startOP, !monitor.estoque?.pedidoEmCurso);
 
-  // Map para os status das estações que são manipulados pelo latch
+  // // Map para os status das estações que são manipulados pelo latch
+  // const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
+  //   [Estacao.Estoque]: computeOverlayStatus(
+  //     !!pingMap[Estacao.Estoque],
+  //     !!monitor.estoque?.pedidoEmCurso,
+  //     !!monitor.estoque?.ocupado,
+  //     finalizadoEstoque
+  //   ),
+  //   [Estacao.Processo]: computeOverlayStatus(
+  //     !!pingMap[Estacao.Processo],
+  //     !!monitor.estoque?.pedidoEmCurso,
+  //     !!monitor.processo?.ocupado,
+  //     finalizadoProcesso
+  //   ),
+  //   [Estacao.Montagem]: computeOverlayStatus(
+  //     !!pingMap[Estacao.Montagem],
+  //     !!monitor.estoque?.pedidoEmCurso,
+  //     !!monitor.montagem?.ocupado,
+  //     finalizadoMontagem
+  //   ),
+  //   [Estacao.Expedicao]: computeOverlayStatus(
+  //     !!pingMap[Estacao.Processo],
+  //     !!monitor.estoque?.pedidoEmCurso,
+  //     !!monitor.expedicao?.ocupado,
+  //     finalizadoExpedicao
+  //   ),
+  // }
+
   const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
-    [Estacao.Estoque]: computeOverlayStatus(
-      !!pingMap[Estacao.Estoque],
-      !!monitor.estoque?.pedidoEmCurso,
-      !!monitor.estoque?.ocupado,
-      finalizadoEstoque
-    ),
-    [Estacao.Processo]: computeOverlayStatus(
-      !!pingMap[Estacao.Processo],
-      !!monitor.estoque?.pedidoEmCurso,
-      !!monitor.processo?.ocupado,
-      finalizadoProcesso
-    ),
-    [Estacao.Montagem]: computeOverlayStatus(
-      !!pingMap[Estacao.Montagem],
-      !!monitor.estoque?.pedidoEmCurso,
-      !!monitor.montagem?.ocupado,
-      finalizadoMontagem
-    ),
-    [Estacao.Expedicao]: computeOverlayStatus(
-      !!pingMap[Estacao.Processo],
-      !!monitor.estoque?.pedidoEmCurso,
-      !!monitor.expedicao?.ocupado,
-      finalizadoExpedicao
-    ),
+    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque.statusEstoque],
+    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque.statusProcesso],
+    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque.statusMontagem],
+    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque.statusExpedicao],
   }
 
   const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
-    [Estacao.Estoque]: EstacaoStatusPipe.Desligado,
-    [Estacao.Processo]: EstacaoStatusPipe.Desligado,
-    [Estacao.Montagem]: EstacaoStatusPipe.Desligado,
-    [Estacao.Expedicao]: EstacaoStatusPipe.Desligado
+    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque.ocupado),
+    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo.ocupado),
+    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem.ocupado),
+    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao.ocupado)
   }
 
 

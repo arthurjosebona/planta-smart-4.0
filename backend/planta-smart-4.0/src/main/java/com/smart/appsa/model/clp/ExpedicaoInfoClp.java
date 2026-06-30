@@ -38,4 +38,9 @@ public class ExpedicaoInfoClp extends EstacaoInfoClp {
     boolean removerExpedicao;
     // Número da OP que está sendo guardada/removida no momento.
     int opGuardadoExpedicao;
+
+    @Override
+    protected byte getStatusByte() {
+        return appStateConfig.getStatusExpedicao();
+    }
 }

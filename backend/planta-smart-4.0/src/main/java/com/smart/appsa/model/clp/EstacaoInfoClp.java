@@ -1,5 +1,8 @@
 package com.smart.appsa.model.clp;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.enums.StatusEstacao;
 
 import lombok.Getter;
@@ -29,11 +32,18 @@ public abstract class EstacaoInfoClp {
     // A estação está livre, aguardando a próxima operação.
     private boolean aguardando;
 
-    // Deriva o {@link StatusEstacao} apresentado no front a partir das flags de estado.
+    @Autowired
+    protected AppStateConfig appStateConfig;
+
+    // Retorna o byte de status global da bancada correspondente a esta estação.
+    protected abstract byte getStatusByte();
+
+    // Deriva o apresentado no front a partir do status global da bancada.
     public StatusEstacao getStatus() {
-        if (ocupado) return StatusEstacao.OCUPADO;
-        if (manual) return StatusEstacao.MANUAL;
-        if (emergencia) return StatusEstacao.EMERGENCIA;
-        return StatusEstacao.AGUARDANDO;
+        return switch (getStatusByte()) {
+            case 1 -> StatusEstacao.OCUPADO;
+            case 2 -> StatusEstacao.AGUARDANDO;
+            default -> StatusEstacao.PARADO;
+        };
     }
 }

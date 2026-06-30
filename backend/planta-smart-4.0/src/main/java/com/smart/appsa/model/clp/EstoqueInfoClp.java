@@ -108,4 +108,9 @@ public class EstoqueInfoClp extends EstacaoInfoClp {
     private boolean retornoEstoqueCheio;
     // Cor do bloco a guardar/adicionar na posição corrente.
     private int corGuardarEstoque;
+
+    @Override
+    protected byte getStatusByte() {
+        return appStateConfig.getStatusEstoque();
+    }
 }
