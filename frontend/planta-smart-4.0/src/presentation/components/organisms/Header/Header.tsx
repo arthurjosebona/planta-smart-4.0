@@ -47,6 +47,13 @@ const IconDashboard = (
 const IconMonitor = (
   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
 );
+const IconIps = (
+  <>
+    <rect x="3" y="5" width="18" height="6" rx="1" />
+    <rect x="3" y="13" width="18" height="6" rx="1" />
+    <path d="M7 8h.01M7 16h.01" />
+  </>
+);
 
 interface NavItem {
   href: string;
@@ -55,7 +62,9 @@ interface NavItem {
   matchPath?: string;
 }
 const NAV_ITEMS: (NavItem | 'separator')[] = [
-  { href: '/', label: 'Home', icon: IconHome },
+  { href: '/home', label: 'Home', icon: IconHome },
+  'separator',
+  { href: '/ips', label: 'Conexão', icon: IconIps },
   'separator',
   { href: '/store', label: 'Store', icon: IconStore },
   'separator',
