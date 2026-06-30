@@ -206,6 +206,15 @@ npm run preview
 ## 🐳 Docker
 
 Há um `Dockerfile` (em `src/Dockerfile`) com build multi-stage: o primeiro estágio gera o build de produção com `node:22-alpine` e o segundo serve o conteúdo de `dist/` com `serve` na porta **3000**.
+## Comandos para iniciar o Docker
+
+### 1. Cria uma imagem Docker a partir do arquivo Dockerfile
+docker build -t smart-frontend .
+
+### 2. Cria e inicia um container usando a imagem smart-frontend.
+
+docker run -p 3000:3000 smart-frontend 
+# Depois acessa em http://localhost:3000.
 
 ```bash
 # a partir da pasta que contém o Dockerfile
