@@ -12,13 +12,13 @@ import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
 import com.smart.appsa.model.enums.Estacao;
 
-/** Converte os modelos parseados dos CLPs ({@code *InfoClp}) nos DTOs de stream. */
+// Converte os modelos parseados dos CLPs ({@code *InfoClp}) nos DTOs de stream.
 public final class ClpStreamMapper {
 
     private ClpStreamMapper() {
     }
 
-    /** Estações sem payload específico (PROCESSO e MONTAGEM). */
+    // Estações sem payload específico (PROCESSO e MONTAGEM).
     public static EstacaoStreamDTO toEstacaoDTO(Estacao estacao, EstacaoInfoClp info, int statusBancada) {
         return new EstacaoStreamDTO(
                 estacao.getNome(),

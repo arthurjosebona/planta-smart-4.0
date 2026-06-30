@@ -4,10 +4,8 @@ import java.util.List;
 
 import com.smart.appsa.model.enums.StatusEstacao;
 
-/**
- * DTO de stream da estação ESTOQUE. Inclui, além dos campos da estação, os bytes de
- * status de todas as bancadas (equivalente ao antigo {@code getEstoqueComStatus}).
- */
+// DTO de stream da estação ESTOQUE. Inclui, além dos campos da estação, os bytes de
+// status de todas as bancadas (equivalente ao antigo {@code getEstoqueComStatus}).
 public record EstoqueStreamDTO(
         String estacao,
         StatusEstacao status,

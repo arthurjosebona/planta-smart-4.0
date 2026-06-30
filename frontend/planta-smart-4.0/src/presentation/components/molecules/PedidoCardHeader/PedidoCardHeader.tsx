@@ -8,6 +8,7 @@ interface PedidoCardHeaderProps {
   ordemDeProducao: number;
   status: StatusPedido;
   iniciarProducao: (id: number) => void;
+  conectado: boolean;
 }
 
 export function PedidoCardHeader({
@@ -15,6 +16,7 @@ export function PedidoCardHeader({
   ordemDeProducao,
   status,
   iniciarProducao,
+  conectado,
 }: PedidoCardHeaderProps) {
   return (
     <div className={styles.header}>
@@ -25,7 +27,7 @@ export function PedidoCardHeader({
       </div>
 
       <div className={styles.actions}>
-        {status === StatusPedido.Pendente && (
+        {status === StatusPedido.Pendente && conectado && (
           <ActionButton label="Iniciar Produção" onClick={() => iniciarProducao(id)} />
         )}
       </div>

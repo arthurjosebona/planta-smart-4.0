@@ -8,10 +8,11 @@ import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard
 import { useEstacoesViewModel } from './useEstacoesViewModel';
 
 export default function EstacoesView() {
-  const { estoque, expedicao, monitor, moduleStatus, erro, dismissErro } = useEstacoesViewModel();
+  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro, pedidoAtual, tempoDecorrido } = useEstacoesViewModel();
 
   const numeroOP = monitor.estoque?.numeroOP ?? 0;
-  const pedidoEmCurso = monitor.estoque?.pedidoEmCurso ?? false;
+  const statusProducao = monitor.estoque?.statusProducao ?? 0;
+
 
   return (
     <AppTemplate>
@@ -27,30 +28,25 @@ export default function EstacoesView() {
 
         <div className={styles.layout}>
           <section className={styles.estacoesSection}>
-            <Estacoes status={monitor} moduleStatus={moduleStatus} />
+            <Estacoes status={monitor} statusEstacoes={statusEstacoes} statusPipelines={statusPipelines} />
           </section>
 
-          <OpEmCursoCard numeroOP={numeroOP} pedidoEmCurso={pedidoEmCurso} />
+          <OpEmCursoCard pedido={pedidoAtual} pedidoEmCurso={!!monitor.estoque?.pedidoEmCurso} tempoDecorrido={tempoDecorrido} />
 
           <div className={styles.inferiorEstoques}>
             <section className={styles.painel}>
               <span className={styles.painelLabel}>Estoque</span>
               <ViewEstoque
-                estoque={estoque.estoque}
-                editMode={estoque.editMode}
-                selectedIds={estoque.selectedIds}
-                onToggle={estoque.toggleBlocoSelection}
+                estoque={bancada.estoque}
+                editMode={false}
+                selectedIds={[]}
+                onToggle={() => {}}
               />
             </section>
 
             <section className={styles.painel}>
               <span className={styles.painelLabel}>Expedição</span>
-              <ViewExpedicao
-                expedicao={expedicao.expedicao}
-                editMode={expedicao.editMode}
-                selectedId={expedicao.selectedId}
-                onToggle={expedicao.selectSlot}
-              />
+              <ViewExpedicao expedicao={bancada.expedicao} editMode={false} />
             </section>
           </div>
         </div>

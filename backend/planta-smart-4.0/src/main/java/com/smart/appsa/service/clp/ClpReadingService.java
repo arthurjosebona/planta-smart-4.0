@@ -18,14 +18,12 @@ import com.smart.appsa.service.clp.reader.PlcDataObserver;
 import com.smart.appsa.service.clp.reader.PlcReaderTask;
 import com.smart.appsa.service.clp.reader.StationReadConfig;
 
-/**
- * Orquestra as threads de leitura dos CLPs.
- *
- * <p>Para cada estação solicitada cria um {@link PlcReaderTask} (Subject), registra os
- * observadores (o {@code CommService} da estação e o {@link PlcDataStore}) e agenda a
- * leitura periódica. Centraliza o ciclo de vida das threads — antes espalhado no
- * {@code ClpController}.
- */
+// Orquestra as threads de leitura dos CLPs.
+//
+// <p>Para cada estação solicitada cria um {@link PlcReaderTask} (Subject), registra os
+// observadores (o {@code CommService} da estação e o {@link PlcDataStore}) e agenda a
+// leitura periódica. Centraliza o ciclo de vida das threads — antes espalhado no
+// {@code ClpController}.
 @Service
 public class ClpReadingService {
 
@@ -55,8 +53,13 @@ public class ClpReadingService {
         this.commServices.put(Estacao.EXPEDICAO, expedicaoCommService);
     }
 
-    // Inicia (ou ignora, se já em execução)
-    public void start(Map<String, String> ips) {
+    // Inicia (ou ignora, se já em execução) a leitura das estações solicitadas.
+    //
+    // @return mapa estação → {@code true} se a conexão com o CLP foi estabelecida
+    //         (ou já estava em leitura), {@code false} se a conexão falhou.
+    //         Nomes inválidos são ignorados e não entram no resultado.
+    public Map<Estacao, Boolean> start(Map<String, String> ips) {
+        Map<Estacao, Boolean> resultados = new EnumMap<>(Estacao.class);
         ips.forEach((nome, ip) -> {
             Optional<Estacao> estacaoOpt = Estacao.fromNome(nome);
             if (estacaoOpt.isEmpty()) {
@@ -66,12 +69,14 @@ public class ClpReadingService {
             Estacao estacao = estacaoOpt.get();
 
             if (futures.containsKey(estacao)) {
-                return; // já está lendo
+                resultados.put(estacao, true); // já está lendo
+                return;
             }
 
             PlcConnector connector = plcConnectionService.getConnection(ip);
             if (connector == null) {
                 System.err.println("Erro ao obter conexão com o CLP: " + ip);
+                resultados.put(estacao, false);
                 return;
             }
 
@@ -88,10 +93,12 @@ public class ClpReadingService {
             ScheduledFuture<?> future = executor.scheduleWithFixedDelay(
                     task, 0, config.delayMs(), TimeUnit.MILLISECONDS);
             futures.put(estacao, future);
+            resultados.put(estacao, true);
         });
+        return resultados;
     }
 
-    /** Cancela todas as threads de leitura e encerra as conexões com os CLPs. */
+    // Cancela todas as threads de leitura e encerra as conexões com os CLPs.
     public void stop() {
         futures.forEach((estacao, future) -> {
             future.cancel(true);

@@ -27,6 +27,9 @@ public class PedidoMapper {
             .registroEntradaExpedicao(pedido.getRegistroEntradaExpedicao())
             .registroSaidaExpedicao(pedido.getRegistroSaidaExpedicao())
             .expedicao(pedido.getExpedicao())
+            .registroEntradaEstoque(pedido.getRegistroEntradaEstoque())
+            .registroEntradaProcesso(pedido.getRegistroEntradaProcesso())
+            .registroEntradaMontagem(pedido.getRegistroEntradaMontagem())
             .build();
     }
 
@@ -47,16 +50,6 @@ public class PedidoMapper {
             .status(pedido.getStatus())
             .tipo(pedido.getTipo())
             .corTampa(pedido.getCorTampa())
-            .build();
-    }
-
-    public static Pedido mapEntityByResponseDTO(PedidoResponseDTO responseDTO) {
-        return Pedido.builder()
-            .ordemDeProducao(responseDTO.ordemDeProducao())
-            .blocos(new ArrayList<>()) // Envia vazio pois é responsabilidade do BlocoService salvar os blocos
-            .status(responseDTO.status())
-            .tipo(responseDTO.tipo())
-            .corTampa(responseDTO.corTampa())
             .build();
     }
 
@@ -162,6 +155,28 @@ public class PedidoMapper {
             .numeroPedido(entity.getOrdemDeProducao())
             .andares(entity.getTipo().getValue())
             .posicaoExpedicao(entity.getExpedicao().getPosicaoFisica())
+            .build();
+    }
+
+    public static Pedido mapEntityByResponseDTO(PedidoResponseDTO responseDTO) {
+        return Pedido.builder()
+            .id(responseDTO.id())
+            .ordemDeProducao(responseDTO.ordemDeProducao())
+            .blocos(responseDTO.blocos() != null
+            ? responseDTO.blocos().stream()
+                .map((b) -> BlocoMapper.mapEntityByResponseDTO(b))
+                .toList()
+            : new ArrayList<>())
+            .status(responseDTO.status())
+            .tipo(responseDTO.tipo())
+            .corTampa(responseDTO.corTampa())
+            .registroCriacao(responseDTO.registroCriacao())
+            .registroEntradaExpedicao(responseDTO.registroEntradaExpedicao())
+            .registroSaidaExpedicao(responseDTO.registroSaidaExpedicao())
+            .registroEntradaProcesso(responseDTO.registroEntradaProcesso())
+            .registroEntradaMontagem(responseDTO.registroEntradaMontagem())
+            .registroEntradaEstoque(responseDTO.registroEntradaEstoque())
+            .expedicao(responseDTO.expedicao())
             .build();
     }
 

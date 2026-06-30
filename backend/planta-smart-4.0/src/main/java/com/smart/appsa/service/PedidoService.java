@@ -242,9 +242,49 @@ public class PedidoService {
                         .orElseThrow(() -> new ResourceNotFoundException("pedido", "ordem de produção", op)));
     }
 
+
     @Transactional(readOnly = true)
     public List<PedidoResponseDTO> findPedidosByExpedicao(Long idExpedicao) {
         return pedidoRepository.findByExpedicaoId(idExpedicao).stream().map(p -> PedidoMapper.mapDto(p)).toList();
+    }
+
+    @Transactional
+    public void handleExitExpedicao(Pedido pedido) {
+        pedido.setRegistroSaidaExpedicao(LocalDateTime.now());
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void updateToConcluido(Pedido pedido) {
+        pedido.setStatus(StatusPedido.CONCLUIDO);
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void handleEntradaEstoque(Integer op) {
+        Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
+        if (pedido.getRegistroEntradaEstoque() != null) return;
+        pedido.setRegistroEntradaEstoque(LocalDateTime.now());
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void handleEntradaProcesso(Integer op) {
+        Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
+        if (pedido.getRegistroEntradaProcesso() != null) return;
+        pedido.setRegistroEntradaProcesso(LocalDateTime.now());
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void handleEntradaMontagem(Integer op) {
+        Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
+        if (pedido.getRegistroEntradaMontagem() != null) return;
+        pedido.setRegistroEntradaMontagem(LocalDateTime.now());
+        pedidoRepository.save(pedido);
     }
 
 }  

@@ -21,5 +21,8 @@ public record PedidoResponseDTO(
     LocalDateTime registroCriacao,
     LocalDateTime registroEntradaExpedicao,
     LocalDateTime registroSaidaExpedicao,
+    LocalDateTime registroEntradaProcesso,
+    LocalDateTime registroEntradaMontagem,
+    LocalDateTime registroEntradaEstoque,
     Expedicao expedicao
 ) {}

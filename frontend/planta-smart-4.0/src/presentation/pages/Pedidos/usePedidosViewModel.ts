@@ -4,9 +4,11 @@ import { pedidoService } from '@config/diContainer';
 import { HttpError } from '@error/HttpError';
 import { Pedido } from '@entities/Pedido';
 import { StatusPedido } from '@enums/StatusPedido';
+import { useStatusContext } from '@contexts/StatusContext';
 
 export function usePedidosViewModel() {
   const [model, setModel] = useState<PedidosModel>(PedidosModelInitial);
+  const { conectado } = useStatusContext();
 
   useEffect(() => {
     fetchPedidos();
@@ -74,6 +76,7 @@ export function usePedidosViewModel() {
 
   return {
     model,
+    conectado,
     iniciarProducao,
     deletarPedido,
     dismissErro,

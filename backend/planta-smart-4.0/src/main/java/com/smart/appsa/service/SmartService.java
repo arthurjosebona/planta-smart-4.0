@@ -10,10 +10,12 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
+import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.exception.ClpComunicacaoException;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +32,7 @@ import java.util.Map;
 public class SmartService {
     private final PlcConnectionService plcConnectionService;
     private final AppStateConfig appStateConfig;
+    private final ApplicationEventPublisher eventPublisher;
     
     public void enviarParaProducao(PedidoConfigDTO config, PedidoInfoDTO detalhes) {
         // 1. Converter o DTO para um bloco de bytes (byte[])
@@ -39,10 +42,12 @@ public class SmartService {
         // 2. Obter a conexão única via seu Service
         PlcConnector connector = plcConnectionService.getConnection(config.getIpClp());
 
-
         if (connector == null) {
             throw new ClpComunicacaoException(config.getIpClp(), "conexão indisponível");
         }
+
+        // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, detalhes.getPosicaoExpedicao(), detalhes.getNumeroPedido()));
+
         try {
             // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
             connector.writeBlock(9, 2, 60, buffer);

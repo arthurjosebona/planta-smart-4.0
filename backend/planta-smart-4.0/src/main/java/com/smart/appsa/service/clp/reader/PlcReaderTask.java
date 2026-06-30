@@ -7,14 +7,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.model.enums.Estacao;
 
-/**
- * Tarefa de leitura de um CLP (o "Subject" do padrão Observer).
- *
- * <p>Lê uma ou mais {@link PlcReadRequest} (Data Blocks), concatena o resultado
- * num único {@code byte[]} e notifica todos os {@link PlcDataObserver} registrados.
- * Unifica os antigos {@code PlcReaderDB} (leitura única) e {@code PlcReaderMultDB}
- * (leitura múltipla): a leitura única é apenas uma lista com um elemento.
- */
+// Tarefa de leitura de um CLP (o "Subject" do padrão Observer).
+//
+// <p>Lê uma ou mais {@link PlcReadRequest} (Data Blocks), concatena o resultado
+// num único {@code byte[]} e notifica todos os {@link PlcDataObserver} registrados.
+// Unifica os antigos {@code PlcReaderDB} (leitura única) e {@code PlcReaderMultDB}
+// (leitura múltipla): a leitura única é apenas uma lista com um elemento.
 public class PlcReaderTask implements Runnable {
 
     private final PlcConnector plcConnector;

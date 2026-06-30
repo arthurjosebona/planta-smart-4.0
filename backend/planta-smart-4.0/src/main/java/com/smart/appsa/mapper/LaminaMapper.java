@@ -13,4 +13,13 @@ public class LaminaMapper {
             .posicao(entity.getPosicao())
             .build();
     }
+
+    public static Lamina mapEntityByResponseDTO(LaminaResponseDTO dto) {
+        return Lamina.builder()
+            .id(dto.id())
+            .cor(dto.cor())
+            .padrao(dto.padrao())
+            .posicao(dto.posicao())
+            .build();
+    }
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './estacoesSection.module.css';
 import { MonitorModel } from '@pages/Monitor/MonitorModel';
-import type { ModuleStatus } from './types';
 
 import bancadaImg from '@assets/bancada/Smart40.png';
 
@@ -38,42 +37,37 @@ import monOn    from '@assets/bancada/Smart40-Mon_on.png';
 import expOff   from '@assets/bancada/Smart40-Exp_off.png';
 import expPause from '@assets/bancada/Smart40-Exp_pause.png';
 import expOn    from '@assets/bancada/Smart40-Exp_on.png';
+import { Estacao } from '@enums/Estacao';
+import { EstacaoStatusModule } from '@enums/EstacaoStatusModule';
+import { EstacaoStatusPipe } from '@enums/EstacaoStatusPipe';
 
-// Pipeline status (0/1/2): derivado do statusXxx do AppStateConfig via SSE
-const pipelineOverlays: Record<string, [string, string, string]> = {
-  estoque:   [estSt0, estSt1, estSt2],
-  processo:  [proSt0, proSt1, proSt2],
-  montagem:  [monSt0, monSt1, monSt2],
-  expedicao: [expSt0, expSt1, expSt2],
+const connectionPipeOverlays: Record<Estacao, Record<EstacaoStatusPipe, string>> = {
+  [Estacao.Estoque]:   { [EstacaoStatusPipe.Desligado]: estOff, [EstacaoStatusPipe.Ocupado]: estPause, [EstacaoStatusPipe.Ligado]: estOn },
+  [Estacao.Processo]:  { [EstacaoStatusPipe.Desligado]: proOff, [EstacaoStatusPipe.Ocupado]: proPause, [EstacaoStatusPipe.Ligado]: proOn },
+  [Estacao.Montagem]:  { [EstacaoStatusPipe.Desligado]: monOff, [EstacaoStatusPipe.Ocupado]: monPause, [EstacaoStatusPipe.Ligado]: monOn },
+  [Estacao.Expedicao]: { [EstacaoStatusPipe.Desligado]: expOff, [EstacaoStatusPipe.Ocupado]: expPause, [EstacaoStatusPipe.Ligado]: expOn },
 };
 
-// Conexão status: derivado do ping + status CLP via SSE
-const connectionOverlays: Record<string, Record<ModuleStatus, string>> = {
-  estoque:   { off: estOff, pause: estPause, on: estOn },
-  processo:  { off: proOff, pause: proPause, on: proOn },
-  montagem:  { off: monOff, pause: monPause, on: monOn },
-  expedicao: { off: expOff, pause: expPause, on: expOn },
-};
+const connectionOverlays: Record<Estacao, Record<EstacaoStatusModule, string | null>> = {
+  [Estacao.Estoque]: {[EstacaoStatusModule.Desligado]: null, [EstacaoStatusModule.Aguardando]: estSt0, [EstacaoStatusModule.Ocupado]: estSt1, [EstacaoStatusModule.Finalizado]: estSt2},
+  [Estacao.Processo]: {[EstacaoStatusModule.Desligado]: null, [EstacaoStatusModule.Aguardando]: proSt0, [EstacaoStatusModule.Ocupado]: proSt1, [EstacaoStatusModule.Finalizado]: proSt2},
+  [Estacao.Montagem]: {[EstacaoStatusModule.Desligado]: null, [EstacaoStatusModule.Aguardando]: monSt0, [EstacaoStatusModule.Ocupado]: monSt1, [EstacaoStatusModule.Finalizado]: monSt2},
+  [Estacao.Expedicao]: {[EstacaoStatusModule.Desligado]: null, [EstacaoStatusModule.Aguardando]: expSt0, [EstacaoStatusModule.Ocupado]: expSt1, [EstacaoStatusModule.Finalizado]: expSt2}
 
-type StationKey = 'estoque' | 'processo' | 'montagem' | 'expedicao';
+}
+
+
 
 interface EstacoesProps {
   status: MonitorModel;
-  moduleStatus: Record<StationKey, ModuleStatus>;
+  statusEstacoes: Record<Estacao, EstacaoStatusModule>;
+  statusPipelines: Record<Estacao, EstacaoStatusPipe>;
 }
 
-export function Estacoes({ status, moduleStatus }: EstacoesProps) {
-  const st = status.estoque;
+const stations: Estacao[] = [Estacao.Estoque, Estacao.Processo, Estacao.Montagem, Estacao.Expedicao];
 
-  const pipelineValues: Record<StationKey, number | undefined> = {
-    estoque:   st?.statusEstoque,
-    processo:  st?.statusProcesso,
-    montagem:  st?.statusMontagem,
-    expedicao: st?.statusExpedicao,
-  };
-
-  const stations: StationKey[] = ['estoque', 'processo', 'montagem', 'expedicao'];
-
+export function Estacoes({ status, statusEstacoes, statusPipelines }: EstacoesProps) {
+ 
   return (
     <div className={styles.wrapper} aria-label="Bancada Smart 4.0">
       <img
@@ -83,32 +77,33 @@ export function Estacoes({ status, moduleStatus }: EstacoesProps) {
         draggable={false}
       />
 
-      {/* Camada 1: status de produção (pipeline 0/1/2) */}
+      {/* Camada 1: status de ping */}
       {stations.map((station) => {
-        const value = pipelineValues[station];
-        const overlays = pipelineOverlays[station];
-        if (value === undefined || overlays[value] === undefined) return null;
+        const pipeStatusValue = statusPipelines[station]
+        const src = connectionPipeOverlays[station][pipeStatusValue];
         return (
           <img
             key={`pipeline-${station}`}
-            src={overlays[value]}
+            src={src}
             className={styles.overlay}
-            alt={`${station} pipeline ${value}`}
+            alt={`${station} pipeline ${pipeStatusValue}`}
             draggable={false}
           />
         );
       })}
 
-      {/* Camada 2: status de conexão (off/pause/on via ping + SSE) */}
+      {/* Camada 2: status de produção */}
       {stations.map((station) => {
-        const connStatus = moduleStatus[station];
-        const src = connectionOverlays[station][connStatus];
+        const moduleStatusValue = statusEstacoes[station];
+        const src = connectionOverlays[station][moduleStatusValue];
+
+        if (!src) return null; // Desligado -> sem overlay
         return (
           <img
             key={`conn-${station}`}
             src={src}
             className={styles.overlay}
-            alt={`${station} ${connStatus}`}
+            alt={`${station} ${moduleStatusValue}`}
             draggable={false}
           />
         );

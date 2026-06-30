@@ -28,6 +28,7 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, './src/presentation/utils'),
       '@mappers': path.resolve(__dirname, './src/infrastructure/mappers'),
       '@contexts': path.resolve(__dirname, './src/contexts'),
+      '@hooks': path.resolve(__dirname, './src/utils/hooks'),
     },
   },
 });

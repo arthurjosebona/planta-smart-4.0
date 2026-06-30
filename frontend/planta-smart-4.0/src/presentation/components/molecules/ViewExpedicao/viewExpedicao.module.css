@@ -1,6 +1,7 @@
 @reference "@styles/global.css";
 
 .view-expedicao {
-  @apply flex flex-wrap;
+  @apply grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-2);
 }
