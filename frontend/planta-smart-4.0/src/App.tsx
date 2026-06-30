@@ -5,6 +5,7 @@ import { ExpedicaoProvider } from '@contexts/ExpedicaoContext';
 import { MonitorProvider } from '@contexts/MonitorContext';
 import { PingProvider } from '@contexts/PingContext';
 import { StatusProvider } from '@contexts/StatusContext';
+import { FilaProducaoProvider } from '@contexts/FilaProducaoContext';
 
 export default function App() {
   return (
@@ -13,13 +14,15 @@ export default function App() {
         <MonitorProvider>
           <StatusProvider>
             <PingProvider>
-              <BrowserRouter>
-                <Routes>
-                  {routes.map((route) => (
-                    <Route key={route.path} path={route.path} element={route.element} />
-                  ))}
-                </Routes>
-              </BrowserRouter>
+              <FilaProducaoProvider>
+                <BrowserRouter>
+                  <Routes>
+                    {routes.map((route) => (
+                      <Route key={route.path} path={route.path} element={route.element} />
+                    ))}
+                  </Routes>
+                </BrowserRouter>
+              </FilaProducaoProvider>
             </PingProvider>
           </StatusProvider>
         </MonitorProvider>

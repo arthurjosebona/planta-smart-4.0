@@ -58,6 +58,20 @@ export function usePedidosViewModel() {
     }
   }
 
+  async function enviarParaProducao(id: number) {
+    setModel((s) => ({ ...s, loading: true, erro: null }));
+    try {
+      await pedidoService.enviarParaProducao(id);
+      // A fila é atualizada via SSE; recarrega a lista para refletir a mudança
+      // de status do pedido (PENDENTE -> PRODUCAO) nos cards.
+      await fetchPedidos();
+    } catch (error: unknown) {
+      const mensagem =
+        error instanceof HttpError ? error.message : 'Erro ao enviar pedido para produção.';
+      setModel((s) => ({ ...s, loading: false, erro: mensagem }));
+    }
+  }
+
   function dismissErro() {
     setModel((s) => ({ ...s, erro: null }));
   }
@@ -78,6 +92,7 @@ export function usePedidosViewModel() {
     model,
     conectado,
     iniciarProducao,
+    enviarParaProducao,
     deletarPedido,
     dismissErro,
     pedidosFiltrados,

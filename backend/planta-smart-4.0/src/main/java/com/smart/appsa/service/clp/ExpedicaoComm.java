@@ -9,9 +9,10 @@ import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
+import com.smart.appsa.events.PedidoConcluidoEvent;
+import com.smart.appsa.events.PedidoEmCursoEvent;
 import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.mapper.PedidoMapper;
-import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
 import com.smart.appsa.service.ExpedicaoService;
 import com.smart.appsa.service.PedidoService;
@@ -144,7 +145,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusExpedicao((byte) 1);
             }
-            pedidoService.handleEntradaExpedicao(appStateConfig.getOrdemDeProducaoEmProducao);
+            pedidoService.handleEntradaExpedicao(expedicaoInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
@@ -363,12 +364,15 @@ public class ExpedicaoComm implements PlcDataObserver {
             System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
             System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");
             appStateConfig.setPedidoEmCurso(false);
+            eventPublisher.publishEvent(new PedidoEmCursoEvent(this, false));
             eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
             opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
             pedidoService.updateToConcluido(
                 PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
             );
             appStateConfig.resetarStatus();
+            // Conclusão real do pedido em curso: dispara o avanço da fila de produção.
+            eventPublisher.publishEvent(new PedidoConcluidoEvent(this, opAtual));
         }
     }
 

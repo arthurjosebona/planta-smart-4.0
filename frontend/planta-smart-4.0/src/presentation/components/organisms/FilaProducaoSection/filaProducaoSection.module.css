@@ -1,0 +1,111 @@
+@reference "@styles/global.css";
+
+.section {
+  @apply relative rounded-xl;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-6);
+}
+
+.accentLine {
+  @apply absolute top-0 left-0 right-0 rounded-t-xl;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  opacity: 0.35;
+}
+
+.sectionHeader {
+  @apply flex items-center justify-between flex-wrap;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-5);
+}
+
+.heading {
+  font-family: var(--font-sans);
+  @apply font-bold tracking-tight;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.conexao {
+  font-family: var(--font-mono);
+  @apply text-[11px] rounded-full;
+  padding: 3px 10px;
+  border: 1px solid var(--color-border);
+}
+
+.conexaoOn {
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.conexaoOff {
+  color: var(--color-text-muted);
+}
+
+.block {
+  margin-bottom: var(--spacing-5);
+}
+
+.block:last-child {
+  margin-bottom: 0;
+}
+
+.blockHeader {
+  @apply flex items-center justify-between;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-3);
+}
+
+.blockLabel {
+  font-family: var(--font-mono);
+  @apply text-[12px] uppercase tracking-wider;
+  color: var(--color-text-muted);
+}
+
+.counter {
+  font-family: var(--font-mono);
+  @apply text-[12px] rounded-full;
+  min-width: 22px;
+  text-align: center;
+  padding: 1px 8px;
+  color: var(--color-text-muted);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+}
+
+.list {
+  @apply flex flex-col;
+  gap: var(--spacing-3);
+}
+
+.item {
+  @apply flex items-center;
+  gap: var(--spacing-3);
+}
+
+.posicao {
+  font-family: var(--font-mono);
+  @apply text-[12px] font-semibold;
+  width: 28px;
+  flex-shrink: 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.itemCard {
+  @apply flex-1 min-w-0;
+}
+
+.stateMsg {
+  font-family: var(--font-mono);
+  @apply text-[13px] italic text-center;
+  color: var(--color-text-muted);
+  padding: var(--spacing-5) 0;
+}
+
+.stateMsgEmpty {
+  @apply rounded-lg;
+  border: 1px dashed var(--color-border);
+}

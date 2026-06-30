@@ -1,4 +1,5 @@
 import { Pedido } from '@entities/Pedido';
+import { FilaProducao } from '@entities/FilaProducao';
 
 export interface IPedidoRepository {
   createPedido(pedido: Pedido): Promise<Pedido>;
@@ -7,6 +8,7 @@ export interface IPedidoRepository {
   findByOrdemDeProducao(op: number): Promise<Pedido>;
   findByExpedicao(expedicaoId: number): Promise<Pedido[]>;
   iniciarProducao(id: number): Promise<Pedido>;
+  enviarParaProducao(id: number): Promise<FilaProducao>;
   update(id: number, pedido: Pedido): Promise<Pedido>;
   delete(id: number): Promise<void>;
 }

@@ -1,10 +1,12 @@
 package com.smart.appsa.service.clp;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.events.PedidoEmCursoEvent;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.enums.CorEstoque;
@@ -50,6 +52,7 @@ public class EstoqueComm implements PlcDataObserver {
     private AppStateConfig appStateConfig;
     private EstoqueService estoqueService;
     private PedidoService pedidoService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     public void onData(String ip, byte[] data) {
@@ -122,6 +125,7 @@ public class EstoqueComm implements PlcDataObserver {
         // que não está sendo feito 2 vezes
         if (estoqueInfoClp.isIniciarPedido() && !appStateConfig.isPedidoEmCurso()) {
             appStateConfig.setPedidoEmCurso(true);
+            eventPublisher.publishEvent(new PedidoEmCursoEvent(this, true));
             System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);

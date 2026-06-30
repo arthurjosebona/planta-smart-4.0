@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePedidosViewModel } from '@pages/Pedidos/usePedidosViewModel';
 import { PedidosSection } from '@components/organisms/PedidoSection/PedidosSection';
+import { FilaProducaoSection } from '@components/organisms/FilaProducaoSection/FilaProducaoSection';
 import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
 import styles from './pedidosView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
@@ -10,6 +11,7 @@ export default function PedidosView() {
     model,
     pedidosFiltrados,
     iniciarProducao,
+    enviarParaProducao,
     deletarPedido,
     dismissErro,
     setStatusPedidoFiltro,
@@ -26,12 +28,14 @@ export default function PedidosView() {
             onDismiss={dismissErro}
           />
         )}
+        <FilaProducaoSection />
         <PedidosSection
           pedidos={pedidosFiltrados}
           loading={model.loading}
           filtroStatus={model.filtroStatus}
           onFiltroStatus={setStatusPedidoFiltro}
           iniciarProducao={iniciarProducao}
+          enviarParaProducao={enviarParaProducao}
           deletarPedido={deletarPedido}
           conectado={conectado}
         />

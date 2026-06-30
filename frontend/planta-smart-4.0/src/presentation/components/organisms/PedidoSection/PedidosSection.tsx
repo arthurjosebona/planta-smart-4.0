@@ -11,6 +11,7 @@ interface PedidosSectionProps {
   filtroStatus: StatusPedido | null;
   onFiltroStatus: (tipo: StatusPedido | null) => void;
   iniciarProducao: (id: number) => void;
+  enviarParaProducao: (id: number) => void;
   deletarPedido: (id: number) => void;
   conectado: boolean;
 }
@@ -30,6 +31,7 @@ export function PedidosSection({
   filtroStatus,
   onFiltroStatus,
   iniciarProducao,
+  enviarParaProducao,
   deletarPedido,
   conectado,
 }: PedidosSectionProps) {
@@ -78,6 +80,10 @@ export function PedidosSection({
         <PedidoModal
           pedido={pedidoSelecionado}
           iniciarProducao={iniciarProducao}
+          enviarParaProducao={(id) => {
+            enviarParaProducao(id);
+            setPedidoSelecionadoId(null);
+          }}
           deletarPedido={(id) => {
             deletarPedido(id);
             setPedidoSelecionadoId(null);

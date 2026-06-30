@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smart.appsa.dto.request.PedidoRequestDTO;
+import com.smart.appsa.dto.response.FilaStreamDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
+import com.smart.appsa.service.FilaProducaoService;
 import com.smart.appsa.service.PedidoService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PedidoController {
     private final PedidoService pedidoService;
+    private final FilaProducaoService filaProducaoService;
 
 
     @PostMapping("")
@@ -47,6 +50,14 @@ public class PedidoController {
     @PutMapping("/start-production/{id}")
     public ResponseEntity<PedidoResponseDTO> startProduction(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.startProduction(id));
+    }
+
+    // Enfileira o pedido para produção. Inicia imediatamente se não há pedido em
+    // execução; caso contrário aguarda na fila (FIFO). Retorna o snapshot da fila.
+    @PostMapping("/{id}/enviar-producao")
+    public ResponseEntity<FilaStreamDTO> enviarProducao(@PathVariable Long id) {
+        filaProducaoService.enfileirar(id);
+        return ResponseEntity.accepted().body(filaProducaoService.snapshot());
     }
 
 

@@ -10,7 +10,6 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
-import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.exception.ClpComunicacaoException;
 
 import lombok.RequiredArgsConstructor;

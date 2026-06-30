@@ -8,6 +8,7 @@ import { StatusPedido } from '@enums/StatusPedido';
 import { IntToTipoPedido } from '@enums/TipoPedido';
 import { IPedidoRepository } from '@repositories/IPedidoRepository';
 import { ConfigBloco } from '@valueObjects/ConfigBloco';
+import { FilaProducao } from '@entities/FilaProducao';
 
 interface PedidoCreateInput {
   ordemDeProducao: number;
@@ -79,6 +80,11 @@ export class PedidoService {
 
   async iniciarProducao(id: number): Promise<Pedido> {
     return await this.repository.iniciarProducao(id);
+  }
+
+  // Enfileira o pedido para produção (FIFO). Retorna o snapshot da fila.
+  async enviarParaProducao(id: number): Promise<FilaProducao> {
+    return await this.repository.enviarParaProducao(id);
   }
 
   async update(id: number, input: PedidoCreateInput): Promise<Pedido> {

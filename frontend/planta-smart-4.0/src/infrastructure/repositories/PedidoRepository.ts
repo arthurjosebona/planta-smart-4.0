@@ -4,6 +4,9 @@ import { IPedidoRepository } from '@repositories/IPedidoRepository';
 import { PedidoMapper } from '../mappers/PedidoMapper';
 import { PedidoCreateResponseDTO } from '@dtos/response/PedidoCreateResponseDTO';
 import { PedidoGetResponseDTO } from '@dtos/response/PedidoGetResponseDTO';
+import { FilaProducao } from '@entities/FilaProducao';
+import { FilaStreamDTO } from '@dtos/response/stream/FilaStreamDTO';
+import { FilaProducaoMapper } from '../mappers/FilaProducaoMapper';
 
 export class PedidoRepository implements IPedidoRepository {
   private readonly httpClient: HttpClient;
@@ -55,6 +58,14 @@ export class PedidoRepository implements IPedidoRepository {
     );
     console.log(PedidoMapper.mapToEntityByGetDTO(data))
     return PedidoMapper.mapToEntityByGetDTO(data);
+  }
+
+  async enviarParaProducao(id: number): Promise<FilaProducao> {
+    const data: FilaStreamDTO = await this.httpClient.post<FilaStreamDTO>(
+      `/api/pedidos/${id}/enviar-producao`,
+      {}
+    );
+    return FilaProducaoMapper.mapToEntityByStreamDTO(data);
   }
 
   async update(id: number, pedido: Pedido): Promise<Pedido> {

@@ -27,6 +27,7 @@ import com.smart.appsa.config.ClpIpConfig;
 import com.smart.appsa.dto.clp.ClpReadOnlyDTO;
 import com.smart.appsa.dto.clp.ClpStatusPingDTO;
 import com.smart.appsa.dto.clp.StartReadingsResponseDTO;
+import com.smart.appsa.dto.response.FilaStreamDTO;
 import com.smart.appsa.model.enums.Estacao;
 import com.smart.appsa.service.clp.ClpReadingService;
 import com.smart.appsa.service.clp.PlcDataStore;
@@ -95,6 +96,18 @@ public class SmartController {
         Estacao estacao = Estacao.fromNome(bancada)
                 .orElseThrow(() -> new IllegalArgumentException("CLP inválido: " + bancada));
         return sseService.subscribe(EnumSet.of(estacao));
+    }
+
+    // Snapshot pontual da fila de produção (pedido em execução, pendentes e tempo decorrido).
+    @GetMapping("/fila")
+    public ResponseEntity<FilaStreamDTO> getFila() {
+        return ResponseEntity.ok(sseService.getFilaSnapshot());
+    }
+
+    // Stream SSE da fila de produção (evento "fila"), emitido só quando a fila muda.
+    @GetMapping("/fila/stream")
+    public SseEmitter filaStream() {
+        return sseService.subscribeFila();
     }
 
     @PostMapping("/ping")

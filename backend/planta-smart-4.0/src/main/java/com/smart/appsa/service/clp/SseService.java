@@ -7,16 +7,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.dto.response.FilaStreamDTO;
+import com.smart.appsa.events.FilaAlteradaEvent;
 import com.smart.appsa.mapper.ClpStreamMapper;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
 import com.smart.appsa.model.clp.MontagemInfo;
 import com.smart.appsa.model.clp.ProcessoInfo;
 import com.smart.appsa.model.enums.Estacao;
+import com.smart.appsa.service.FilaProducaoService;
 
 // Camada SSE no padrão Observer. É notificada (via {@link #publicar(Estacao)}) ao final de
 // cada ciclo de leitura de um CLP, monta o DTO da estação e <b>só emite quando o conteúdo
@@ -32,20 +36,26 @@ public class SseService {
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
     private final Map<Estacao, Object> ultimoDto = new ConcurrentHashMap<>();
 
+    // Assinantes do stream da fila de produção (canal independente das estações).
+    private final List<SseEmitter> filaSubscribers = new CopyOnWriteArrayList<>();
+    private volatile FilaStreamDTO ultimaFila;
+
     private final EstoqueInfoClp estoqueInfo;
     private final ProcessoInfo processoInfo;
     private final MontagemInfo montagemInfo;
     private final ExpedicaoInfoClp expedicaoInfo;
     private final AppStateConfig appState;
+    private final FilaProducaoService filaProducaoService;
 
     public SseService(EstoqueInfoClp estoqueInfo, ProcessoInfo processoInfo,
                       MontagemInfo montagemInfo, ExpedicaoInfoClp expedicaoInfo,
-                      AppStateConfig appState) {
+                      AppStateConfig appState, FilaProducaoService filaProducaoService) {
         this.estoqueInfo = estoqueInfo;
         this.processoInfo = processoInfo;
         this.montagemInfo = montagemInfo;
         this.expedicaoInfo = expedicaoInfo;
         this.appState = appState;
+        this.filaProducaoService = filaProducaoService;
     }
     
     public SseEmitter subscribe(Set<Estacao> estacoes) {
@@ -101,6 +111,63 @@ public class SseService {
             subscribers.remove(sub);
             try {
                 sub.emitter().complete();
+            } catch (Exception ignore) {
+                // emitter já encerrado
+            }
+        }
+    }
+
+    // ---- Stream da fila de produção (evento nomeado "fila") ----
+
+    // Assina o stream da fila e recebe o snapshot inicial ao conectar.
+    public SseEmitter subscribeFila() {
+        SseEmitter emitter = new SseEmitter(0L); // sem timeout
+        filaSubscribers.add(emitter);
+
+        emitter.onCompletion(() -> filaSubscribers.remove(emitter));
+        emitter.onTimeout(() -> { filaSubscribers.remove(emitter); emitter.complete(); });
+        emitter.onError(e -> filaSubscribers.remove(emitter));
+
+        FilaStreamDTO dto = filaProducaoService.snapshot();
+        ultimaFila = dto;
+        enviarFila(emitter, dto);
+        return emitter;
+    }
+
+    // Reage a qualquer alteração da fila (enfileirar/iniciar/concluir/tick do cronômetro)
+    // e só emite quando o snapshot difere do último propagado.
+    @EventListener
+    public void onFilaAlterada(FilaAlteradaEvent event) {
+        publicarFila();
+    }
+
+    public void publicarFila() {
+        FilaStreamDTO novo = filaProducaoService.snapshot();
+        if (Objects.equals(ultimaFila, novo)) {
+            return; // nada mudou -> não emite
+        }
+        ultimaFila = novo;
+        for (SseEmitter emitter : filaSubscribers) {
+            enviarFila(emitter, novo);
+        }
+    }
+
+    // Snapshot pontual da fila (para o endpoint REST).
+    public FilaStreamDTO getFilaSnapshot() {
+        return filaProducaoService.snapshot();
+    }
+
+    private void enviarFila(SseEmitter emitter, FilaStreamDTO dto) {
+        try {
+            synchronized (emitter) {
+                emitter.send(SseEmitter.event()
+                        .name("fila")
+                        .data(dto));
+            }
+        } catch (Exception ex) {
+            filaSubscribers.remove(emitter);
+            try {
+                emitter.complete();
             } catch (Exception ignore) {
                 // emitter já encerrado
             }

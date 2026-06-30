@@ -10,12 +10,13 @@ import { StatusPedido } from '@enums/StatusPedido';
 interface PedidoModalProps {
   pedido: Pedido;
   iniciarProducao: (id: number) => void;
+  enviarParaProducao: (id: number) => void;
   deletarPedido: (id: number) => void;
   onClose: () => void;
   conectado: boolean;
 }
 
-export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose, conectado }: PedidoModalProps) {
+export function PedidoModal({ pedido, iniciarProducao, enviarParaProducao, deletarPedido, onClose, conectado }: PedidoModalProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -53,6 +54,11 @@ export function PedidoModal({ pedido, iniciarProducao, deletarPedido, onClose, c
               <>
                 <hr className={styles.divider} />
                 <div className={styles.updateDeleteButtons}>
+                  <ActionButton
+                    label="Enviar para produção"
+                    onClick={() => enviarParaProducao(pedido.id!)}
+                    disabled={!conectado}
+                  />
                   <ActionButton label="Deletar" onClick={() => deletarPedido(pedido.id!)} />
                 </div>
               </>
