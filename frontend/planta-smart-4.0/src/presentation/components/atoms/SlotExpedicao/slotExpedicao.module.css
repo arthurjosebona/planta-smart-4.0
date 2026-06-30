@@ -17,6 +17,24 @@
   background: var(--color-bg-raised);
 }
 
+.slot--edit,
+.slot--clickable {
+  cursor: pointer;
+}
+
+.slot--clickable:hover {
+  border-color: var(--color-accent);
+}
+
+.slot--edit:hover {
+  border-color: var(--color-accent);
+}
+
+.slot--selected {
+  border-color: var(--color-accent);
+  background: rgba(100, 160, 255, 0.08);
+}
+
 /* Label #N */
 .slot-label {
   font-family: var(--font-mono);

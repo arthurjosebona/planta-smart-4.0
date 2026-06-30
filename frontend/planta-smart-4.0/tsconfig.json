@@ -5,6 +5,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
+    "moduleResolution": "bundler",
     "paths": {
       "@entities/*": ["./src/domain/entities/*"],
       "@repositories/*": ["./src/domain/repositories/*"],
@@ -19,8 +20,13 @@
       "@repositoriesImp/*": ["./src/infrastructure/repositories/*"],
       "@config/*": ["./src/config/*"],
       "@error/*": ["./src/domain/error/*"],
-      "@styles/*": ["./src/styles/*"]
+      "@styles/*": ["./src/styles/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@utils/*": ["./src/presentation/utils/*"],
+      "@mappers/*": ["./src/infrastructure/mappers/*"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@hooks/*": ["./src/utils/hooks/*"],
     }
   },
-  "include": ["src", "src/vite-env.d.ts"]
+  "include": ["src", "src/vite-env.d.ts"],
 }

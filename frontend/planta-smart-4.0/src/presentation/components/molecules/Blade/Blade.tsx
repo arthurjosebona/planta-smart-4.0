@@ -3,6 +3,13 @@ import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { PadraoLamina } from '@enums/PadraoLamina';
 import { PosicaoLamina } from '@enums/PosicaoLamina';
+import {
+  BLOCK,
+  COLUMN,
+  BLADE,
+  ENGRAVE_COLOR,
+  ENGRAVE_LINE_WIDTH,
+} from '@config/blockModel';
 import { PlasticMat } from '@components/atoms/PlasticMat/PlasticMat';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -136,17 +143,21 @@ function patternTo3D(
 ): THREE.Vector3[][] {
   const paths = PATTERN_PATHS[padrao];
   const { minU, maxU, minV, maxV } = pathBounds(paths);
-  const scale = Math.min((bladeWidth * 0.58) / (maxU - minU), (bladeHeight * 0.62) / (maxV - minV));
+  const scale = Math.min(
+    (bladeWidth * BLADE.widthRatio) / (maxU - minU),
+    (bladeHeight * BLADE.heightRatio) / (maxV - minV)
+  );
   const cx = face === PosicaoLamina.Frente ? 0 : bladeX;
   const cy = bladeY;
+  const off = BLADE.engraveOffset;
 
   return paths.map((path) =>
     path.map(([u, v]) => {
       if (face === PosicaoLamina.Frente)
-        return new THREE.Vector3(cx + u * scale, cy + v * scale, bladeZ + bladeT / 2 + 0.004);
+        return new THREE.Vector3(cx + u * scale, cy + v * scale, bladeZ + bladeT / 2 + off);
       if (face === PosicaoLamina.Esquerda)
-        return new THREE.Vector3(bladeX - bladeT / 2 - 0.004, cy + v * scale, bladeZ + u * scale);
-      return new THREE.Vector3(bladeX + bladeT / 2 + 0.004, cy + v * scale, bladeZ - u * scale);
+        return new THREE.Vector3(bladeX - bladeT / 2 - off, cy + v * scale, bladeZ + u * scale);
+      return new THREE.Vector3(bladeX + bladeT / 2 + off, cy + v * scale, bladeZ - u * scale);
     })
   );
 }
@@ -174,13 +185,13 @@ export function Blade({
   cor,
   padrao,
   blockY,
-  blockW = 1.7,
-  blockD = 1.7,
-  blockH = 0.71,
-  baseT = 0.1,
-  colW = 0.22,
-  bladeT = 0.08,
-  bladeRecess = -0.14,
+  blockW = BLOCK.width,
+  blockD = BLOCK.depth,
+  blockH = BLOCK.height,
+  baseT = BLOCK.baseThickness,
+  colW = COLUMN.width,
+  bladeT = BLADE.thickness,
+  bladeRecess = BLADE.recess,
 }: BladeProps) {
   const bodyH = blockH - baseT;
 
@@ -220,7 +231,7 @@ export function Blade({
         <PlasticMat color={cor} />
       </mesh>
       {patternLines?.map((pts, i) => (
-        <Line key={i} points={pts} color="#050505" lineWidth={2.7} />
+        <Line key={i} points={pts} color={ENGRAVE_COLOR} lineWidth={ENGRAVE_LINE_WIDTH} />
       ))}
     </group>
   );

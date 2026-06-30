@@ -5,7 +5,7 @@ export class HttpClient {
   private readonly defaultHeaders: Record<string, string>;
 
   constructor() {
-    this.baseURL = 'http://localhost:8080';
+    this.baseURL = 'http://localhost:8088';
     this.defaultHeaders = {
       'Content-Type': 'application/json',
     };
@@ -21,6 +21,13 @@ export class HttpClient {
     }
     if (response.status === 204) {
       return undefined as T;
+    }
+    // Alguns endpoints (ex.: POST /api/smart/readonly) respondem com texto puro,
+    // não JSON. Só desserializa como JSON quando o Content-Type indicar isso.
+    const contentType = response.headers.get('content-type') ?? '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      return (text ? text : undefined) as T;
     }
     return response.json() as Promise<T>;
   }

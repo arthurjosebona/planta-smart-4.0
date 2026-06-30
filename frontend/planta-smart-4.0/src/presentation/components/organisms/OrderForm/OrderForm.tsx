@@ -54,13 +54,12 @@ interface OrderFormProps {
   createPedido: () => void;
 }
 
-const FACES       = Object.values(PosicaoLamina) as PosicaoLamina[];
-const PADROES     = Object.values(PadraoLamina) as PadraoLamina[];
-const CORES_TAMPA = Object.values(CorTampa) as CorTampa[];
-const CORES_BLOCO = Object.values(CorBloco) as CorBloco[];
-const CORES_LAMINA= Object.values(CorLamina) as CorLamina[];
+const FACES        = Object.values(PosicaoLamina) as PosicaoLamina[];
+const PADROES      = Object.values(PadraoLamina)  as PadraoLamina[];
+const CORES_TAMPA  = Object.values(CorTampa)      as CorTampa[];
+const CORES_BLOCO  = Object.values(CorBloco)      as CorBloco[];
+const CORES_LAMINA = Object.values(CorLamina)     as CorLamina[];
 
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function OrderForm({
   state,
@@ -73,6 +72,13 @@ export function OrderForm({
   setOrdemDeProducao,
   createPedido,
 }: OrderFormProps) {
+  // Só é possível enviar quando a tampa e todos os blocos visíveis têm cor
+  // definida (itens em modo blueprint têm cor === null).
+  const todosBlocosComCor = state.blocos
+    .slice(0, state.numBlocos)
+    .every((bloco) => bloco.cor !== null);
+  const podeEnviar = state.corTampa !== null && todosBlocosComCor;
+
   return (
     <div className={styles.root}>
 
@@ -124,7 +130,6 @@ export function OrderForm({
 
       <Divider />
 
-      {/* ── Blocos ── */}
       {Array.from({ length: state.numBlocos }, (_, i) => {
         const bloco = state.blocos[i];
         return (
@@ -204,27 +209,24 @@ export function OrderForm({
         );
       })}
 
-      {/* ── Criar pedido ── */}
       <Divider />
-      <div className={styles.submitWrapper}>
-        <button
-          onClick={createPedido}
-          disabled={state.loading}
-          className={`${styles.submitBtn} ${state.loading ? styles.submitBtnLoading : ''}`}
-        >
-          {state.loading ? 'Criando…' : 'Criar pedido'}
-        </button>
-      </div>
-
-      {/* ── Debug panel ── */}
-      <Divider />
-      <div className={styles.debug}>
-        <div className={styles.debugTitle}>debug</div>
-        <div>loading: <span className={state.loading ? styles.debugLoading : styles.debugMuted}>{String(state.loading)}</span></div>
-        <div>sucesso: <span className={state.sucesso ? styles.debugOk : styles.debugMuted}>{String(state.sucesso)}</span></div>
-        <div>erro: <span className={state.erro ? styles.debugError : styles.debugMuted}>{state.erro ?? 'null'}</span></div>
-        <div>pedidoCriado: <span className={state.pedidoCriado ? styles.debugOk : styles.debugMuted}>{state.pedidoCriado ? `id ${state.pedidoCriado.id}` : 'null'}</span></div>
-      </div>
+      {podeEnviar ? (
+        <div className={styles.submitWrapper}>
+          <button
+            onClick={createPedido}
+            disabled={state.loading}
+            className={`${styles.submitBtn} ${state.loading ? styles.submitBtnLoading : ''}`}
+          >
+            {state.loading ? 'Criando…' : 'Criar pedido'}
+          </button>
+        </div>
+      ) : (
+        <div className={styles.submitWrapper}>
+          <p className={styles.submitHint}>
+            Escolha a cor da tampa e de todos os blocos para criar o pedido.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

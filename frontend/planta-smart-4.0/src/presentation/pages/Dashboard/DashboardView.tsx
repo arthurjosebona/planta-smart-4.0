@@ -1,6 +1,8 @@
 import { useDashboardViewModel } from '@pages/Dashboard/useDashboardViewModel';
 import { EstoqueSection } from '@components/organisms/EstoqueSection/EstoqueSection';
 import { ExpedicaoSection } from '@components/organisms/ExpedicaoSection/ExpedicaoSection';
+import { ExpedicaoDetalheModal } from '@components/organisms/ExpedicaoDetalheModal/ExpedicaoDetalheModal';
+import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
 import styles from './dashboardView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
 
@@ -13,6 +15,16 @@ export default function DashboardView() {
     changeBlockColor,
     cleanEstoque,
     saveEstoque,
+    dismissErro,
+    enterExpedicaoEditMode,
+    cancelExpedicaoEditMode,
+    selectSlot,
+    changeOpInput,
+    saveExpedicao,
+    detalheSlot,
+    abrirDetalheExpedicao,
+    fecharDetalheExpedicao,
+    iniciarProducao,
   } = useDashboardViewModel();
 
   if (model.loading && model.estoque.length === 0) {
@@ -27,14 +39,16 @@ export default function DashboardView() {
 
   return (
     <AppTemplate>
-      <main id="main-content" className={styles.main}> {/* ← estava sem className */}
+      <main id="main-content" className={styles.main}>
         {model.erro && (
-          <div className="erro-banner" role="alert">
-            {model.erro}
-          </div>
+          <FeedbackBanner
+            variant="error"
+            message={model.erro}
+            onDismiss={dismissErro}
+          />
         )}
 
-        <div className={styles.sections}> {/* ← wrapper novo */}
+        <div className={styles.sections}>
           <EstoqueSection
             estoque={model.estoque}
             editMode={model.editMode}
@@ -47,8 +61,30 @@ export default function DashboardView() {
             onClean={cleanEstoque}
             onSave={saveEstoque}
           />
-          <ExpedicaoSection expedicao={model.expedicao} />
+          <ExpedicaoSection
+            expedicao={model.expedicao}
+            editMode={model.expedicaoEditMode}
+            selectedId={model.selectedExpedicaoId}
+            opInput={model.opInput}
+            loading={model.loading}
+            onEnterEdit={enterExpedicaoEditMode}
+            onCancel={cancelExpedicaoEditMode}
+            onToggleSlot={selectSlot}
+            onSelectSlot={abrirDetalheExpedicao}
+            onOpInputChange={changeOpInput}
+            onSave={saveExpedicao}
+          />
         </div>
+
+        {detalheSlot && (
+          <ExpedicaoDetalheModal
+            expedicaoId={detalheSlot.id}
+            posicaoFisica={detalheSlot.posicaoFisica}
+            op={detalheSlot.ordemDeProducaoAtual}
+            iniciarProducao={iniciarProducao}
+            onClose={fecharDetalheExpedicao}
+          />
+        )}
       </main>
     </AppTemplate>
   );

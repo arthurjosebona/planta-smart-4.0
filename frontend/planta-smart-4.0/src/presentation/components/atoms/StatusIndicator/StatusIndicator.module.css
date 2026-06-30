@@ -1,0 +1,198 @@
+.sticker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #fdfbf3 0%, #f0ecdd 100%);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  transform: rotate(-2deg);
+  user-select: none;
+  transition: box-shadow 0.3s ease;
+}
+
+/* canto "descolado", para reforçar a leitura de adesivo */
+.sticker::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.18) 50%);
+  border-radius: 0 10px 0 0;
+}
+
+/* "pino" que prende o adesivo, puramente decorativo */
+.pin {
+  position: absolute;
+  top: -6px;
+  left: 18px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ededed, #9a9a9a);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+.led {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ledCore {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  z-index: 1;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ledRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.online .ledCore {
+  background: #2ecc71;
+  box-shadow: 0 0 6px 2px rgba(46, 204, 113, 0.9);
+}
+
+.online .ledRing {
+  background: #2ecc71;
+  animation: pulse 1.6s ease-out infinite;
+}
+
+.offline .ledCore {
+  background: #e74c3c;
+  box-shadow: 0 0 4px 1px rgba(231, 76, 60, 0.55);
+}
+
+.offline .ledRing {
+  background: #e74c3c;
+  opacity: 0;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b6b6b;
+  text-transform: uppercase;
+}
+
+.state {
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.online .state {
+  color: #1f9d54;
+}
+
+.offline .state {
+  color: #c0392b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ledRing {
+    animation: none !important;
+  }
+}
+
+/* ── Variante compacta, para uso dentro do Header ── */
+.compact {
+  transform: none;
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  box-shadow: none;
+  gap: 7px;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.compact::after {
+  display: none;
+}
+
+.compact.online {
+  background: rgba(46, 204, 113, 0.07);
+  border-color: rgba(46, 204, 113, 0.22);
+}
+
+.compact.offline {
+  background: rgba(231, 76, 60, 0.07);
+  border-color: rgba(231, 76, 60, 0.22);
+}
+
+.compact .led {
+  width: 10px;
+  height: 10px;
+}
+
+.compact .ledCore {
+  width: 7px;
+  height: 7px;
+}
+
+.compact .text {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.compact .label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.compact .state {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.compact.online .state {
+  color: #2ecc71;
+}
+
+.compact.offline .state {
+  color: #e74c3c;
+}

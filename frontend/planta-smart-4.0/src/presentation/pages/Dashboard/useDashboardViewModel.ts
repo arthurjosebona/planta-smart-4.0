@@ -1,95 +1,68 @@
-import { useState, useEffect } from 'react';
-import { StoreModel, StoreModelInitial } from '@pages/Dashboard/DashboardModel';
-import { CorEstoque } from '@enums/CorEstoque';
-import { estoqueService, expedicaoService } from '@config/diContainer';
-import { HttpError } from '@error/HttpError';
+import { useState } from 'react';
+import { useEstoqueContext } from '@contexts/EstoqueContext';
+import { useExpedicaoContext } from '@contexts/ExpedicaoContext';
+import { StoreModel } from '@pages/Dashboard/DashboardModel';
+import { Expedicao } from '@entities/Expedicao';
+import { pedidoService } from '@config/diContainer';
 
 export function useDashboardViewModel() {
-  const [model, setModel] = useState<StoreModel>(StoreModelInitial);
+  const estoque = useEstoqueContext();
+  const expedicao = useExpedicaoContext();
 
-  useEffect(() => {
-    fetchAll();
-  }, []);
+  // Slot de expedição aberto no modal de detalhe (clique fora do modo de edição).
+  const [detalheSlot, setDetalheSlot] = useState<Expedicao | null>(null);
 
-  async function fetchAll() {
-    setModel((s) => ({ ...s, loading: true, erro: null }));
-    try {
-      const [estoque, expedicao] = await Promise.all([
-        estoqueService.findAll(),
-        expedicaoService.findAll(),
-      ]);
-      setModel((s) => ({ ...s, estoque, expedicao, loading: false }));
-    } catch {
-      setModel((s) => ({
-        ...s,
-        loading: false,
-        erro: 'Erro ao carregar dados.',
-      }));
-    }
+  function abrirDetalheExpedicao(id: number) {
+    const slot = expedicao.expedicao.find((s) => s.id === id) ?? null;
+    setDetalheSlot(slot);
   }
 
-  // ── Edição de estoque ──────────────────────────────────────────────────────
-  function enterEditMode() {
-    setModel((s) => ({ ...s, editMode: true, selectedIds: [] }));
+  function fecharDetalheExpedicao() {
+    setDetalheSlot(null);
   }
 
-  function cancelEditMode() {
-    setModel((s) => ({ ...s, editMode: false, selectedIds: [] }));
+  async function iniciarProducao(id: number) {
+    await pedidoService.iniciarProducao(id);
   }
 
-  function toggleBlocoSelection(id: number) {
-    setModel((s) => {
-      const already = s.selectedIds.includes(id);
-      return {
-        ...s,
-        selectedIds: already ? s.selectedIds.filter((i) => i !== id) : [...s.selectedIds, id],
-      };
-    });
-  }
+  const model: StoreModel = {
+    estoque: estoque.estoque,
+    expedicao: expedicao.expedicao,
+    expedicaoSnapshot: [],
+    editMode: estoque.editMode,
+    selectedIds: estoque.selectedIds,
+    loading: estoque.loading || expedicao.loading,
+    erro: estoque.erro ?? expedicao.erro,
+    expedicaoEditMode: expedicao.editMode,
+    selectedExpedicaoId: expedicao.selectedId,
+    opInput: expedicao.opInput,
+  };
 
-  function changeBlockColor(cor: CorEstoque) {
-    setModel((s) => ({
-      ...s,
-      estoque: s.estoque.map((bloco) =>
-        s.selectedIds.includes(bloco.id) ? { ...bloco, cor: cor } : bloco
-      ),
-      // Desseleciona após aplicar a cor
-      selectedIds: [],
-    }));
-  }
-
-  function cleanEstoque() {
-    setModel((s) => ({
-      ...s,
-      estoque: s.estoque.map((bloco) =>
-        s.selectedIds.includes(bloco.id) ? { ...bloco, cor: CorEstoque.Vazio } : bloco
-      ),
-      selectedIds: [],
-    }));
-  }
-
-  async function saveEstoque() {
-    setModel((s) => ({ ...s, loading: true, erro: null }));
-    try {
-      await estoqueService.updateAll(model.estoque);
-      setModel((s) => ({ ...s, loading: false, editMode: false }));
-    } catch (error: unknown) {
-      const mensagem = error instanceof HttpError ? error.message : 'Erro desconhecido';
-      setModel((s) => ({
-        ...s,
-        loading: false,
-        erro: mensagem,
-      }));
-    }
+  function dismissErro() {
+    estoque.dismissErro();
+    expedicao.dismissErro();
   }
 
   return {
     model,
-    enterEditMode,
-    cancelEditMode,
-    toggleBlocoSelection,
-    changeBlockColor,
-    cleanEstoque,
-    saveEstoque,
+    // detalhe expedição
+    detalheSlot,
+    abrirDetalheExpedicao,
+    fecharDetalheExpedicao,
+    iniciarProducao,
+    // estoque
+    enterEditMode: estoque.enterEditMode,
+    cancelEditMode: estoque.cancelEditMode,
+    toggleBlocoSelection: estoque.toggleBlocoSelection,
+    changeBlockColor: estoque.changeBlockColor,
+    cleanEstoque: estoque.cleanEstoque,
+    saveEstoque: estoque.saveEstoque,
+    dismissErro,
+    // expedição
+    enterExpedicaoEditMode: expedicao.enterEditMode,
+    cancelExpedicaoEditMode: expedicao.cancelEditMode,
+    selectSlot: expedicao.selectSlot,
+    changeOpInput: expedicao.changeOpInput,
+    saveExpedicao: expedicao.saveExpedicao,
   };
 }

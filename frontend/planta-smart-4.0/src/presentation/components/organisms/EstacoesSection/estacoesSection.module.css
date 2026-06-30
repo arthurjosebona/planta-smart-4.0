@@ -1,0 +1,20 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 703px;
+  line-height: 0;
+  user-select: none;
+}
+
+.base,
+.overlay {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

@@ -1,0 +1,90 @@
+@reference "@styles/global.css";
+
+.main {
+  @apply mx-auto flex flex-col;
+  width: 100%;
+  max-width: 1100px;
+  gap: var(--spacing-6);
+  padding: var(--spacing-8) var(--spacing-6);
+}
+
+/* ── Cabeçalho da página ── */
+.header {
+  @apply flex flex-col;
+  gap: var(--spacing-1);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heading {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.subheading {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ── Layout principal ── */
+.layout {
+  @apply flex flex-col;
+  align-items: stretch;
+  gap: var(--spacing-6);
+  width: 100%;
+}
+
+.estacoesSection {
+  @apply flex flex-col;
+  width: 100%;
+}
+
+/* ── Painéis inferiores (Estoque / Expedição) ── */
+.inferiorEstoques {
+  @apply grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-5);
+  align-items: start;
+}
+
+.painel {
+  @apply flex flex-col;
+  gap: var(--spacing-3);
+  padding: var(--spacing-5);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--ease-base), box-shadow var(--ease-base);
+}
+
+.painel:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.painelLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ── Responsivo ── */
+@media (max-width: 860px) {
+  .main {
+    padding: var(--spacing-6) var(--spacing-4);
+  }
+
+  .inferiorEstoques {
+    grid-template-columns: 1fr;
+  }
+}

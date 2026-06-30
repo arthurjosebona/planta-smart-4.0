@@ -1,0 +1,399 @@
+@reference "@styles/global.css";
+
+.main {
+  @apply mx-auto flex flex-col;
+  max-width: 1100px;
+  width: 100%;
+  padding: var(--spacing-10) var(--spacing-6);
+  gap: var(--spacing-8);
+}
+
+/* ── Cabeçalho ── */
+.intro {
+  @apply flex flex-col;
+  gap: var(--spacing-2);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  max-width: 64ch;
+}
+
+/* ── Fluxo: bancada → produto ── */
+.flow {
+  @apply flex flex-row items-center justify-center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-6);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.flowBancada {
+  @apply flex flex-col items-center;
+  flex: 1;
+  min-width: 0;
+  gap: var(--spacing-2);
+}
+
+.flowImg {
+  @apply w-full h-auto;
+  max-width: 560px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+}
+
+.flowCaption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.flowArrow {
+  width: 48px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.produtoImg {
+  width: 180px;
+  height: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+}
+
+/* ── Contexto ── */
+.context {
+  @apply flex flex-col;
+  gap: var(--spacing-3);
+  padding: var(--spacing-6);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--color-accent);
+}
+
+.contextTitle {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.contextText {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  max-width: 90ch;
+}
+
+.contextText strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* ── Indicadores (KPIs) ── */
+.kpis {
+  @apply grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--spacing-3);
+}
+
+.kpi {
+  @apply relative flex flex-col;
+  gap: var(--spacing-1);
+  padding: var(--spacing-4);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.kpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--color-text-muted);
+}
+
+.kpi.good::before {
+  background: var(--color-success);
+}
+.kpi.bad::before {
+  background: var(--color-danger);
+}
+.kpi.warn::before {
+  background: var(--color-warning);
+}
+.kpi.neutral::before {
+  background: var(--color-accent);
+}
+
+.kpiLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.kpiValue {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ── Detalhes da bancada ── */
+.details {
+  @apply flex flex-col;
+  gap: var(--spacing-4);
+}
+
+.detailsHeader {
+  @apply flex flex-row items-center justify-between;
+  gap: var(--spacing-3);
+}
+
+.connState {
+  @apply inline-flex flex-row items-center;
+  gap: var(--spacing-2);
+  padding: 5px var(--spacing-3);
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+}
+
+.connState.online {
+  color: var(--color-success);
+  border-color: rgba(76, 175, 125, 0.28);
+}
+
+.connState.offline {
+  color: var(--color-danger);
+  border-color: rgba(224, 91, 91, 0.25);
+}
+
+.connDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Grid de estações ── */
+.stations {
+  @apply grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+  list-style: none;
+}
+
+.stationCard {
+  @apply relative flex flex-col;
+  overflow: hidden;
+  padding: var(--spacing-4) var(--spacing-5);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  gap: var(--spacing-2);
+}
+
+.stationCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.stationCard.estoque::before {
+  background: #378add;
+}
+.stationCard.processo::before {
+  background: #1d9e75;
+}
+.stationCard.montagem::before {
+  background: #ef9f27;
+}
+.stationCard.expedicao::before {
+  background: #e24b4a;
+}
+
+.stationTop {
+  @apply flex flex-row items-center justify-between;
+  gap: var(--spacing-2);
+}
+
+.stationLabel {
+  @apply flex flex-row items-center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  gap: 6px;
+}
+
+.stationDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stationDot.on {
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(76, 175, 125, 0.18);
+}
+
+.stationDot.off {
+  background: var(--color-text-muted);
+}
+
+.stationIp {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.stationMeta {
+  @apply flex flex-row flex-wrap items-center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.metaSep {
+  color: var(--color-text-muted);
+}
+
+/* ── Status tag (status operacional do stream) ── */
+.statusTag {
+  @apply inline-flex items-center;
+  padding: 2px var(--spacing-2);
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.statusTag.muted,
+.flag.muted {
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.statusTag.active {
+  color: var(--color-accent);
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent-glow);
+}
+
+.statusTag.warn,
+.flag.warn {
+  color: var(--color-warning);
+  background: rgba(232, 160, 69, 0.1);
+  border-color: rgba(232, 160, 69, 0.28);
+}
+
+.statusTag.danger,
+.flag.danger {
+  color: var(--color-danger);
+  background: var(--color-danger-dim);
+  border-color: rgba(224, 91, 91, 0.28);
+}
+
+/* ── Flags inline (emergência/manual) ── */
+.flag {
+  @apply inline-flex items-center;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+/* ── Responsivo ── */
+@media (max-width: 1000px) {
+  .kpis {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .flow {
+    flex-direction: column;
+    gap: var(--spacing-5);
+  }
+
+  .flowArrow {
+    transform: rotate(90deg);
+  }
+
+  .flowImg {
+    max-width: 85%;
+  }
+}
+
+@media (max-width: 560px) {
+  .kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stations {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}

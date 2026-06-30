@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smart.appsa.clpcomm.PlcConnectionService;
+import com.smart.appsa.clpcomm.PlcConnector;
+import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.config.ClpIpConfig;
+import com.smart.appsa.dto.request.ExpedicaoRequestDTO;
 import com.smart.appsa.dto.response.ExpedicaoResponseDTO;
 import com.smart.appsa.exception.ExpedicaoLotadaException;
 import com.smart.appsa.exception.InvalidPosicaoExpedicaoException;
-import com.smart.appsa.exception.OrdemDeProducaoExpedidaException;
-import com.smart.appsa.exception.PosicaoExpedicaoOcupadaException;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.ExpedicaoMapper;
 import com.smart.appsa.model.Expedicao;
@@ -20,7 +23,17 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ExpedicaoService {
+    // Data Block da estação EXPEDIÇÃO.
+    private static final int DB_EXPEDICAO = 9;
+    // Offset (int) inicial do magazine de expedição (12 posições, 2 bytes cada).
+    private static final int OFFSET_MAGAZINE = 6;
+    // Número de posições do magazine de expedição.
+    private static final int TAMANHO_MAGAZINE = 12;
+
     private final ExpedicaoRepository expedicaoRepository;
+    private final PlcConnectionService plcConnectionService;
+    private final ClpIpConfig clpIpConfig;
+    private final AppStateConfig appStateConfig;
 
     @Transactional(readOnly = true)
     public List<ExpedicaoResponseDTO> findAll() {
@@ -49,7 +62,7 @@ public class ExpedicaoService {
     }
 
     @Transactional
-    public void AssignOrdemAtPosicao(int ordemDeProducao, int posicaoFisica) {
+    public void assignOrdemAtPosicao(int ordemDeProducao, int posicaoFisica) {
         validateFields(ordemDeProducao, posicaoFisica);
         Expedicao expedicao = expedicaoRepository.findByPosicaoFisica(posicaoFisica)
                 .orElseThrow(() -> new RuntimeException("Posição não encontrada no banco."));
@@ -60,15 +73,63 @@ public class ExpedicaoService {
     private void validateFields(int ordemDeProducao, int posicaoFisica) {
         if (posicaoFisica < 1 || posicaoFisica > 12) 
             throw new InvalidPosicaoExpedicaoException(posicaoFisica);
-        if (expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica)) 
-            throw new PosicaoExpedicaoOcupadaException(posicaoFisica);
-        if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) 
-            throw new OrdemDeProducaoExpedidaException(ordemDeProducao);
+        // if (expedicaoRepository.findPosicoesOcupadas().contains(posicaoFisica)) 
+        //     throw new PosicaoExpedicaoOcupadaException(posicaoFisica);
+        // if (expedicaoRepository.existsByOrdemDeProducaoAtual(ordemDeProducao)) 
+        //     throw new OrdemDeProducaoExpedidaException(ordemDeProducao);
+    }
+
+    @Transactional
+    public void updateAll(List<ExpedicaoRequestDTO> expedicao) {
+        for(ExpedicaoRequestDTO e : expedicao) {
+            assignOrdemAtPosicao(e.ordemDeProducao(), e.posicaoFisica());
+        }
+        escreverExpedicaoNoClp();
+    }
+
+    // Escreve o magazine completo de OPs no CLP EXPEDIÇÃO [DB9, byte 6, 24 bytes].
+    // A verificação de readOnly é feita primeiro: em modo somente-leitura nada é escrito.
+    private void escreverExpedicaoNoClp() {
+        if (appStateConfig.isReadOnly()) {
+            return;
+        }
+
+        String ip = clpIpConfig.getExpedicaoIp();
+        PlcConnector connector = plcConnectionService.getConnection(ip);
+        if (connector == null) {
+            System.out.println("Sem conexão com CLP EXPEDIÇÃO " + ip + " - magazine não escrito.");
+            return;
+        }
+
+        // Cada posição física (1..12) vira um int16 big-endian (offset = (posicao - 1) * 2).
+        byte[] magazine = new byte[TAMANHO_MAGAZINE * 2];
+        for (Expedicao e : expedicaoRepository.findAll()) {
+            Integer posicao = e.getPosicaoFisica();
+            if (posicao != null && posicao >= 1 && posicao <= TAMANHO_MAGAZINE) {
+                int op = e.getOrdemDeProducaoAtual() != null ? e.getOrdemDeProducaoAtual() : 0;
+                int idx = (posicao - 1) * 2;
+                magazine[idx] = (byte) ((op >> 8) & 0xFF);
+                magazine[idx + 1] = (byte) (op & 0xFF);
+            }
+        }
+
+        try {
+            connector.writeBlock(DB_EXPEDICAO, OFFSET_MAGAZINE, magazine.length, magazine);
+        } catch (Exception ex) {
+            System.out.println("ERRO: Na tentativa de escrever o magazine da Expedição [DB9:6]");
+            ex.printStackTrace();
+        }
     }
 
     @Transactional(readOnly = true)
     public Expedicao findFirstPosicaoLivre() {
         return expedicaoRepository.findFirstByOrdemDeProducaoAtualOrderByPosicaoFisicaAsc(0)
                 .orElseThrow(() -> new ExpedicaoLotadaException());
+    }
+
+    @Transactional(readOnly = true)
+    public Expedicao findByPosicaoFisica(Integer posicaoFisica) {
+        return expedicaoRepository.findByPosicaoFisica(posicaoFisica)
+            .orElseThrow(() -> new ResourceNotFoundException("Expedicao", "posicaoFisica", posicaoFisica));
     }
 }

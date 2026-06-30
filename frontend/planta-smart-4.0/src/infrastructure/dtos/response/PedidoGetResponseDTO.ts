@@ -12,5 +12,6 @@ export interface PedidoGetResponseDTO {
   registroCriacao: string;
   registroEntradaExpedicao: string | null;
   registroSaidaExpedicao: string | null;
+  registroEntradaEstoque: string | null;
   expedicao: ExpedicaoResponseDTO;
 }

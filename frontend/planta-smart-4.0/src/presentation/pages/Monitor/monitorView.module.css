@@ -1,0 +1,62 @@
+@reference "@styles/global.css";
+
+.main {
+  @apply mx-auto flex flex-col;
+  padding: var(--spacing-6) var(--spacing-6) var(--spacing-8);
+  gap: var(--spacing-5);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.streamStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid transparent;
+}
+
+.streamStatus.online {
+  color: var(--color-success);
+  background: rgba(76, 175, 125, 0.08);
+  border-color: rgba(76, 175, 125, 0.25);
+}
+
+.streamStatus.offline {
+  color: var(--color-text-muted);
+  background: var(--color-bg-raised);
+  border-color: var(--color-border);
+}
+
+.streamDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.streamStatus.online .streamDot {
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}

@@ -1,0 +1,84 @@
+@reference "@styles/global.css";
+
+.overlay {
+  @apply fixed left-0 right-0 bottom-0 flex items-start justify-center overflow-y-auto;
+  top: var(--header-h);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  padding: var(--spacing-5);
+}
+
+.modal {
+  @apply relative flex w-full flex-col overflow-hidden rounded-xl;
+  margin: auto;
+  max-width: 1100px;
+  max-height: calc(100vh - var(--header-h) - 2 * var(--spacing-5));
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.closeBtn {
+  @apply absolute flex items-center justify-center rounded-lg cursor-pointer;
+  top: var(--spacing-3);
+  right: var(--spacing-3);
+  width: 32px;
+  height: 32px;
+  z-index: 1;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: all var(--ease-base);
+}
+
+.closeBtn:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+.content {
+  @apply flex flex-col md:flex-row;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.lista {
+  @apply flex flex-col overflow-y-auto;
+  flex: 1 1 50%;
+  min-height: 0;
+  padding: var(--spacing-6);
+}
+
+/* Quando não há modelo a exibir, a lista ocupa o card inteiro. */
+.lista--full {
+  flex-basis: 100%;
+}
+
+.titulo {
+  @apply text-lg font-medium;
+  color: var(--color-text-primary);
+}
+
+.divider {
+  @apply border-none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--spacing-3) 0;
+}
+
+.cards {
+  @apply flex flex-col;
+  gap: var(--spacing-3);
+}
+
+.stateMsg {
+  @apply text-sm;
+  color: var(--color-text-muted);
+  padding: var(--spacing-3) 0;
+}
+
+.viewer {
+  @apply flex flex-col items-center justify-center;
+  flex: 1 1 50%;
+  min-height: 360px;
+}

@@ -4,8 +4,16 @@ import { SiteTitle } from '@components/molecules/SiteTitle/SiteTitle';
 import { NavLink } from '@components/molecules/NavLink/NavLink';
 import { NavSeparator } from '@components/atoms/NavSeparator/NavSeparator';
 import { HamburgerButton } from '@components/atoms/HamburgerButton/HamburgerButton';
+import { StatusIndicator } from '@components/atoms/StatusIndicator/StatusIndicator';
 import styles from '@components/organisms/Header/header.module.css';
+import { useStatusContext } from '@contexts/StatusContext';
 
+const IconHome = (  
+  <>
+    <path d="m3 9 9-7 9 7" />
+    <path d="M5 10v10a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V10" />
+  </>
+);
 const IconPedido = (
   <>
     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
@@ -36,6 +44,16 @@ const IconDashboard = (
     <rect x="14" y="14" width="7" height="7" rx="1" />
   </>
 );
+const IconMonitor = (
+  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+);
+const IconIps = (
+  <>
+    <rect x="3" y="5" width="18" height="6" rx="1" />
+    <rect x="3" y="13" width="18" height="6" rx="1" />
+    <path d="M7 8h.01M7 16h.01" />
+  </>
+);
 
 interface NavItem {
   href: string;
@@ -44,21 +62,33 @@ interface NavItem {
   matchPath?: string;
 }
 const NAV_ITEMS: (NavItem | 'separator')[] = [
-  { href: '/store',     label: 'Store',     icon: IconStore     },
-  { href: '/pedidos',   label: 'Pedidos',   icon: IconPedido    },
+  { href: '/home', label: 'Home', icon: IconHome },
+  'separator',
+  { href: '/ips', label: 'Conexão', icon: IconIps },
+  'separator',
+  { href: '/store', label: 'Store', icon: IconStore },
+  'separator',
+  { href: '/pedidos', label: 'Pedidos', icon: IconPedido },
   'separator',
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
-  { href: '/estacoes',  label: 'Estações',  icon: IconEstacoes  },
+  'separator',
+  { href: '/estacoes', label: 'Estações', icon: IconEstacoes },
+  'separator',
+  { href: '/monitor', label: 'Monitor', icon: IconMonitor },
+  'separator',
 ];
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
-  const navRef    = useRef<HTMLElement>(null);
+  const { conectado } = useStatusContext();
+  const navRef = useRef<HTMLElement>(null);
   const btnWrapRef = useRef<HTMLDivElement>(null);
 
   // Fecha ao navegar para outra rota
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   // Fecha ao clicar fora
   useEffect(() => {
@@ -67,7 +97,8 @@ export function Header() {
         menuOpen &&
         !navRef.current?.contains(e.target as Node) &&
         !btnWrapRef.current?.contains(e.target as Node)
-      ) setMenuOpen(false);
+      )
+        setMenuOpen(false);
     }
     document.addEventListener('mousedown', onMouseDown);
     return () => document.removeEventListener('mousedown', onMouseDown);
@@ -109,6 +140,8 @@ export function Header() {
             ),
           )}
         </nav>
+
+        <StatusIndicator conectado={conectado} compact />
 
         {/* div wrapper: dispensa forwardRef no HamburgerButton */}
         <div ref={btnWrapRef} className={styles.menuBtn}>
