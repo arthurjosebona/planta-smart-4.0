@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMART 4.0 — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d10;
+  --panel:#11161b;
+  --panel-2:#161c22;
+  --line:#232b32;
+  --cyan:#16d6e0;
+  --amber:#ff6a2b;
+  --green:#3ddc84;
+  --text:#e7edf1;
+  --muted:#7c8a96;
+  --font-display:'Rajdhani',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:linear-gradient(var(--line) 1px, transparent 1px),linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:42px 42px;background-position:-1px -1px;
+}
+::selection{background:var(--amber);color:#0a0d10;}
+
+/* ===== HUD ===== */
+.hud{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  background:rgba(10,13,16,0.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.hud-brand{display:flex;align-items:center;gap:10px;}
+.hud-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hud-brand b{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:0.5px;}
+.hud-stats{display:flex;gap:22px;font-family:var(--font-mono);font-size:12px;color:var(--muted);}
+.hud-stats span b{color:var(--text);font-weight:600;}
+
+/* ===== VIEWS ===== */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ----- HOME VIEW ----- */
+#home{padding:130px 28px 60px;max-width:1180px;margin:0 auto;}
+.home-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:16px;text-align:center;}
+.home-title{font-family:var(--font-display);font-weight:700;font-size:clamp(38px,6vw,72px);line-height:1;text-align:center;}
+.home-title em{font-style:normal;color:var(--cyan);}
+.home-sub{max-width:600px;margin:20px auto 0;color:var(--muted);font-size:15px;text-align:center;line-height:1.6;}
+
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px;}
+.cat-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:36px 28px;cursor:pointer;text-align:left;position:relative;overflow:hidden;
+  transition:transform .25s ease, border-color .25s ease, background .25s ease;
+}
+.cat-card:hover{transform:translateY(-6px);border-color:var(--c);background:var(--panel-2);}
+.cat-card:focus-visible{outline:2px solid var(--c);outline-offset:3px;}
+.cat-card .num{font-family:var(--font-mono);font-size:12px;color:var(--c);letter-spacing:2px;}
+.cat-card .ic{
+  width:64px;height:64px;border-radius:50%;border:1px solid var(--c);color:var(--c);
+  display:flex;align-items:center;justify-content:center;font-size:28px;margin:18px 0 20px;
+  background:rgba(255,255,255,0.02);
+}
+.cat-card h2{font-family:var(--font-display);font-weight:700;font-size:26px;margin-bottom:10px;}
+.cat-card p{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:22px;}
+.cat-card .count{
+  font-family:var(--font-mono);font-size:11px;color:var(--c);
+  display:flex;align-items:center;gap:8px;letter-spacing:1px;
+}
+.cat-card .count .arrow{transition:transform .2s ease;}
+.cat-card:hover .count .arrow{transform:translateX(4px);}
+.c1{--c:var(--cyan);} .c2{--c:var(--amber);} .c3{--c:var(--green);}
+
+.home-foot{text-align:center;padding:70px 20px 30px;color:var(--muted);font-size:12px;font-family:var(--font-mono);letter-spacing:1px;}
+.home-foot b{color:var(--text);}
+
+/* ----- CATEGORY VIEW ----- */
+#category{padding:120px 28px 60px;max-width:1180px;margin:0 auto;}
+.cat-header{margin-bottom:36px;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+  color:var(--muted);font-family:var(--font-mono);font-size:12px;letter-spacing:1px;
+  padding:9px 16px;border-radius:8px;cursor:pointer;margin-bottom:26px;transition:border-color .2s,color .2s;
+}
+.back-btn:hover{border-color:var(--cat-accent);color:var(--cat-accent);}
+.cat-tag{font-family:var(--font-mono);font-size:12px;padding:4px 10px;border-radius:4px;border:1px solid var(--cat-accent);color:var(--cat-accent);letter-spacing:1px;display:inline-block;margin-bottom:10px;}
+.cat-title{font-family:var(--font-display);font-size:clamp(28px,4vw,42px);font-weight:700;}
+.cat-desc{color:var(--muted);font-size:14px;margin:10px 0 8px;max-width:680px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:24px;}
+.chip{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 16px 14px;
+  text-align:left;cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease;
+  position:relative;font-family:inherit;color:var(--text);
+}
+.chip:hover{transform:translateY(-3px);border-color:var(--cat-accent);background:var(--panel-2);}
+.chip:focus-visible{outline:2px solid var(--cat-accent);outline-offset:2px;}
+.chip .ix{font-family:var(--font-mono);font-size:10px;color:var(--cat-accent);letter-spacing:1px;}
+.chip .ttl{font-family:var(--font-display);font-weight:600;font-size:16.5px;margin-top:6px;line-height:1.25;}
+.chip .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4;}
+.chip .arrow{position:absolute;top:14px;right:14px;color:var(--muted);font-size:13px;}
+
+/* ===== MODAL ===== */
+.overlay{
+  position:fixed;inset:0;background:rgba(6,8,10,0.78);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
+}
+.overlay.open{display:flex;}
+.modal{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;
+  max-height:84vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,0.6);animation:rise .22s ease;
+}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.modal-head{
+  padding:22px 24px 16px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  position:sticky;top:0;background:var(--panel);
+}
+.modal-head .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;}
+.modal-head h3{font-family:var(--font-display);font-size:24px;font-weight:700;margin-top:6px;}
+.modal-close{
+  background:var(--panel-2);border:1px solid var(--line);color:var(--text);width:32px;height:32px;
+  border-radius:8px;cursor:pointer;font-size:16px;flex:none;display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{border-color:var(--text);}
+.modal-body{padding:20px 24px 26px;}
+.modal-body .lead{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:18px;}
+.spec-label{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:10px;}
+.spec-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.spec-list li{font-size:13px;line-height:1.55;padding-left:18px;position:relative;color:#cfd8de;}
+.spec-list li::before{content:'';position:absolute;left:0;top:7px;width:7px;height:7px;background:var(--li-accent,var(--cyan));}
+.modal-body code{font-family:var(--font-mono);background:var(--panel-2);padding:1px 6px;border-radius:4px;font-size:12.5px;color:var(--cyan);}
+
+@media(max-width:780px){
+  .cat-grid{grid-template-columns:1fr;}
+  #home, #category{padding-top:110px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .hud-dot{animation:none;}
+  .chip,.cat-card,.modal{transition:none;animation:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-brand"><div class="hud-dot"></div><b>dbSmart40</b></div>
+  <div class="hud-stats">
+    <span><b>28</b> posições estoque</span>
+    <span><b>12</b> posições expedição</span>
+    <span><b>3</b> categorias · <b>26</b> tecnologias</span>
+  </div>
+</div>
+
+<!-- ===== HOME VIEW ===== -->
+<div class="view active" id="home">
+  <div class="home-eyebrow">Bancada Industrial · Indústria 4.0</div>
+  <h1 class="home-title">SMART <em>4.0</em></h1>
+  <p class="home-sub">Painel da bancada didática. Escolha uma frente para abrir a ficha técnica completa de cada tecnologia.</p>
+
+  <div class="cat-grid">
+    <button class="cat-card c1" data-cat="1">
+      <div class="num">ETAPA 01</div>
+      <div class="ic">◆</div>
+      <h2>Modelagem</h2>
+      <p>Domínio, DER, cardinalidade e regras de negócio do pátio industrial.</p>
+      <div class="count">5 TECNOLOGIAS <span class="arrow">↗</span></div>
+    </button>
+    <button class="cat-card c2" data-cat="2">
+      <div class="num">ETAPA 02</div>
+      <div class="ic">▣</div>
+      <h2>Backend</h2>
+      <p>Spring Boot, API REST, exceções customizadas, protocolo S7 e SSE.</p>
+      <div class="count">11 TECNOLOGIAS <span class="arrow">↗</span></div>
+    </button>
+    <button class="cat-card c3" data-cat="3">
+      <div class="num">ETAPA 03</div>
+      <div class="ic">▦</div>
+      <h2>Frontend</h2>
+      <p>Clean Architecture, MVVM, Atomic Design, Context API e visualização 3D.</p>
+      <div class="count">10 TECNOLOGIAS <span class="arrow">↗</span></div>
+    </button>
+  </div>
+
+  <div class="home-foot">BANCADA SMART 4.0 · <b>dbSmart40</b> · Sistema de Pátio Industrial</div>
+</div>
+
+<!-- ===== CATEGORY VIEW ===== -->
+<div class="view" id="category">
+  <div class="cat-header">
+    <button class="back-btn" id="backBtn">← VOLTAR</button>
+    <div><span class="cat-tag" id="catTag">TAG</span></div>
+    <h1 class="cat-title" id="catTitle">Título</h1>
+    <p class="cat-desc" id="catDesc"></p>
+  </div>
+  <div class="grid" id="catGrid"></div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <div class="tag" id="m-tag">TAG</div>
+        <h3 id="m-title">Título</h3>
+      </div>
+      <button class="modal-close" id="m-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="lead" id="m-lead"></p>
+      <div class="spec-label">ESPECIFICAÇÕES</div>
+      <ul class="spec-list" id="m-specs"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  1:{accent:'#16d6e0',tag:'ETAPA 01 · MODELAGEM',title:'Modelagem de Dados',
+    desc:'A planta da bancada: como Pedido, Bloco, Lâmina, Estoque e Expedição se relacionam antes de uma linha de código.',
+    items:[
+    {t:'Entidades de Domínio', h:'Pedido · Bloco · Lâmina · Estoque · Expedição',
+     lead:'O núcleo do sistema: cinco entidades que representam o ciclo de vida físico de um bloco de mármore/granito dentro do pátio.',
+     specs:['<code>Pedido</code> agrega 1+ blocos e carrega tipo, cor de tampa e status','<code>Bloco</code> referencia posição de estoque e pode gerar até 3 lâminas','<code>Lâmina</code> é o subproduto do desdobramento de um bloco','<code>Estoque</code> e <code>Expedição</code> modelam posições físicas fixas no pátio']},
+    {t:'Diagrama Entidade-Relacionamento', h:'DER do pátio industrial',
+     lead:'Representação visual das entidades e seus relacionamentos antes da implementação no banco de dados.',
+     specs:['Define chaves primárias e estrangeiras entre Pedido, Bloco e Lâmina','Valida cardinalidades antes de gerar as tabelas','Serve de contrato entre modelagem e camada de persistência (JPA)','Usado para validar regras de negócio com o orientador/cliente']},
+    {t:'Cardinalidade', h:'1→N e 1→0..3',
+     lead:'As regras de multiplicidade que travam o comportamento do domínio.',
+     specs:['<code>Pedido 1 → N Blocos</code>: um pedido pode conter vários blocos','<code>Bloco 1 → 0..3 Lâminas</code>: um bloco gera no máximo 3 lâminas','Cardinalidade 0..3 exige validação de negócio (não é constraint de banco)','Mapeada via <code>@OneToMany</code> com <code>mappedBy</code> no JPA']},
+    {t:'Regras de Negócio', h:'Tipo × blocos · 28 estoque · 12 expedição · andar único',
+     lead:'As restrições físicas e operacionais do pátio, traduzidas em regras de validação.',
+     specs:['Cada <code>TipoPedido</code> define um nº máximo de blocos permitido','28 posições fixas de estoque — não pode haver overbooking','12 posições fixas de expedição — vínculo automático ao status','Regra de "andar único": um bloco não pode empilhar sobre outro']},
+    {t:'Enums de Domínio', h:'TipoPedido · StatusPedido · CorTampa · CorBloco',
+     lead:'Vocabulário fechado do domínio, evitando strings mágicas espalhadas pelo sistema.',
+     specs:['<code>StatusPedido</code> controla o fluxo: recebido → estoque → expedido','<code>CorBloco</code>/<code>CorTampa</code> alimentam o componente 3D (Three.js)','Enums mapeados como <code>@Enumerated(EnumType.STRING)</code> no JPA','Reaproveitados no frontend via tipagem TypeScript espelhada']},
+  ]},
+  2:{accent:'#ff6a2b',tag:'ETAPA 02 · BACKEND',title:'Backend',
+    desc:'A "esteira" de processamento: camadas Spring Boot, contratos REST e a ponte com o chão de fábrica via protocolo S7.',
+    items:[
+    {t:'Arquitetura em Camadas', h:'Controller → Service → Repository',
+     lead:'Separação clássica de responsabilidades do Spring Boot, isolando regra de negócio de infraestrutura.',
+     specs:['<code>Controller</code> só recebe/devolve DTOs — zero lógica de negócio','<code>Service</code> concentra as regras (ex: validação das 28 posições)','<code>Repository</code> extends <code>JpaRepository</code> para acesso a dados','Facilita testes unitários isolando cada camada com Mockito']},
+    {t:'DTO + Mapper', h:'Request/Response · Entidade ↔ DTO',
+     lead:'Camada de tradução que evita expor entidades JPA diretamente na API.',
+     specs:['<code>PedidoRequestDTO</code> valida entrada com Bean Validation','<code>PedidoResponseDTO</code> formata saída sem campos sensíveis/lazy','Mapper converte entidade ↔ DTO, evitando <code>LazyInitializationException</code>','Desacopla contrato de API da estrutura interna do banco']},
+    {t:'Mapeamento ORM (JPA)', h:'@OneToMany / @ManyToOne',
+     lead:'Tradução das cardinalidades do DER para anotações JPA/Hibernate.',
+     specs:['<code>@OneToMany(mappedBy="pedido")</code> em Pedido → List&lt;Bloco&gt;','<code>@ManyToOne</code> em Bloco apontando para Pedido','<code>cascade</code> e <code>orphanRemoval</code> controlam o ciclo de vida dos blocos','Posições de estoque/expedição mapeadas com <code>@OneToOne</code> opcional']},
+    {t:'API REST', h:'POST · GET · PUT · DELETE',
+     lead:'Contrato HTTP padronizado para operações de CRUD sobre pedidos, blocos e posições.',
+     specs:['<code>POST /pedidos</code> cria pedido e valida regra tipo×blocos','<code>GET /estoque</code> retorna as 28 posições e seu status','<code>PUT /expedicao/{id}</code> realiza vínculo automático de posição','Códigos HTTP semânticos (201, 404, 409) por cenário de erro']},
+    {t:'Service como Filtro de Qualidade', h:'Regra de negócio centralizada',
+     lead:'A camada de Service é o único lugar autorizado a decidir "pode ou não pode".',
+     specs:['Toda regra de negócio (capacidade, cor, andar único) mora aqui','Controllers nunca tomam decisão — apenas delegam ao Service','Testado isoladamente com JUnit + Mockito mockando o Repository','Convenção de nomenclatura dos testes: <code>deveFazer...</code> / <code>deveLancar...</code>']},
+    {t:'Validações de Negócio', h:'Regras antes da persistência',
+     lead:'Camada de defesa que impede dados inconsistentes de chegar ao banco.',
+     specs:['Valida limite de blocos por <code>TipoPedido</code> antes do <code>save()</code>','Impede vincular bloco a posição de estoque já ocupada','Valida transições de <code>StatusPedido</code> (não permite "pular" etapa)','Lança exceções customizadas em vez de retornar <code>null</code>']},
+    {t:'Exceções Customizadas', h:'15+ exceções · GlobalExceptionHandler',
+     lead:'Catálogo próprio de erros de domínio, centralizado em um handler global.',
+     specs:['Ex: <code>PosicaoEstoqueIndisponivelException</code>, <code>LimiteBlocoExcedidoException</code>','<code>@RestControllerAdvice</code> captura e padroniza todas as respostas de erro','Cada exceção mapeia para um HTTP status específico','Evita try/catch repetido em cada Controller']},
+    {t:'Erro Estruturado (JSON)', h:'Resposta de erro padronizada',
+     lead:'Todo erro da API segue o mesmo formato previsível para o frontend consumir.',
+     specs:['Campos fixos: <code>timestamp</code>, <code>status</code>, <code>mensagem</code>, <code>path</code>','Consumido diretamente pelos toasts de erro do frontend','Evita stack trace exposto ao cliente final','Facilita logging e rastreabilidade no chão de fábrica']},
+    {t:'Protocolo S7', h:'Comunicação industrial (PLC)',
+     lead:'Ponte entre o backend e os controladores lógicos programáveis (CLPs) da bancada física.',
+     specs:['Protocolo proprietário Siemens para leitura/escrita em CLPs S7-1200/1500','Usado para ler sensores de posição e status do pátio físico','Dados do PLC alimentam o estado refletido no dashboard 3D','Camada de integração isolada para não acoplar Service ao hardware']},
+    {t:'SSE — Server-Sent Events', h:'Streaming em tempo real',
+     lead:'Canal unidirecional servidor→cliente para refletir mudanças do pátio sem polling.',
+     specs:['Endpoint <code>text/event-stream</code> mantém conexão aberta com o navegador','Dispara evento a cada mudança de status de pedido/posição','Mais leve que WebSocket para fluxo unidirecional servidor→cliente','Consumido no frontend via <code>EventSource</code> dentro dos Contexts']},
+    {t:'Vínculo Automático', h:'Estoque ⇄ Expedição',
+     lead:'Regra de orquestração que move um bloco entre posições conforme o status do pedido avança.',
+     specs:['Ao mudar <code>StatusPedido</code>, o Service libera a posição de estoque','Aloca automaticamente uma das 12 posições de expedição livres','Bloqueia a transição se não houver posição de expedição disponível','Evento de mudança é propagado via SSE para o painel em tempo real']},
+  ]},
+  3:{accent:'#3ddc84',tag:'ETAPA 03 · FRONTEND',title:'Frontend',
+    desc:'O painel de operação: visualização 3D dos blocos, estado em tempo real e a experiência do operador.',
+    items:[
+    {t:'Clean Architecture', h:'domain · infrastructure · service · presentation',
+     lead:'Organização em camadas independentes, isolando regra de UI de regra de domínio.',
+     specs:['<code>domain</code>: tipos e regras puras (sem dependência de framework)','<code>infrastructure</code>: HttpClient, SSE, adapters externos','<code>service</code>: orquestra chamadas e regras de apresentação','<code>presentation</code>: componentes React/Vue puramente visuais']},
+    {t:'MVVM', h:'ViewModel separado da View',
+     lead:'Padrão que isola lógica de estado/apresentação dos componentes visuais.',
+     specs:['Hooks como <code>usePedidoViewModel</code> concentram estado e ações','View (JSX/template) fica "burra", apenas renderiza props','Facilita testar lógica de tela sem montar componente visual','ViewModel consome a camada <code>service</code> da Clean Architecture']},
+    {t:'Atomic Design', h:'Átomos → Moléculas → Organismos → Páginas',
+     lead:'Hierarquia de composição que organiza a biblioteca de componentes da bancada.',
+     specs:['Átomos: botão, badge de status, ícone de posição','Moléculas: <code>PedidoCard</code>, indicador de conexão','Organismos: <code>EstoqueSection</code>, <code>ViewEstoque</code>','Páginas: dashboard completo combinando os organismos']},
+    {t:'Componentização', h:'PedidoCard · EstoqueSection · ViewEstoque',
+     lead:'Componentes reutilizáveis que espelham as entidades do domínio na tela.',
+     specs:['<code>PedidoCard</code> exibe tipo, cor e status com badges dinâmicos','<code>EstoqueSection</code> renderiza grade das 28 posições de estoque','<code>ViewEstoque</code> orquestra filtros + grade + alertas','Props tipadas via interfaces TypeScript espelhando os DTOs']},
+    {t:'Context API', h:'Monitor · Estoque · Expedição · Ping',
+     lead:'Gerenciamento de estado global sem biblioteca externa, dividido por domínio.',
+     specs:['<code>MonitorContext</code> centraliza eventos SSE recebidos do backend','<code>EstoqueContext</code> e <code>ExpedicaoContext</code> isolam suas 28/12 posições','<code>PingContext</code> mede latência e saúde da conexão com o backend','Evita prop-drilling entre organismos de telas diferentes']},
+    {t:'Hooks Customizados', h:'useXxxViewModel · useConexaoStatus',
+     lead:'Encapsulam lógica reaproveitável de estado, efeitos colaterais e conexão.',
+     specs:['<code>usePedidoViewModel</code> implementa o padrão MVVM em React','<code>useConexaoStatus</code> monitora o <code>EventSource</code> da SSE','Hooks isolam <code>useEffect</code>/<code>useState</code> dos componentes visuais','Testáveis isoladamente com React Testing Library']},
+    {t:'Consumo de API', h:'HttpClient + SSE',
+     lead:'Camada de infraestrutura responsável por toda comunicação com o backend.',
+     specs:['<code>HttpClient</code> via Axios com baseURL por variável de ambiente','Interceptors tratam o JSON de erro padronizado do backend','<code>EventSource</code> dedicado consome o stream SSE de eventos','Reconexão automática em caso de queda do stream']},
+    {t:'Visualização 3D', h:'Three.js / React Three Fiber',
+     lead:'Representação tridimensional dos blocos no pátio, estilo "peça de LEGO".',
+     specs:['Componente de bloco com geometria parametrizada (dimensões reais)','Cor do bloco mapeada a partir do enum <code>CorBloco</code>','Posição 3D calculada a partir da posição lógica de estoque/expedição','Renderizado com <code>@react-three/fiber</code> + <code>@react-three/drei</code>']},
+    {t:'UX e Usabilidade', h:'Filtros · alertas · toast · formulário dinâmico',
+     lead:'Camada de experiência que traduz dados técnicos em decisões rápidas para o operador.',
+     specs:['Filtros por status/tipo na grade de 28 posições de estoque','Toasts disparados a partir dos erros estruturados da API','Botões condicionais habilitados conforme regra de negócio do Service','Formulário de pedido adapta campos conforme <code>TipoPedido</code> escolhido']},
+    {t:'TypeScript', h:'Tipagem estática',
+     lead:'Contrato de tipos espelhando enums e DTOs do backend para reduzir bugs em runtime.',
+     specs:['Interfaces espelham <code>PedidoResponseDTO</code>, <code>BlocoDTO</code> etc.','Enums TS sincronizados com <code>TipoPedido</code>/<code>StatusPedido</code> do backend','Tipagem de props evita renderizar campo inexistente em runtime','Genéricos tipam respostas do HttpClient (<code>HttpClient&lt;T&gt;</code>)']},
+  ]}
+};
+
+const homeView = document.getElementById('home');
+const catView = document.getElementById('category');
+const catGrid = document.getElementById('catGrid');
+const catTag = document.getElementById('catTag');
+const catTitle = document.getElementById('catTitle');
+const catDesc = document.getElementById('catDesc');
+
+function openCategory(id){
+  const group = DATA[id];
+  document.documentElement.style.setProperty('--cat-accent-value', group.accent);
+  catView.style.setProperty('--cat-accent', group.accent);
+  catTag.textContent = group.tag;
+  catTag.style.color = group.accent;
+  catTag.style.borderColor = group.accent;
+  catTitle.textContent = group.title;
+  catDesc.textContent = group.desc;
+
+  catGrid.innerHTML = '';
+  group.items.forEach((item, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.innerHTML = `
+      <span class="ix">${String(idx+1).padStart(2,'0')}</span>
+      <div class="ttl">${item.t}</div>
+      <div class="hint">${item.h}</div>
+      <span class="arrow">↗</span>`;
+    btn.addEventListener('click', ()=>openModal(group, item));
+    catGrid.appendChild(btn);
+  });
+
+  homeView.classList.remove('active');
+  catView.classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function goHome(){
+  catView.classList.remove('active');
+  homeView.classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+document.querySelectorAll('.cat-card').forEach(card=>{
+  card.addEventListener('click', ()=> openCategory(card.dataset.cat));
+});
+document.getElementById('backBtn').addEventListener('click', goHome);
+
+const overlay = document.getElementById('overlay');
+const mTag = document.getElementById('m-tag');
+const mTitle = document.getElementById('m-title');
+const mLead = document.getElementById('m-lead');
+const mSpecs = document.getElementById('m-specs');
+
+function openModal(group, item){
+  mTag.textContent = group.tag;
+  mTag.style.color = group.accent;
+  mTitle.textContent = item.t;
+  mLead.textContent = item.lead;
+  mSpecs.innerHTML = item.specs.map(s=>`<li style="--li-accent:${group.accent}">${s}</li>`).join('');
+  overlay.classList.add('open');
+}
+function closeModal(){ overlay.classList.remove('open'); }
+
+document.getElementById('m-close').addEventListener('click', closeModal);
+overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){ if(overlay.classList.contains('open')) closeModal(); else if(catView.classList.contains('active')) goHome(); }
+});
+</script>
+</body>
+</html>
