@@ -51,18 +51,9 @@ export class PedidoRepository implements IPedidoRepository {
     return PedidoMapper.mapToEntitiesByGetDTOs(data);
   }
 
-  async iniciarProducao(id: number): Promise<Pedido> {
-    const data: PedidoGetResponseDTO = await this.httpClient.put(
+  async iniciarProducao(id: number): Promise<FilaProducao> {
+    const data: FilaStreamDTO = await this.httpClient.put(
       '/api/pedidos/start-production/' + id,
-      {}
-    );
-    console.log(PedidoMapper.mapToEntityByGetDTO(data))
-    return PedidoMapper.mapToEntityByGetDTO(data);
-  }
-
-  async enviarParaProducao(id: number): Promise<FilaProducao> {
-    const data: FilaStreamDTO = await this.httpClient.post<FilaStreamDTO>(
-      `/api/pedidos/${id}/enviar-producao`,
       {}
     );
     return FilaProducaoMapper.mapToEntityByStreamDTO(data);

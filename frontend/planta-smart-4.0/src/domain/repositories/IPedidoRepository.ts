@@ -7,8 +7,7 @@ export interface IPedidoRepository {
   findById(id: number): Promise<Pedido>;
   findByOrdemDeProducao(op: number): Promise<Pedido>;
   findByExpedicao(expedicaoId: number): Promise<Pedido[]>;
-  iniciarProducao(id: number): Promise<Pedido>;
-  enviarParaProducao(id: number): Promise<FilaProducao>;
+  iniciarProducao(id: number): Promise<FilaProducao>;
   update(id: number, pedido: Pedido): Promise<Pedido>;
   delete(id: number): Promise<void>;
 }

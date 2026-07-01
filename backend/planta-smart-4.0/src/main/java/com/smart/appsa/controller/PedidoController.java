@@ -48,18 +48,10 @@ public class PedidoController {
     }
 
     @PutMapping("/start-production/{id}")
-    public ResponseEntity<PedidoResponseDTO> startProduction(@PathVariable Long id) {
-        return ResponseEntity.ok(pedidoService.startProduction(id));
-    }
-
-    // Enfileira o pedido para produção. Inicia imediatamente se não há pedido em
-    // execução; caso contrário aguarda na fila (FIFO). Retorna o snapshot da fila.
-    @PostMapping("/{id}/enviar-producao")
-    public ResponseEntity<FilaStreamDTO> enviarProducao(@PathVariable Long id) {
+    public ResponseEntity<FilaStreamDTO> startProduction(@PathVariable Long id) {
         filaProducaoService.enfileirar(id);
-        return ResponseEntity.accepted().body(filaProducaoService.snapshot());
+        return ResponseEntity.ok(filaProducaoService.snapshot());
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

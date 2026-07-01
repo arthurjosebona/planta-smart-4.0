@@ -57,6 +57,7 @@ export class PedidoService {
       registroCriacao: null,
       registroEntradaExpedicao: null,
       registroSaidaExpedicao: null,
+      registroEntradaEstoque: null,
       expedicao: null,
     };
     return this.repository.createPedido(pedido);
@@ -78,13 +79,8 @@ export class PedidoService {
     return await this.repository.findByExpedicao(expedicaoId);
   }
 
-  async iniciarProducao(id: number): Promise<Pedido> {
+  async iniciarProducao(id: number): Promise<FilaProducao> {
     return await this.repository.iniciarProducao(id);
-  }
-
-  // Enfileira o pedido para produção (FIFO). Retorna o snapshot da fila.
-  async enviarParaProducao(id: number): Promise<FilaProducao> {
-    return await this.repository.enviarParaProducao(id);
   }
 
   async update(id: number, input: PedidoCreateInput): Promise<Pedido> {
@@ -99,6 +95,7 @@ export class PedidoService {
       status: StatusPedido.Pendente, // ignorado pelo backend no update, mas mantém o tipo Pedido coerente
       registroCriacao: null,
       registroEntradaExpedicao: null,
+      registroEntradaEstoque: null,
       registroSaidaExpedicao: null,
       expedicao: null,
     };
