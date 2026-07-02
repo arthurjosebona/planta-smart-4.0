@@ -18,12 +18,15 @@ import com.smart.appsa.service.clp.reader.PlcDataObserver;
 import com.smart.appsa.service.clp.reader.PlcReaderTask;
 import com.smart.appsa.service.clp.reader.StationReadConfig;
 
+import lombok.extern.slf4j.Slf4j;
+
 // Orquestra as threads de leitura dos CLPs.
 //
 // <p>Para cada estação solicitada cria um {@link PlcReaderTask} (Subject), registra os
 // observadores (o {@code CommService} da estação e o {@link PlcDataStore}) e agenda a
 // leitura periódica. Centraliza o ciclo de vida das threads — antes espalhado no
 // {@code ClpController}.
+@Slf4j
 @Service
 public class ClpReadingService {
 
@@ -63,19 +66,21 @@ public class ClpReadingService {
         ips.forEach((nome, ip) -> {
             Optional<Estacao> estacaoOpt = Estacao.fromNome(nome);
             if (estacaoOpt.isEmpty()) {
-                System.err.println("Nome de CLP inválido: " + nome);
+                log.warn("Nome de CLP inválido ignorado: {}", nome);
                 return;
             }
             Estacao estacao = estacaoOpt.get();
 
             if (futures.containsKey(estacao)) {
-                resultados.put(estacao, true); // já está lendo
+                log.debug("Leitura da estação {} já está em execução, ignorando.", estacao.getNome());
+                resultados.put(estacao, true);
                 return;
             }
 
+            log.info("Iniciando leitura da estação {} no IP {}", estacao.getNome(), ip);
             PlcConnector connector = plcConnectionService.getConnection(ip);
             if (connector == null) {
-                System.err.println("Erro ao obter conexão com o CLP: " + ip);
+                log.error("Falha ao obter conexão com o CLP {} ({})", estacao.getNome(), ip);
                 resultados.put(estacao, false);
                 return;
             }
@@ -93,6 +98,7 @@ public class ClpReadingService {
             ScheduledFuture<?> future = executor.scheduleWithFixedDelay(
                     task, 0, config.delayMs(), TimeUnit.MILLISECONDS);
             futures.put(estacao, future);
+            log.info("Thread de leitura '{}' agendada com delay {}ms", estacao.getNome(), config.delayMs());
             resultados.put(estacao, true);
         });
         return resultados;
@@ -100,9 +106,10 @@ public class ClpReadingService {
 
     // Cancela todas as threads de leitura e encerra as conexões com os CLPs.
     public void stop() {
+        log.info("Parando todas as threads de leitura ({} estações ativas).", futures.size());
         futures.forEach((estacao, future) -> {
             future.cancel(true);
-            System.out.println("Thread de leitura '" + estacao.getNome() + "' cancelada.");
+            log.info("Thread de leitura '{}' cancelada.", estacao.getNome());
         });
         futures.clear();
         plcConnectionService.closeAll();

@@ -13,6 +13,7 @@ import com.smart.appsa.dto.clp.PedidoInfoDTO;
 import com.smart.appsa.exception.ClpComunicacaoException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,6 +27,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SmartService {
@@ -34,27 +36,21 @@ public class SmartService {
     private final ApplicationEventPublisher eventPublisher;
     
     public void enviarParaProducao(PedidoConfigDTO config, PedidoInfoDTO detalhes) {
-        // 1. Converter o DTO para um bloco de bytes (byte[])
         byte[] buffer = converterParaBytes(detalhes);
+        log.debug("Bloco de bytes gerado para CLP {}:\n{}", config.getIpClp(), formatHex(buffer));
 
-        printHex(buffer);
-        // 2. Obter a conexão única via seu Service
         PlcConnector connector = plcConnectionService.getConnection(config.getIpClp());
-
         if (connector == null) {
             throw new ClpComunicacaoException(config.getIpClp(), "conexão indisponível");
         }
 
-        // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, detalhes.getPosicaoExpedicao(), detalhes.getNumeroPedido()));
-
         try {
-            // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
             connector.writeBlock(9, 2, 60, buffer);
-            System.out.println("Dados enviados para o CLP: " + config.getIpClp());
+            log.info("Bloco de dados enviado ao CLP {} (DB9, offset 2, 60 bytes).", config.getIpClp());
             enviarTampa(config.getTampaPedido());
             iniciarExecucaoPedido(config.getIpClp());
-
         } catch (Exception ex) {
+            log.error("Falha ao enviar dados para o CLP {}: {}", config.getIpClp(), ex.getMessage(), ex);
             throw new ClpComunicacaoException(config.getIpClp(), ex);
         }
     }
@@ -85,71 +81,54 @@ public class SmartService {
         return buffer.array();
     }
 
-    // Printar bloco de bytes do Pedido no console
-    public void printHex(byte[] bytes) {
+    private String formatHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
-        System.out.println("--- BLOCO DE BYTES (HEXADECIMAL) ---");
-
+        sb.append("--- BLOCO DE BYTES (HEX) ---\n");
         for (int i = 0; i < bytes.length; i++) {
-            // Converte o byte para Hex e garante que tenha 2 dígitos (ex: 0A em vez de A)
             sb.append(String.format("%02X ", bytes[i]));
-
-            // Opcional: Quebra de linha a cada 10 bytes para facilitar a leitura
-            if ((i + 1) % 10 == 0) {
-                sb.append("\n");
-            }
+            if ((i + 1) % 10 == 0) sb.append("\n");
         }
-
-        System.out.println(sb.toString());
-        System.out.println("------------------------------------");
+        sb.append("\n----------------------------");
+        return sb.toString();
     }
 
     // Envia comando para a Planta Smart iniciar a produção do Pedido
     public void iniciarExecucaoPedido(String ipClp) {
         PlcConnector plcConnector = plcConnectionService.getConnection(ipClp);
         if (plcConnector == null) {
+            log.warn("iniciarExecucaoPedido: sem conexão com CLP {}", ipClp);
             return;
         }
 
         try {
+            log.debug("Resetando flags do estoque no CLP {}...", ipClp);
+            plcConnector.writeBit(9, 0, 0, false);
+            plcConnector.writeBit(9, 64, 0, false);
+            plcConnector.writeBit(9, 64, 1, false);
+            plcConnector.writeBit(9, 62, 0, false);
 
-            // Inicializa as flags da estação ESTOQUE
-            //plcConnector.connect();
-            plcConnector.writeBit(9, 0, 0, Boolean.parseBoolean("FALSE"));
-            plcConnector.writeBit(9, 64, 0, Boolean.parseBoolean("FALSE"));
-            plcConnector.writeBit(9, 64, 1, Boolean.parseBoolean("FALSE"));
-            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
-
-            // plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
-            // Iniciar pedido
-            System.out.println("SETAR FLAG INICIAR PEDIDO");
-            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("TRUE"));
+            log.info("Setando flag IniciarPedido [DB9:62.0] = TRUE no CLP {}", ipClp);
+            plcConnector.writeBit(9, 62, 0, true);
         } catch (Exception ex) {
-
+            log.error("Erro ao setar flag IniciarPedido no CLP {}: {}", ipClp, ex.getMessage(), ex);
         }
     }
 
     public void enviarTampa(int tampa) {
-        System.out.println("\n\nSELETOR DE TAMPAS INSTALADO NA BANCADA\n\n");
-        // Passo 2) Selecionar a tampa via POST
+        log.info("Enviando tampa {} para o seletor ESP32.", tampa);
         try {
             RestTemplate apiSeletorTampa = new RestTemplate();
             String url = "http://10.74.241.245/api/move_pos";
 
-            // 1. Definir o cabeçalho como application/x-www-form-urlencoded
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            // 2. Usar MultiValueMap (específico para formulários no Spring)
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             map.add("pos", String.valueOf(tampa));
             map.add("offset", "0");
 
-            // 3. Criar a entidade com cabeçalhos e corpo
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-            // 4. Tente ler a resposta primeiro como String para ver o que o ESP32 está
-            // realmente enviando
             ResponseEntity<Map<String, Object>> response = apiSeletorTampa.exchange(
                 url,
                 HttpMethod.POST,
@@ -158,33 +137,29 @@ public class SmartService {
             );
 
             Map<String, Object> body = response.getBody();
-            System.out.println("Resposta do ESP32: " + body);
+            log.debug("Resposta do ESP32 (tampa {}): {}", tampa, body);
 
-            // Verificação robusta
             if (body == null || body.get("status") == null) {
-                System.out.println("Deu erro");
+                log.error("ESP32 retornou resposta inválida para tampa {}: body={}", tampa, body);
                 return;
             }
 
             String status = body.get("status").toString();
-
-            // Verificação flexível (ignora maiúsculas/minúsculas)
             if (!status.toLowerCase().contains("ok")) {
-                System.out.println("Deu erro");
+                log.error("ESP32 rejeitou o comando de tampa {}: status={}", tampa, status);
                 return;
             }
 
+            log.info("Tampa {} confirmada pelo ESP32.", tampa);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Deu erro");
-            return;
+            log.error("Falha ao comunicar com ESP32 para tampa {}: {}", tampa, e.getMessage(), e);
         }
     }
 
     public boolean sendBlockBytesToClp(String ipClp, int db, int offset, byte[] dados, int size) {
         PlcConnector plcConnector = plcConnectionService.getConnection(ipClp);
         if (plcConnector == null) {
-            System.out.println("Sem conexão com CLP " + ipClp);
+            log.warn("sendBlockBytesToClp: sem conexão com CLP {}", ipClp);
             return false;
         }
         if (!appStateConfig.isReadOnly()) {

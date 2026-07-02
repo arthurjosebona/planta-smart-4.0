@@ -7,14 +7,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.smart.appsa.dto.response.ErrorResponseDTO;
 import com.smart.appsa.exception.core.AppException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponseDTO> handleAppException(AppException ex) {
-        System.out.println("STACK TRACE ERRO: ");
-        ex.printStackTrace();
-        System.out.println(ex.getMessage() + " " + String.valueOf(ex.getStatus().value()));
+        log.error("AppException [HTTP {}]: {}", ex.getStatus().value(), ex.getMessage(), ex);
         return ResponseEntity
             .status(ex.getStatus())
             .body(new ErrorResponseDTO(ex.getMessage(), ex.getStatus().value()));
@@ -22,10 +23,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex) {
-        System.out.println(ex.getMessage());
+        log.warn("IllegalArgumentException: {}", ex.getMessage());
         return ResponseEntity
             .badRequest()
             .body(new ErrorResponseDTO(ex.getMessage(), 400));
     }
-    
+
 }

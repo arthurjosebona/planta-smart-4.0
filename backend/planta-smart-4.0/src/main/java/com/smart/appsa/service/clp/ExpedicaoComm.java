@@ -19,6 +19,7 @@ import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 // Handler da estação EXPEDIÇÃO (CLP 4 / DB9).
 //
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 //
 // <p>Toda escrita no CLP é condicionada a {@code !appStateConfig.isReadOnly()}:
 // em modo somente-leitura a aplicação observa, mas nunca escreve de volta.
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExpedicaoComm implements PlcDataObserver {
@@ -129,8 +131,7 @@ public class ExpedicaoComm implements PlcDataObserver {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, false);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [startOp][finishOp]: Atualização da Flag RecebidoOPExp [DB9:0.0] para FALSE");
+                    log.error("ERRO [idle]: Falha ao baixar RecebidoOPExp [DB9:0.0]: {}", e.getMessage());
                 }
             }
         }
@@ -145,13 +146,13 @@ public class ExpedicaoComm implements PlcDataObserver {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusExpedicao((byte) 1);
             }
+            log.info("[EXPEDICAO] StartOP detectado — OP {}. Confirmando recepção.", expedicaoInfoClp.getNumeroOP());
             pedidoService.handleEntradaExpedicao(expedicaoInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [startOp]: Atualização da Flag RecebidoOPExp [DB9:0.0] para TRUE");
+                    log.error("ERRO [startOp]: Falha ao subir RecebidoOPExp [DB9:0.0]: {}", e.getMessage());
                 }
             }
         }
@@ -162,13 +163,13 @@ public class ExpedicaoComm implements PlcDataObserver {
     // statusExpedicao = 2 (se há pedido em curso).
     private void tratarFimOperacao(PlcConnector plcConnectorExp) {
         if (expedicaoInfoClp.isFinishOP() & !expedicaoInfoClp.isRecebidoOp()) {
+            log.info("[EXPEDICAO] FinishOP detectado — OP {}.", expedicaoInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                     appStateConfig.setBlockFinished(true);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [finishOp]: Atualização da Flag RecebidoOPExp [DB9:0.0] para TRUE");
+                    log.error("ERRO [finishOp]: Falha ao subir RecebidoOPExp [DB9:0.0]: {}", e.getMessage());
                 }
                 if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                     appStateConfig.setStatusExpedicao((byte) 2);
@@ -200,8 +201,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             try {
                 plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_GERENCIAMENTO_EXPEDICAO, BIT_INICIAR_GUARDAR, false);
             } catch (Exception e) {
-                System.out.println(
-                        "ERRO [Pedir Posição]: Atualização da Flag IniciarGuardar [DB9:2.1] para FALSE");
+                log.error("ERRO [gerenciarPosicaoGuardar]: Falha ao baixar IniciarGuardar [DB9:2.1]: {}", e.getMessage());
             }
             return;
         }
@@ -214,18 +214,18 @@ public class ExpedicaoComm implements PlcDataObserver {
 
         int posicaoExpedicaoSolicitada = expedicaoService.findFirstPosicaoLivre().getPosicaoFisica();
         appStateConfig.setPosicaoExpedicaoSolicitada(posicaoExpedicaoSolicitada);
+        log.info("[EXPEDICAO] PedirPosição: posição livre encontrada = {}.", posicaoExpedicaoSolicitada);
 
         try {
             plcConnectorExp.writeInt(DB_EXPEDICAO, OFFSET_POSICAO_GUARDAR, posicaoExpedicaoSolicitada);
         } catch (Exception e) {
-            System.out.println("ERRO: Atualização da PosicaoGuardarExpedicao [DB9:4]");
+            log.error("ERRO: Falha ao gravar PosicaoGuardarExpedicao [DB9:4]: {}", e.getMessage());
         }
 
         try {
             plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_GERENCIAMENTO_EXPEDICAO, BIT_INICIAR_GUARDAR, true);
         } catch (Exception e) {
-            System.out.println(
-                    "ERRO [Pedir Posição]: Atualização da Flag IniciarGuardar [DB9:2.1] para TRUE");
+            log.error("ERRO [gerenciarPosicaoGuardar]: Falha ao subir IniciarGuardar [DB9:2.1]: {}", e.getMessage());
         }
     }
 
@@ -236,7 +236,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             try {
                 plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_GERENCIAMENTO_EXPEDICAO, BIT_RECEBIDO_EXPEDICAO, false);
             } catch (Exception e) {
-                System.out.println("ERRO [Adicionar/Remover Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para FALSE");
+                log.error("ERRO [resetarRecebidoExpedicao]: Falha ao baixar RecebidoExpedicao [DB9:2.0]: {}", e.getMessage());
             }
         }
     }
@@ -248,16 +248,14 @@ public class ExpedicaoComm implements PlcDataObserver {
     private void adicionarOpNaExpedicao(PlcConnector plcConnectorExp) {
         
         if (expedicaoInfoClp.isAdicionarExpedicao() & !appStateConfig.isAux_expedicao()) {
-            System.out.printf("\n\n\n\n-------------------\nCHEGOU NO adicionarOpNaExpepdicao\n-----------------------\n\n\n\n\n");
-
+            log.info("[EXPEDICAO] AdicionarExpedicao — OP {} na posição {}.", expedicaoInfoClp.getOpGuardadoExpedicao(), expedicaoInfoClp.getPosicaoGuardarExp());
             appStateConfig.setAux_expedicao(true);
 
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_GERENCIAMENTO_EXPEDICAO, BIT_RECEBIDO_EXPEDICAO, true);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [Adicionar Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para TRUE");
+                    log.error("ERRO [adicionarExpedicao]: Falha ao subir RecebidoExpedicao [DB9:2.0]: {}", e.getMessage());
                 }
 
                 if (expedicaoInfoClp.getPosicaoGuardarExp() > 0) {
@@ -268,9 +266,9 @@ public class ExpedicaoComm implements PlcDataObserver {
                             expedicaoInfoClp.getOpGuardadoExpedicao(),
                             expedicaoInfoClp.getPosicaoGuardarExp()
                         );
+                        log.info("[EXPEDICAO] OP {} adicionada na posição {} com sucesso.", expedicaoInfoClp.getOpGuardadoExpedicao(), expedicaoInfoClp.getPosicaoGuardarExp());
                     } catch (Exception e) {
-                        System.out.println("ERRO: Na tentativa de adicionar na Expedição");
-                        e.printStackTrace();
+                        log.error("ERRO: Falha ao adicionar OP {} na Expedição posição {}: {}", expedicaoInfoClp.getOpGuardadoExpedicao(), expedicaoInfoClp.getPosicaoGuardarExp(), e.getMessage(), e);
                     }
                 }
             }
@@ -289,11 +287,11 @@ public class ExpedicaoComm implements PlcDataObserver {
                 try {
                     plcConnectorExp.writeBit(DB_EXPEDICAO, OFFSET_GERENCIAMENTO_EXPEDICAO, BIT_RECEBIDO_EXPEDICAO, true);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [Remover Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para TRUE");
+                    log.error("ERRO [removerExpedicao]: Falha ao subir RecebidoExpedicao [DB9:2.0]: {}", e.getMessage());
                 }
 
                 if (expedicaoInfoClp.getPosicaoRemovidoExpedicao() > 0) {
+                    log.info("[EXPEDICAO] RemoverExpedicao — posição {}.", expedicaoInfoClp.getPosicaoRemovidoExpedicao());
                     int offset = OFFSET_MAGAZINE + (expedicaoInfoClp.getPosicaoRemovidoExpedicao() - 1) * 2;
                     try {
                         // A flag removerExpedicao permanece TRUE por vários ciclos de leitura, mas
@@ -305,16 +303,16 @@ public class ExpedicaoComm implements PlcDataObserver {
                         ).getOrdemDeProducaoAtual();
 
                         if (ordemAtual <= 0) {
+                            log.debug("[EXPEDICAO] RemoverExpedicao: posição {} já zerada, ignorando.", expedicaoInfoClp.getPosicaoRemovidoExpedicao());
                             return;
                         }
 
                         plcConnectorExp.writeInt(DB_EXPEDICAO, offset, 0);
-
                         pedidoService.handleExitExpedicao(ordemAtual);
                         expedicaoService.assignOrdemAtPosicao(expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
+                        log.info("[EXPEDICAO] OP {} removida da posição {} com sucesso.", ordemAtual, expedicaoInfoClp.getPosicaoRemovidoExpedicao());
                     } catch (Exception e) {
-                        System.out.println("ERRO: Na tentativa de remover da Expedição");
-                        e.printStackTrace();
+                        log.error("ERRO: Falha ao remover da Expedição posição {}: {}", expedicaoInfoClp.getPosicaoRemovidoExpedicao(), e.getMessage(), e);
                     }
                 }
             }
@@ -340,7 +338,7 @@ public class ExpedicaoComm implements PlcDataObserver {
                 if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                     appStateConfig.setStatusProducao((byte) 1);
                 }
-                System.out.println("Operação OP:" + expedicaoInfoClp.getOpGuardadoExpedicao() + " Finalizada.");
+                log.info("[EXPEDICAO] OP {} guardada na posição {} — operação finalizada.", expedicaoInfoClp.getOpGuardadoExpedicao(), expedicaoInfoClp.getPosicaoGuardadoExpedicao());
             }
         }
     }
@@ -359,10 +357,9 @@ public class ExpedicaoComm implements PlcDataObserver {
             return;
         }
         int opAtual = expedicaoInfoClp.getNumeroOP();
-        System.out.printf("\n\n\nPASSOU DAS VERIFICAÇÕES INICIAIS DE handleExpedicaoGuardado, OP: " + opAtual + "\n\n\n\n");
+        log.debug("[EXPEDICAO] handleExpedicaoGuardado — opGuardado={}, opAtual={}.", expedicaoInfoClp.getOpGuardadoExpedicao(), opAtual);
         if (expedicaoInfoClp.getOpGuardadoExpedicao() == opAtual) {
-            System.out.printf("\n\n\n\n-------------------\nCHEGOU NO handleEstoqueGuadrado\n-----------------------\n\n\n\n\n");
-            System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");
+            log.info("===== OP {} CONCLUÍDA — pedidoEmCurso → false =====", opAtual);
             appStateConfig.setPedidoEmCurso(false);
             eventPublisher.publishEvent(new PedidoEmCursoEvent(this, false));
             eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
@@ -392,37 +389,31 @@ public class ExpedicaoComm implements PlcDataObserver {
     @Async("plcWriteExpedicaoExecutor")
     @EventListener
     public void atualizarPosicaoExpedicao(UpdateExpedicaoEvent event) {
-        System.out.println("Evento de atualizar posição expedição");
+        log.info("UpdateExpedicaoEvent recebido — posição={}, codPedido={}.", event.getPosicao(), event.getCodPedido());
         PlcConnector connector = plcConnectionService.getConnection(clpIpConfig.getIp("expedicao"));
         if (connector == null) {
-            System.out.println("AVISO: CLP expedicao desconectado, reserva pos "  + event.getPosicao() + " pedido " + event.getCodPedido() + " descartada");
+            log.warn("AVISO: CLP expedição desconectado — reserva posição {} pedido {} descartada.", event.getPosicao(), event.getCodPedido());
             return;
         }
         synchronized (connector) {
             try {
                 connector.writeInt(DB_EXPEDICAO, 6 + (event.getPosicao() - 1) * 2, event.getCodPedido());
+                log.debug("Reserva de expedição gravada: posição={}, codPedido={}.", event.getPosicao(), event.getCodPedido());
             } catch (Exception e) {
-                System.out.println("ERRO: write reserva expedicao posicao " + event.getPosicao());
-                e.printStackTrace();
+                log.error("ERRO: Falha ao gravar reserva de expedição posição {}: {}", event.getPosicao(), e.getMessage(), e);
             }
         }
     }
 
     public void printHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        System.out.println("--- BLOCO DE BYTES (HEXADECIMAL) ---");
-
-        for (int i = 0; i < bytes.length; i++) {
-            // Converte o byte para Hex e garante que tenha 2 dígitos (ex: 0A em vez de A)
-            sb.append(String.format("%02X ", bytes[i]));
-
-            // Opcional: Quebra de linha a cada 10 bytes para facilitar a leitura
-            if ((i + 1) % 10 == 0) {
-                sb.append("\n");
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("--- BLOCO DE BYTES (HEX) ---\n");
+            for (int i = 0; i < bytes.length; i++) {
+                sb.append(String.format("%02X ", bytes[i]));
+                if ((i + 1) % 10 == 0) sb.append("\n");
             }
+            sb.append("\n----------------------------");
+            log.debug(sb.toString());
         }
-
-        System.out.println(sb.toString());
-        System.out.println("------------------------------------");
     }
 }

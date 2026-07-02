@@ -15,6 +15,7 @@ import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 // Handler da estação ESTOQUE (CLP 1 / DB9).
 //
@@ -26,6 +27,7 @@ import lombok.AllArgsConstructor;
 //
 // <p>Toda escrita no CLP é condicionada a {@code !appStateConfig.isReadOnly()}:
 // em modo somente-leitura a aplicação observa, mas nunca escreve de volta.
+@Slf4j
 @Service
 @AllArgsConstructor
 public class EstoqueComm implements PlcDataObserver {
@@ -119,23 +121,23 @@ public class EstoqueComm implements PlcDataObserver {
     // o ESTOQUE confirmou o início do pedido e ficou OCUPADO. Marca pedidoEmCurso,
     // zera os status de estoque/produção e baixa a flag IniciarPedido para FALSE.
     private void confirmarInicioPedido(PlcConnector plcConnectorEst) {
-        // Antes monitorava a flag ocupado, porém essa flag nunca fica true ao mesmo tempo que o 
+        // Antes monitorava a flag ocupado, porém essa flag nunca fica true ao mesmo tempo que o
         // iniciarPedido, e com um pooling >200ms ele só lê um tick dessa flag, então não tem perigo
-        // de cair no if duas vezes, mas mesmo assim verifica a flag do pedido em curso para garantir 
+        // de cair no if duas vezes, mas mesmo assim verifica a flag do pedido em curso para garantir
         // que não está sendo feito 2 vezes
         if (estoqueInfoClp.isIniciarPedido() && !appStateConfig.isPedidoEmCurso()) {
+            log.info("===== PEDIDO EM CURSO INICIADO — OP {} =====", estoqueInfoClp.getNumeroOP());
             appStateConfig.setPedidoEmCurso(true);
             eventPublisher.publishEvent(new PedidoEmCursoEvent(this, true));
-            System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
             pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_INICIAR_PEDIDO, BIT_INICIAR_PEDIDO, false);
+                    log.debug("Flag IniciarPedido [DB9:62.0] setada para FALSE.");
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [iniciarPedido == true & ocupado == true]: Atualização da Flag IniciarPedido [DB9:62.0] para FALSE");
+                    log.error("ERRO [iniciarPedido]: Falha ao baixar Flag IniciarPedido [DB9:62.0]: {}", e.getMessage());
                 }
             }
         }
@@ -149,7 +151,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, false);
                 } catch (Exception e) {
-                    System.out.println("ERRO: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para FALSE");
+                    log.error("ERRO: Falha ao baixar RecebidoOPEstoque [DB9:0.0]: {}", e.getMessage());
                 }
             }
         }
@@ -160,6 +162,7 @@ public class EstoqueComm implements PlcDataObserver {
     // subindo a flag RecebidoOP para TRUE.
     private void tratarInicioOperacao(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isStartOP() & !estoqueInfoClp.isRecebidoOp()) {
+            log.info("[ESTOQUE] StartOP detectado — OP {}. Confirmando recepção.", estoqueInfoClp.getNumeroOP());
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusEstoque((byte) 1);
             }
@@ -167,8 +170,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [startOp]: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para TRUE");
+                    log.error("ERRO [startOp]: Falha ao subir RecebidoOPEstoque [DB9:0.0]: {}", e.getMessage());
                 }
             }
         }
@@ -179,12 +181,12 @@ public class EstoqueComm implements PlcDataObserver {
     // (se há pedido em curso).
     private void tratarFimOperacao(PlcConnector plcConnectorEst) {
         if (estoqueInfoClp.isFinishOP() & !estoqueInfoClp.isRecebidoOp()) {
+            log.info("[ESTOQUE] FinishOP detectado — OP {}.", estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO [finishOp]: Atualização da Flag RecebidoOPEstoque [DB9:0.0] para TRUE");
+                    log.error("ERRO [finishOp]: Falha ao subir RecebidoOPEstoque [DB9:0.0]: {}", e.getMessage());
                 }
                 if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                     appStateConfig.setStatusEstoque((byte) 2);
@@ -201,7 +203,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_GERENCIAMENTO_ESTOQUE, BIT_RECEBIDO_ESTOQUE, false);
                 } catch (Exception e) {
-                    System.out.println("ERRO: Atualização da Flag RecebidoEstoque [DB9:64.0] para FALSE");
+                    log.error("ERRO: Falha ao baixar RecebidoEstoque [DB9:64.0]: {}", e.getMessage());
                 }
             }
         }
@@ -216,7 +218,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_GERENCIAMENTO_ESTOQUE, BIT_RECEBIDO_ESTOQUE, true);
                 } catch (Exception e) {
-                    System.out.println("ERRO: Atualização da Flag RecebidoEstoque [DB9:64.0] para TRUE");
+                    log.error("ERRO: Falha ao subir RecebidoEstoque [DB9:64.0]: {}", e.getMessage());
                 }
 
                 byte offset = (byte) (OFFSET_MAGAZINE + (estoqueInfoClp.getPosicaoEstoque() - 1));
@@ -226,8 +228,7 @@ public class EstoqueComm implements PlcDataObserver {
                     plcConnectorEst.writeByte(DB_ESTOQUE, offset, (byte) 0);
                     estoqueService.assignBlockColorByPosicaoFisica(estoqueInfoClp.getPosicaoEstoque(), CorEstoque.VAZIO);
                 } catch (Exception e) {
-                    System.out.println("ERRO: Na tentativa de remover do Estoque");
-                    e.printStackTrace();
+                    log.error("ERRO: Falha ao remover bloco do Estoque na posição {}: {}", estoqueInfoClp.getPosicaoEstoque(), e.getMessage(), e);
                 }
             }
         }
@@ -242,7 +243,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_GERENCIAMENTO_ESTOQUE, BIT_RECEBIDO_ESTOQUE, true);
                 } catch (Exception e) {
-                    System.out.println("ERRO: Atualização da Flag RecebidoEstoque [DB9:64.0] para TRUE");
+                    log.error("ERRO: Falha ao subir RecebidoEstoque [DB9:64.0]: {}", e.getMessage());
                 }
 
                 byte offset = (byte) (OFFSET_MAGAZINE + (estoqueInfoClp.getPosicaoEstoque() - 1));
@@ -255,8 +256,7 @@ public class EstoqueComm implements PlcDataObserver {
                         CorEstoque.fromValue(estoqueInfoClp.getCorGuardarEstoque())
                     );
                 } catch (Exception e) {
-                    System.out.println("ERRO: Na tentativa de adicionar no Estoque");
-                    e.printStackTrace();
+                    log.error("ERRO: Falha ao adicionar bloco no Estoque na posição {}: {}", estoqueInfoClp.getPosicaoEstoque(), e.getMessage(), e);
                 }
             }
         }
@@ -271,8 +271,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_GERENCIAMENTO_ESTOQUE, BIT_INICIAR_GUARDAR, false);
                 } catch (Exception e) {
-                    System.out.println(
-                            "ERRO: Atualização da Flag IniciarGuardarEstoque [DB9:64.1] para FALSE");
+                    log.error("ERRO: Falha ao baixar IniciarGuardarEstoque [DB9:64.1]: {}", e.getMessage());
                 }
             }
         }
@@ -287,19 +286,20 @@ public class EstoqueComm implements PlcDataObserver {
             if (!appStateConfig.isReadOnly()) {
                 Estoque primeiraPosicaoLivre = estoqueService.findByCorEstoque(CorEstoque.VAZIO).get(0);
                 if (primeiraPosicaoLivre != null) {
+                    log.info("[ESTOQUE] PedirPosição: respondendo com posição {}.", primeiraPosicaoLivre.getPosicaoFisica());
                     try {
                         plcConnectorEst.writeInt(DB_ESTOQUE, OFFSET_POSICAO_GUARDAR, primeiraPosicaoLivre.getPosicaoFisica());
                     } catch (Exception e) {
-                        System.out.println("ERRO: Atualização da PosicaoGuardarEstoque [DB9:66]");
+                        log.error("ERRO: Falha ao gravar PosicaoGuardarEstoque [DB9:66]: {}", e.getMessage());
                     }
 
                     try {
                         plcConnectorEst.writeBit(DB_ESTOQUE, OFFSET_GERENCIAMENTO_ESTOQUE, BIT_INICIAR_GUARDAR, true);
                     } catch (Exception e) {
-                        System.out.println("ERRO: Atualização da Flag IniciarGuardarEstoque [DB9:64.1]");
+                        log.error("ERRO: Falha ao subir IniciarGuardarEstoque [DB9:64.1]: {}", e.getMessage());
                     }
                 } else {
-                    System.out.println("ERRO: Nao existe posição livre.");
+                    log.error("ERRO: Não existe posição livre no estoque para guardar bloco.");
                 }
             }
         }

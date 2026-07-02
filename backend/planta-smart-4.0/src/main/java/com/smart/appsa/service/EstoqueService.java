@@ -18,7 +18,9 @@ import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.repository.EstoqueRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -107,7 +109,7 @@ public class EstoqueService {
         String ip = clpIpConfig.getEstoqueIp();
         PlcConnector connector = plcConnectionService.getConnection(ip);
         if (connector == null) {
-            System.out.println("Sem conexão com CLP ESTOQUE " + ip + " - magazine não escrito.");
+            log.warn("Sem conexão com CLP ESTOQUE {} — magazine não escrito.", ip);
             return;
         }
 
@@ -122,9 +124,9 @@ public class EstoqueService {
 
         try {
             connector.writeBlock(DB_ESTOQUE, OFFSET_MAGAZINE, TAMANHO_MAGAZINE, magazine);
+            log.debug("Magazine do estoque escrito no CLP {} [DB9:68, {} bytes].", ip, TAMANHO_MAGAZINE);
         } catch (Exception ex) {
-            System.out.println("ERRO: Na tentativa de escrever o magazine do Estoque [DB9:68]");
-            ex.printStackTrace();
+            log.error("Erro ao escrever magazine do Estoque [DB9:68] no CLP {}: {}", ip, ex.getMessage(), ex);
         }
     }
 }

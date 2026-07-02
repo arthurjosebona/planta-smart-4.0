@@ -34,7 +34,9 @@ import com.smart.appsa.service.clp.PlcDataStore;
 import com.smart.appsa.service.clp.SseService;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/smart")
 @AllArgsConstructor
@@ -125,10 +127,10 @@ public class SmartController {
                 isClpOnline = false;
             }
 
-            System.out.println(nome + "(" + ip + ")" + ": " + isClpOnline);
+            log.info("Ping CLP {}({}): {}", nome, ip, isClpOnline ? "ONLINE" : "OFFLINE");
             statusClps.add(ClpStatusPingDTO.builder().nome(nome).ip(ip).online(isClpOnline).verifiedAt(LocalDateTime.now().toString()).build());
         });
-        
+
         clpIpConfig.getEndpoints().forEach((nome, endpoint) -> {
             boolean isOnline = false;
 
@@ -140,7 +142,7 @@ public class SmartController {
                 isOnline = false;
             }
 
-            System.out.println(nome + "(" + endpoint.getIp() + ":" + endpoint.getPorta() + ")" + ": " + isOnline);
+            log.info("Ping endpoint {}({}:{}): {}", nome, endpoint.getIp(), endpoint.getPorta(), isOnline ? "ONLINE" : "OFFLINE");
             statusClps.add(ClpStatusPingDTO.builder().nome(nome).ip(endpoint.getIp()).online(isOnline).verifiedAt(LocalDateTime.now().toString()).build());
         });
 

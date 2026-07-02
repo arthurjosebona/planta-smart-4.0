@@ -1,10 +1,12 @@
 package com.smart.appsa.controller;
 
 import com.smart.appsa.config.ClpIpConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/config/clp")
 public class ClpConfigController {
@@ -37,7 +39,7 @@ public class ClpConfigController {
 
     @PutMapping("/ips")
     public ResponseEntity<Void> setAllIps(@RequestBody Map<String, String> novosIps) {
-        System.out.println("Atualizando IPs: " + novosIps);
+        log.info("Atualizando IPs dos CLPs: {}", novosIps);
         novosIps.forEach(clpIpConfig::setIp);
         return ResponseEntity.noContent().build();
     }

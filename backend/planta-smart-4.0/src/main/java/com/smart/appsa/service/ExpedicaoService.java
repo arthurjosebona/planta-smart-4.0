@@ -19,7 +19,9 @@ import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.repository.ExpedicaoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExpedicaoService {
@@ -97,7 +99,7 @@ public class ExpedicaoService {
         String ip = clpIpConfig.getExpedicaoIp();
         PlcConnector connector = plcConnectionService.getConnection(ip);
         if (connector == null) {
-            System.out.println("Sem conexão com CLP EXPEDIÇÃO " + ip + " - magazine não escrito.");
+            log.warn("Sem conexão com CLP EXPEDIÇÃO {} — magazine não escrito.", ip);
             return;
         }
 
@@ -115,9 +117,9 @@ public class ExpedicaoService {
 
         try {
             connector.writeBlock(DB_EXPEDICAO, OFFSET_MAGAZINE, magazine.length, magazine);
+            log.debug("Magazine da expedição escrito no CLP {} [DB9:6, {} bytes].", ip, magazine.length);
         } catch (Exception ex) {
-            System.out.println("ERRO: Na tentativa de escrever o magazine da Expedição [DB9:6]");
-            ex.printStackTrace();
+            log.error("Erro ao escrever magazine da Expedição [DB9:6] no CLP {}: {}", ip, ex.getMessage(), ex);
         }
     }
 

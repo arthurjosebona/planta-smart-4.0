@@ -31,7 +31,9 @@ import com.smart.appsa.model.enums.StatusPedido;
 import com.smart.appsa.repository.PedidoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PedidoService {
@@ -122,17 +124,19 @@ public class PedidoService {
     public PedidoResponseDTO startProduction(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));
+        log.info("Iniciando produção do pedido id={} OP={}", id, pedido.getOrdemDeProducao());
         assignEstoqueSlots(pedido);
         prepareForCompletion(pedido);
         Pedido updated = saveWithExpedition(pedido);
-        System.out.println("DTOs PARA A BANCADA: ");
+
         PedidoInfoDTO infoDTO = PedidoMapper.mapToInfoDTOByEntity(updated);
         PedidoConfigDTO configDTO = PedidoMapper.mapToConfigDTOByEntity(updated);
-
-        System.out.println(infoDTO.toString());
-        System.out.println(configDTO.toString());
+        log.debug("DTOs para a bancada — info: {} | config: {}", infoDTO, configDTO);
 
         smartService.enviarParaProducao(configDTO, infoDTO);
+        log.info("Pedido id={} OP={} enviado para produção. Expedição: posição {}",
+                id, updated.getOrdemDeProducao(),
+                updated.getExpedicao() != null ? updated.getExpedicao().getPosicaoFisica() : "N/A");
 
         return PedidoMapper.mapDto(updated);
     }
@@ -253,12 +257,14 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
         if (pedido.getRegistroSaidaExpedicao() != null) return;
+        log.info("[RASTREIO] OP {} saiu da expedição.", op);
         pedido.setRegistroSaidaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
 
     @Transactional
     public void updateToConcluido(Pedido pedido) {
+        log.info("[RASTREIO] OP {} concluída. Atualizando status para CONCLUIDO.", pedido.getOrdemDeProducao());
         pedido.setStatus(StatusPedido.CONCLUIDO);
         pedido.setRegistroSaidaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
@@ -269,6 +275,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
         if (pedido.getRegistroEntradaEstoque() != null) return;
+        log.info("[RASTREIO] OP {} entrou no ESTOQUE.", op);
         pedido.setRegistroEntradaEstoque(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
@@ -278,6 +285,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
         if (pedido.getRegistroEntradaProcesso() != null) return;
+        log.info("[RASTREIO] OP {} entrou no PROCESSO.", op);
         pedido.setRegistroEntradaProcesso(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
@@ -287,6 +295,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
         if (pedido.getRegistroEntradaMontagem() != null) return;
+        log.info("[RASTREIO] OP {} entrou na MONTAGEM.", op);
         pedido.setRegistroEntradaMontagem(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
@@ -296,6 +305,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
         if (pedido.getRegistroEntradaExpedicao() != null) return;
+        log.info("[RASTREIO] OP {} entrou na EXPEDIÇÃO.", op);
         pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
