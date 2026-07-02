@@ -2,6 +2,7 @@ import { useEstoqueContext } from '@contexts/EstoqueContext';
 import { useExpedicaoContext } from '@contexts/ExpedicaoContext';
 import { useMonitorContext } from '@contexts/MonitorContext';
 import { usePingContext } from '@contexts/PingContext';
+import { useFilaProducaoContext } from '@contexts/FilaProducaoContext';
 import { StatusEstacao } from '@enums/StatusEstacao';
 import { CorEstoque } from '@enums/CorEstoque';
 import type { Estoque } from '@entities/Estoque';
@@ -76,6 +77,7 @@ export function useEstacoesViewModel() {
   const expedicao = useExpedicaoContext();
   const monitor: MonitorModel = useMonitorContext();
   const { pingMap } = usePingContext();
+  const { fila, tempoExecucaoSegundos } = useFilaProducaoContext();
   const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(null);
   const ultimaOpBuscada = useRef<number | null>(null);
 
@@ -160,5 +162,10 @@ export function useEstacoesViewModel() {
     dismissErro,
     pedidoAtual,
     tempoDecorrido,
+    filaProducao: {
+      emExecucao: fila.emExecucao,
+      pendentes: fila.pendentes,
+      tempoExecucaoSegundos,
+    },
   };
 }

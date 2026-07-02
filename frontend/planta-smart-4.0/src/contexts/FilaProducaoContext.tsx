@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, ReactNode } fro
 import { FilaProducao, FilaProducaoInitial } from '@entities/FilaProducao';
 import { FilaStreamDTO } from '@dtos/response/stream/FilaStreamDTO';
 import { FilaProducaoMapper } from '@mappers/FilaProducaoMapper';
+import { useStatusContext } from './StatusContext';
 
 const SSE_URL = 'http://localhost:8088/api/smart/fila/stream';
 
@@ -16,8 +17,8 @@ const FilaProducaoContext = createContext<FilaProducaoContextValue | null>(null)
 
 export function FilaProducaoProvider({ children }: { children: ReactNode }) {
   const [fila, setFila] = useState<FilaProducao>(FilaProducaoInitial);
-  const [conectado, setConectado] = useState(false);
   const [tempoExecucaoSegundos, setTempoExecucaoSegundos] = useState(0);
+  const { conectado } = useStatusContext();
 
   // Base do cronômetro: último valor recebido do backend e o instante (monotônico)
   // em que chegou. O tick local extrapola a partir daí, e cada novo evento SSE
@@ -25,12 +26,15 @@ export function FilaProducaoProvider({ children }: { children: ReactNode }) {
   const baseSegundosRef = useRef(0);
   const baseTimestampRef = useRef(performance.now());
   const emExecucaoRef = useRef(false);
+  
 
   useEffect(() => {
-    const source = new EventSource(SSE_URL);
 
-    source.onopen = () => setConectado(true);
-    source.onerror = () => setConectado(false);
+    if (!conectado) {
+      return;
+    }
+
+    const source = new EventSource(SSE_URL);
 
     source.addEventListener('fila', (e) => {
       try {
@@ -49,7 +53,7 @@ export function FilaProducaoProvider({ children }: { children: ReactNode }) {
     });
 
     return () => source.close();
-  }, []);
+  }, [conectado]);
 
   // Tick local de 1s: avança o cronômetro entre os eventos do SSE sem esperar o
   // próximo tick do servidor. Só corre enquanto há pedido em execução.
@@ -64,7 +68,7 @@ export function FilaProducaoProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <FilaProducaoContext.Provider value={{ fila, tempoExecucaoSegundos, conectado }}>
+    <FilaProducaoContext.Provider value={{ fila, tempoExecucaoSegundos }}>
       {children}
     </FilaProducaoContext.Provider>
   );

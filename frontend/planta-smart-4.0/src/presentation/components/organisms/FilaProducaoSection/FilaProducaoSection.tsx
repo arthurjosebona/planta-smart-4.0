@@ -1,15 +1,16 @@
 import { PedidoCard } from '@components/organisms/PedidoCard/PedidoCard';
 import { ProducaoTimer } from '@components/atoms/ProducaoTimer/ProducaoTimer';
-import { useFilaProducaoContext } from '@contexts/FilaProducaoContext';
+import { Pedido } from '@entities/Pedido';
 import styles from '@components/organisms/FilaProducaoSection/filaProducaoSection.module.css';
 
 interface FilaProducaoSectionProps {
+  emExecucao: Pedido | null;
+  pendentes: Pedido[];
+  tempoExecucaoSegundos: number;
   onSelecionarPedido?: (id: number) => void;
 }
 
-export function FilaProducaoSection({ onSelecionarPedido }: FilaProducaoSectionProps) {
-  const { fila, tempoExecucaoSegundos, conectado } = useFilaProducaoContext();
-  const { emExecucao, pendentes } = fila;
+export function FilaProducaoSection({ emExecucao, pendentes, tempoExecucaoSegundos, onSelecionarPedido }: FilaProducaoSectionProps) {
 
   return (
     <section className={styles.section} aria-label="Fila de Produção">
@@ -17,11 +18,6 @@ export function FilaProducaoSection({ onSelecionarPedido }: FilaProducaoSectionP
 
       <div className={styles.sectionHeader}>
         <h2 className={styles.heading}>Fila de Produção</h2>
-        <span
-          className={`${styles.conexao} ${conectado ? styles.conexaoOn : styles.conexaoOff}`}
-        >
-          {conectado ? 'Conectado' : 'Desconectado'}
-        </span>
       </div>
 
       {/* Pedido em execução */}

@@ -6,9 +6,10 @@ import { ViewEstoque } from '@components/molecules/ViewEstoque/ViewEstoque';
 import { ViewExpedicao } from '@components/molecules/ViewExpedicao/ViewExpedicao';
 import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard';
 import { useEstacoesViewModel } from './useEstacoesViewModel';
+import { FilaProducaoSection } from '@components/organisms/FilaProducaoSection/FilaProducaoSection';
 
 export default function EstacoesView() {
-  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro, pedidoAtual, tempoDecorrido } = useEstacoesViewModel();
+  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro, pedidoAtual, tempoDecorrido, filaProducao } = useEstacoesViewModel();
 
   const numeroOP = monitor.estoque?.numeroOP ?? 0;
   const statusProducao = monitor.estoque?.statusProducao ?? 0;
@@ -32,6 +33,11 @@ export default function EstacoesView() {
           </section>
 
           <OpEmCursoCard pedido={pedidoAtual} pedidoEmCurso={!!monitor.estoque?.pedidoEmCurso} tempoDecorrido={tempoDecorrido} />
+          <FilaProducaoSection
+            emExecucao={filaProducao.emExecucao}
+            pendentes={filaProducao.pendentes}
+            tempoExecucaoSegundos={filaProducao.tempoExecucaoSegundos}
+          />
 
           <div className={styles.inferiorEstoques}>
             <section className={styles.painel}>
