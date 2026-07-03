@@ -1,6 +1,6 @@
 import { EstoqueStream } from "@entities/stream/EstoqueStream";
 import { ExpedicaoStream } from "@entities/stream/ExpedicaoStream";
-import { ProcessoMontagemStream } from "@entities/stream/ProcessoMontagemStream";
+import { ProcessoMontagemStream } from "@entities/stream/ProcessoStream";
 
 export interface MonitorModel {
   estoque: EstoqueStream | null;
