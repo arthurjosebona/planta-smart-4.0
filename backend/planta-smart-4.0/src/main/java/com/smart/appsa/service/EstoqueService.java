@@ -97,6 +97,12 @@ public class EstoqueService {
         escreverEstoqueNoClp();
     }
 
+    // Sincroniza o magazine de estoque com o estado atual do banco.
+    @Transactional(readOnly = true)
+    public void sincronizarEstoqueNoClp() {
+        escreverEstoqueNoClp();
+    }
+
     // Escreve o mapa de cores completo do magazine no CLP ESTOQUE [DB9, byte 68, 28 bytes].
     // A verificação de readOnly é feita primeiro: em modo somente-leitura nada é escrito.
     private void escreverEstoqueNoClp() {

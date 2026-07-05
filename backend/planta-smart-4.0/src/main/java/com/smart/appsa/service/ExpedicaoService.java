@@ -87,6 +87,12 @@ public class ExpedicaoService {
         escreverExpedicaoNoClp();
     }
 
+    // Sincroniza o magazine de expedição com o estado atual do banco.
+    @Transactional(readOnly = true)
+    public void sincronizarExpedicaoNoClp() {
+        escreverExpedicaoNoClp();
+    }
+
     // Escreve o magazine completo de OPs no CLP EXPEDIÇÃO [DB9, byte 6, 24 bytes].
     // A verificação de readOnly é feita primeiro: em modo somente-leitura nada é escrito.
     private void escreverExpedicaoNoClp() {

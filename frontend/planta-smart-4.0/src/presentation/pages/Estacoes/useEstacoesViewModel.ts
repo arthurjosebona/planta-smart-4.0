@@ -2,6 +2,7 @@ import { useEstoqueContext } from '@contexts/EstoqueContext';
 import { useExpedicaoContext } from '@contexts/ExpedicaoContext';
 import { useMonitorContext } from '@contexts/MonitorContext';
 import { usePingContext } from '@contexts/PingContext';
+import { useStatusContext } from '@contexts/StatusContext';
 import { StatusEstacao } from '@enums/StatusEstacao';
 import { CorEstoque } from '@enums/CorEstoque';
 import type { Estoque } from '@entities/Estoque';
@@ -66,10 +67,10 @@ function useLatch(trigger: boolean | undefined, reset: boolean | undefined): boo
 //   return EstacaoStatusModule.Aguardando; // fallback enquanto não ocupou nem finalizou
 // }
 
-function computePipelineStatus(ligado: boolean, ocupado: boolean): EstacaoStatusPipe {
-  if (!ligado) return EstacaoStatusPipe.Desligado;
-  if (ocupado) return EstacaoStatusPipe.Ocupado;
-  return EstacaoStatusPipe.Ligado;
+function computePipelineStatus(online: boolean, pausado: boolean): EstacaoStatusPipe {
+  if (online) return EstacaoStatusPipe.Ligado;
+  if (pausado) return EstacaoStatusPipe.Ocupado;
+  return EstacaoStatusPipe.Desligado;
 }
 
 export function useEstacoesViewModel() {
@@ -77,8 +78,12 @@ export function useEstacoesViewModel() {
   const expedicao = useExpedicaoContext();
   const monitor: MonitorModel = useMonitorContext();
   const { pingMap } = usePingContext();
+  const { conectado } = useStatusContext();
+  const hasEverConnected = useRef(false);
   const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(null);
   const ultimaOpBuscada = useRef<number | null>(null);
+
+  if (conectado) hasEverConnected.current = true;
 
   useEffect(() => {
     if (!monitor.estoque?.numeroOP || monitor.estoque?.numeroOP == 0 || monitor.estoque?.numeroOP === ultimaOpBuscada.current) return;
@@ -88,6 +93,19 @@ export function useEstacoesViewModel() {
     pedidoService.findByOrdemDeProducao(monitor.estoque?.numeroOP)
       .then(setPedidoAtual)
   }, [monitor.estoque?.numeroOP]);
+
+  // Re-fetch the pedido when pedidoEmCurso transitions to true.
+  // handleEntradaEstoque (which sets registroEntradaEstoque) is committed synchronously
+  // inside confirmarInicioPedido before AppStateConfig.pedidoEmCurso is set to true,
+  // so by the time this SSE event arrives the timestamp is already in the DB.
+  const pedidoEmCurso = monitor.estoque?.pedidoEmCurso;
+  useEffect(() => {
+    if (!pedidoEmCurso || !ultimaOpBuscada.current) return;
+    if (pedidoAtual?.registroEntradaEstoque) return;
+
+    pedidoService.findByOrdemDeProducao(ultimaOpBuscada.current)
+      .then(setPedidoAtual);
+  }, [pedidoEmCurso]);
 
   const tempoDecorrido = useTempoDecorrido(pedidoAtual?.registroEntradaEstoque);
 
@@ -135,19 +153,26 @@ export function useEstacoesViewModel() {
   //   ),
   // }
 
-  const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
+  const statusEstacoes: Record<Estacao, EstacaoStatusModule> = conectado ? {
     [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque?.statusEstoque ?? 0] ?? EstacaoStatusModule.Aguardando,
     [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque?.statusProcesso ?? 0] ?? EstacaoStatusModule.Aguardando,
     [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque?.statusMontagem ?? 0] ?? EstacaoStatusModule.Aguardando,
     [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque?.statusExpedicao ?? 0] ?? EstacaoStatusModule.Aguardando,
-  }
+  } : {
+    [Estacao.Estoque]: EstacaoStatusModule.Desligado,
+    [Estacao.Processo]: EstacaoStatusModule.Desligado,
+    [Estacao.Montagem]: EstacaoStatusModule.Desligado,
+    [Estacao.Expedicao]: EstacaoStatusModule.Desligado,
+  };
+
+  const pausado = !conectado && hasEverConnected.current;
 
   const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
-    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque?.ocupado),
-    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo?.ocupado),
-    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem?.ocupado),
-    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao?.ocupado)
-  }
+    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, pausado),
+    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, pausado),
+    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, pausado),
+    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, pausado),
+  };
 
 
   const montagemStream = monitor.montagem as MontagemStream | null;

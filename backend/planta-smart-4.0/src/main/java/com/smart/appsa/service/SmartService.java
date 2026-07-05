@@ -10,12 +10,12 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
-import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.exception.ClpComunicacaoException;
+import com.smart.appsa.exception.EsteiraDesativadaException;
+import com.smart.appsa.model.clp.MontagemInfo;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,9 +32,18 @@ import java.util.Map;
 public class SmartService {
     private final PlcConnectionService plcConnectionService;
     private final AppStateConfig appStateConfig;
-    private final ApplicationEventPublisher eventPublisher;
+    private final MontagemInfo montagemInfo;
     
     public void enviarParaProducao(PedidoConfigDTO config, PedidoInfoDTO detalhes) {
+
+        // Verifica se as esteiras estão rodando, senão lança exception e dá rollback em tudo até agora
+        if (!montagemInfo.getSupervisorioEstoque().equals("LIVRE") ||
+            !montagemInfo.getSupervisorioExpedicao().equals("LIVRE") ||
+            !montagemInfo.getSupervisorioMontagem().equals("LIVRE") ||
+            !montagemInfo.getSupervisorioProcesso().equals("LIVRE") ) {
+            throw new EsteiraDesativadaException();
+        }
+
         // 1. Converter o DTO para um bloco de bytes (byte[])
         byte[] buffer = converterParaBytes(detalhes);
 
@@ -45,8 +54,6 @@ public class SmartService {
         if (connector == null) {
             throw new ClpComunicacaoException(config.getIpClp(), "conexão indisponível");
         }
-
-        // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, detalhes.getPosicaoExpedicao(), detalhes.getNumeroPedido()));
 
         try {
             // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
@@ -125,12 +132,6 @@ public class SmartService {
             // Iniciar pedido
             System.out.println("SETAR FLAG INICIAR PEDIDO");
             plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("TRUE"));
-
-            Thread.sleep(800);
-
-            System.out.println("RESETAR FLAG INICIAR PEDIDO");
-            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
-
         } catch (Exception ex) {
 
         }

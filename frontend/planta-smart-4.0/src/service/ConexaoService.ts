@@ -50,6 +50,18 @@ export class ConexaoService {
     }
   }
 
+  /**
+   * Para o loop de leitura dos CLPs no backend (POST /api/smart/stop-readings)
+   * e marca o status global como desconectado.
+   */
+  async desconectar(): Promise<void> {
+    try {
+      await this.repository.desconectar();
+    } finally {
+      this.setConectado(false);
+    }
+  }
+
   /** Inscreve um listener para mudanças de status; retorna a função de unsubscribe. */
   subscribe = (listener: Listener): (() => void) => {
     this.listeners.add(listener);

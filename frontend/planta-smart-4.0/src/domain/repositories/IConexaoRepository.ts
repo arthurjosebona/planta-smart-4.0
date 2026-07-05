@@ -5,6 +5,7 @@ import { StartReadingsResponseDTO } from '@dtos/response/StartReadingsResponseDT
 export interface IConexaoRepository {
   conectar(modulos: ModuloIP[]): Promise<void>;
   iniciarLeituras(modulos: ModuloIP[]): Promise<StartReadingsResponseDTO>;
+  desconectar(): Promise<void>;
   pingAll(): Promise<ClpPingResponseDTO[]>;
   setReadOnly(value: boolean): Promise<void>;
   getReadOnly(): Promise<boolean>;

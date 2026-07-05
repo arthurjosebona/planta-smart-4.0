@@ -211,6 +211,37 @@
   cursor: not-allowed;
 }
 
+/* ── Botão desconectar ── */
+.btnDesconectar {
+  @apply w-full flex flex-row items-center justify-center;
+  gap: var(--spacing-2);
+  padding: 14px var(--spacing-4);
+  background: #9B1C1C;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.btnDesconectar:hover:not(:disabled) {
+  background: #7B1212;
+  box-shadow: 0 4px 12px rgba(155, 28, 28, 0.3);
+}
+
+.btnDesconectar:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btnDesconectar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Painel direito: bancada ── */
 .bancada {
   @apply flex items-center justify-center;
