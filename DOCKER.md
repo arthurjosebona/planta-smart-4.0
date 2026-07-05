@@ -79,7 +79,7 @@ Após subir:
 |-----------|------------------------|
 | Frontend  | http://localhost:3000  |
 | Backend   | http://localhost:8080  |
-| MySQL     | localhost:3306         |
+| MySQL     | localhost:3307         |
 
 ---
 
