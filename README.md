@@ -93,10 +93,24 @@ planta-smart-4.0/
 
 Consulte os guias específicos de cada parte do sistema:
 
-- [📖 README — Backend](./backend/planta-smart-4.0/README.md)
-- [📖 README — Frontend](./frontend/planta-smart-4.0/README.md)
+- [📖 README — Backend](./backend/planta-smart-4.0/README.md) — instalação, banco de dados, variáveis de ambiente e endpoints
+- [📖 README — Frontend](./frontend/planta-smart-4.0/README.md) — instalação e execução da interface web
+- [🐳 DOCKER.md](./DOCKER.md) — subir todo o sistema (banco + backend + frontend) com Docker Compose
 
-A ordem recomendada é: **banco de dados → backend → frontend**.
+A ordem recomendada (execução manual) é: **banco de dados → backend → frontend**.
+
+---
+
+## 📖 Documentação da API (Swagger)
+
+Com o backend em execução, a documentação interativa de todos os endpoints REST fica disponível via **Swagger UI / OpenAPI 3**:
+
+| Recurso | URL |
+|---|---|
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| OpenAPI JSON | http://localhost:8080/v3/api-docs |
+
+Pela Swagger UI é possível visualizar e **testar** cada endpoint diretamente no navegador. Detalhes em [README — Backend](./backend/planta-smart-4.0/README.md#-documentação-da-api-swagger--openapi).
 
 ---
 

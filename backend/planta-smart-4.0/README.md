@@ -36,7 +36,8 @@ com.smart.appsa/
 │   ├── PedidoController    → /api/pedidos
 │   ├── EstoqueController   → /api/estoque
 │   ├── ExpedicaoController → /api/expedicao
-│   └── PageController      → Roteamento de views Thymeleaf
+│   ├── ClpConfigController → /api/config/clp
+│   └── SmartController     → /api/smart (leituras, SSE, ping, readonly)
 │
 ├── service/              # Regras de negócio
 │   ├── PedidoService
@@ -102,9 +103,11 @@ O banco utilizado é o **MySQL**. O schema é criado manualmente antes da primei
 - **Maven** (ou use o `mvnw` incluso no projeto)
 - **MySQL 8+** em execução local
 
+> 💡 **Prefere não instalar Java/MySQL na máquina?** Suba tudo (banco + backend + frontend) com Docker Compose seguindo o guia [**DOCKER.md**](../../DOCKER.md).
+
 ---
 
-## 🚀 Executando o Backend
+## 🚀 Executando o Backend (Manual de Instalação)
 
 ### 1. Configurar o banco de dados
 
@@ -114,23 +117,32 @@ Crie o schema executando o script SQL incluído no projeto:
 mysql -u root -p < src/main/resources/script.sql
 ```
 
-Isso irá recriar o banco `DB_SA_SMART40` com todas as tabelas necessárias.
+Isso irá **recriar** o banco `DB_SA_SMART40` (o script começa com `DROP DATABASE IF EXISTS`) com todas as tabelas e constraints necessárias.
 
-### 2. Ajustar as configurações
+> O schema também é mantido pelo JPA em tempo de execução (`spring.jpa.hibernate.ddl-auto=update`), mas rodar o `script.sql` garante o estado inicial correto na primeira instalação.
 
-Edite o arquivo `src/main/resources/application.properties` conforme seu ambiente:
+### 2. Configurar as variáveis de ambiente
 
-```properties
-# URL do banco
-spring.datasource.url=jdbc:mysql://localhost:3306/db_sa_smart40
+As credenciais do banco **não ficam no `application.properties`** — elas são lidas de um arquivo `.env` na raiz de `backend/planta-smart-4.0/` (carregado pela biblioteca `spring-dotenv`).
 
-# Credenciais (altere se necessário)
-spring.datasource.username=root
-spring.datasource.password=root
+Crie o arquivo `.env`:
 
-# Porta do servidor (padrão: 8080)
-server.port=8080
+```env
+# Usuário e senha do MySQL
+DB_USER=root
+DB_PASSWORD=sua_senha
+
+# Porta do servidor Spring Boot (opcional — padrão 8080)
+PORT=8080
 ```
+
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `DB_USER` | ✅ | Usuário do MySQL |
+| `DB_PASSWORD` | ✅ | Senha do MySQL |
+| `PORT` | ❌ | Porta HTTP do backend (padrão `8080`) |
+
+O `application.properties` referencia essas variáveis (`${DB_USER}`, `${DB_PASSWORD}`, `${PORT:8080}`) e já aponta para `jdbc:mysql://localhost:3306/db_sa_smart40`. Os **IPs dos CLPs** também ficam no `application.properties` (`clp.ips.*`) — ajuste-os para a topologia da sua rede.
 
 ### 3. Executar a aplicação
 
@@ -159,6 +171,19 @@ A API estará disponível em: **`http://localhost:8080`**
 
 ---
 
+## 📖 Documentação da API (Swagger / OpenAPI)
+
+Com a aplicação em execução, a documentação interativa de **todos os endpoints** é gerada automaticamente pelo **springdoc-openapi**:
+
+| Recurso | URL |
+|---|---|
+| **Swagger UI** (interface interativa) | http://localhost:8080/swagger-ui.html |
+| **OpenAPI JSON** (contrato) | http://localhost:8080/v3/api-docs |
+
+Pela Swagger UI é possível **visualizar e testar** cada endpoint diretamente pelo navegador (botão *Try it out*), inspecionando parâmetros, corpos de requisição e respostas. Os metadados (título, descrição, versão) são definidos em `config/OpenApiConfig.java`.
+
+---
+
 ## 📡 Endpoints da API
 
 ### Pedidos — `/api/pedidos`
@@ -168,22 +193,54 @@ A API estará disponível em: **`http://localhost:8080`**
 | `POST` | `/api/pedidos` | Criar um novo pedido |
 | `GET` | `/api/pedidos` | Listar todos os pedidos |
 | `GET` | `/api/pedidos/{id}` | Buscar pedido por ID |
-| `PUT` | `/api/pedidos/{id}/status` | Marcar pedido como concluído |
+| `GET` | `/api/pedidos/op/{op}` | Buscar pedido pela ordem de produção |
+| `GET` | `/api/pedidos/expedicao/{id}` | Listar pedidos de um slot de expedição |
+| `PUT` | `/api/pedidos/{id}` | Atualizar um pedido |
+| `PUT` | `/api/pedidos/start-production/{id}` | Iniciar a produção do pedido (envia ao CLP) |
+| `DELETE` | `/api/pedidos/{id}` | Excluir um pedido |
 
 ### Estoque — `/api/estoque`
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/api/estoque` | Consultar estado atual do estoque |
-| `PUT` | `/api/estoque/{id}` | Atualizar posição/cor de um slot |
+| `GET` | `/api/estoque` | Consultar todo o estoque |
+| `GET` | `/api/estoque/{id}` | Buscar posição de estoque por ID |
+| `GET` | `/api/estoque/disponivel` | Listar posições disponíveis |
+| `GET` | `/api/estoque/indisponivel` | Listar posições ocupadas |
+| `PUT` | `/api/estoque` | Atualizar em lote posições/cores do estoque |
 
 ### Expedição — `/api/expedicao`
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/api/expedicao` | Consultar slots de expedição |
+| `GET` | `/api/expedicao` | Consultar todos os slots de expedição |
+| `GET` | `/api/expedicao/{id}` | Buscar slot de expedição por ID |
+| `PUT` | `/api/expedicao` | Atualizar em lote os slots de expedição |
 
-> Todos os endpoints aceitam e retornam **JSON** e possuem `@CrossOrigin(origins = "*")` habilitado para integração com o frontend.
+### Configuração dos CLPs — `/api/config/clp`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/api/config/clp/ips` | Obter o mapa de IPs dos CLPs |
+| `GET` | `/api/config/clp/ips/{clp}` | Obter o IP de um CLP específico |
+| `PUT` | `/api/config/clp/ips/{clp}` | Atualizar o IP de um CLP |
+| `PUT` | `/api/config/clp/ips` | Atualizar todos os IPs de uma vez |
+
+### Supervisão / CLPs — `/api/smart`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/api/smart/start-readings` | Inicia as leituras dos CLPs (recebe `{ estoque, processo, montagem, expedicao }`) |
+| `POST` | `/api/smart/stop-readings` | Interrompe as leituras e fecha as conexões |
+| `GET` | `/api/smart/data/{clp}` | Último dado bruto (hex) lido de um CLP |
+| `GET` | `/api/smart/stream` | **SSE** multiplexado com eventos de todas as estações |
+| `GET` | `/api/smart/stream/{bancada}` | **SSE** de uma única estação |
+| `POST` | `/api/smart/ping` | Verifica a conectividade (TCP:102) de cada CLP |
+| `POST` | `/api/smart/reset-status` | Zera os campos de status de produção |
+| `POST` | `/api/smart/readonly?value=true\|false` | Ativa/desativa o modo somente-leitura |
+| `GET` | `/api/smart/readonly` | Consulta o estado do modo somente-leitura |
+
+> Todos os endpoints aceitam e retornam **JSON** (exceto os streams SSE, que emitem `text/event-stream`). O CORS é habilitado globalmente para integração com o frontend.
 
 ---
 
@@ -203,7 +260,7 @@ A API estará disponível em: **`http://localhost:8080`**
 
 ## 🔌 Integração com CLPs
 
-Para que a supervisão em tempo real funcione, os CLPs Siemens das estações devem estar acessíveis via rede (IP/TCP, porta 102). Configure os endereços IPs dos PLCs no código de inicialização conforme a topologia da rede da bancada.
+Para que a supervisão em tempo real funcione, os CLPs Siemens das estações devem estar acessíveis via rede (IP/TCP, porta 102). Configure os endereços IPs dos PLCs em `src/main/resources/application.properties` (`clp.ips.estoque`, `clp.ips.processo`, `clp.ips.montagem`, `clp.ips.expedicao`) — ou em tempo de execução via `PUT /api/config/clp/ips` — conforme a topologia da rede da bancada.
 
 A comunicação é **bidirecional**: o backend lê tags dos CLPs para exibir o status atual das estações e escreve tags para comandar operações como iniciar ou pausar uma etapa.
 
@@ -214,3 +271,9 @@ A comunicação é **bidirecional**: o backend lê tags dos CLPs para exibir o s
 ```bash
 ./mvnw test
 ```
+
+---
+
+## 🐳 Docker
+
+O backend possui um `Dockerfile` (build multi-stage: Maven → JRE 17) e é orquestrado junto com o banco e o frontend pelo `docker-compose.yml` na raiz do repositório. Consulte o guia completo em [**DOCKER.md**](../../DOCKER.md).
