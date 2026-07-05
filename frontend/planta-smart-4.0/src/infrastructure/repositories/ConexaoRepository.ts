@@ -26,6 +26,10 @@ export class ConexaoRepository implements IConexaoRepository {
     return this.httpClient.post<StartReadingsResponseDTO>('/api/smart/start-readings', body);
   }
 
+  async desconectar(): Promise<void> {
+    await this.httpClient.post<void>('/api/smart/stop-readings', {});
+  }
+
   async pingAll(): Promise<ClpPingResponseDTO[]> {
     // Rota: POST /api/smart/ping — sem body
     return this.httpClient.post<ClpPingResponseDTO[]>('/api/smart/ping', {});

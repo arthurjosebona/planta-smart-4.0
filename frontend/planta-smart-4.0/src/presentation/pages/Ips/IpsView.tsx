@@ -15,9 +15,11 @@ const MODULE_CLASSES: Record<string, string> = {
 export default function IpsView() {
   const {
     model,
+    conectado,
     handleFaixaChange,
     confirmarFaixa,
     conectar,
+    desconectar,
     toggleReadOnly,
     dismissErro,
     dismissSucesso,
@@ -100,14 +102,25 @@ export default function IpsView() {
             </span>
           </label>
 
-          <button
-            type="button"
-            className={styles.btnConectar}
-            disabled={model.loading}
-            onClick={conectar}
-          >
-            {model.loading ? 'Conectando…' : 'Conectar'}
-          </button>
+          {conectado ? (
+            <button
+              type="button"
+              className={styles.btnDesconectar}
+              disabled={model.loading}
+              onClick={desconectar}
+            >
+              {model.loading ? 'Desconectando…' : 'Desconectar'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={styles.btnConectar}
+              disabled={model.loading}
+              onClick={conectar}
+            >
+              {model.loading ? 'Conectando…' : 'Conectar'}
+            </button>
+          )}
         </section>
 
         {/* ── Painel direito ── */}
