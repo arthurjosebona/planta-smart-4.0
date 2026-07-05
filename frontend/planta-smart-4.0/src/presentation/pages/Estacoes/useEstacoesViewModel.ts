@@ -89,6 +89,19 @@ export function useEstacoesViewModel() {
       .then(setPedidoAtual)
   }, [monitor.estoque?.numeroOP]);
 
+  // Re-fetch the pedido when pedidoEmCurso transitions to true.
+  // handleEntradaEstoque (which sets registroEntradaEstoque) is committed synchronously
+  // inside confirmarInicioPedido before AppStateConfig.pedidoEmCurso is set to true,
+  // so by the time this SSE event arrives the timestamp is already in the DB.
+  const pedidoEmCurso = monitor.estoque?.pedidoEmCurso;
+  useEffect(() => {
+    if (!pedidoEmCurso || !ultimaOpBuscada.current) return;
+    if (pedidoAtual?.registroEntradaEstoque) return;
+
+    pedidoService.findByOrdemDeProducao(ultimaOpBuscada.current)
+      .then(setPedidoAtual);
+  }, [pedidoEmCurso]);
+
   const tempoDecorrido = useTempoDecorrido(pedidoAtual?.registroEntradaEstoque);
 
   function dismissErro() {
