@@ -70,7 +70,7 @@ const NAV_ITEMS: (NavItem | 'separator')[] = [
   'separator',
   { href: '/pedidos', label: 'Pedidos', icon: IconPedido },
   'separator',
-  { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
+  { href: '/dashboard', label: 'Gestor', icon: IconDashboard },
   'separator',
   { href: '/estacoes', label: 'Estações', icon: IconEstacoes },
   'separator',
