@@ -135,17 +135,17 @@ export function useEstacoesViewModel() {
   // }
 
   const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
-    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque.statusEstoque],
-    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque.statusProcesso],
-    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque.statusMontagem],
-    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque.statusExpedicao],
+    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque?.statusEstoque ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque?.statusProcesso ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque?.statusMontagem ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque?.statusExpedicao ?? 0] ?? EstacaoStatusModule.Aguardando,
   }
 
   const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
-    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque.ocupado),
-    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo.ocupado),
-    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem.ocupado),
-    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao.ocupado)
+    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque?.ocupado),
+    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo?.ocupado),
+    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem?.ocupado),
+    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao?.ocupado)
   }
 
 
