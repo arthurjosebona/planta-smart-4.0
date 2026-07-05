@@ -14,6 +14,7 @@ import { Pedido } from '@entities/Pedido';
 import { pedidoService } from '@config/diContainer';
 import { useTempoDecorrido } from '@hooks/useTempoDecorrido';
 import { MonitorModel } from '@pages/Monitor/MonitorModel';
+import { MontagemStream } from '@entities/stream/MontagemStream';
 
 // Converte o vetor de cores do magazine de estoque recebido via SSE
 // (posicoesOcupadas) em entidades Estoque para exibição somente-leitura.
@@ -135,19 +136,27 @@ export function useEstacoesViewModel() {
   // }
 
   const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
-    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque.statusEstoque],
-    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque.statusProcesso],
-    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque.statusMontagem],
-    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque.statusExpedicao],
+    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque?.statusEstoque ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque?.statusProcesso ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque?.statusMontagem ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque?.statusExpedicao ?? 0] ?? EstacaoStatusModule.Aguardando,
   }
 
   const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
-    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque.ocupado),
-    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo.ocupado),
-    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem.ocupado),
-    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao.ocupado)
+    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque?.ocupado),
+    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo?.ocupado),
+    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem?.ocupado),
+    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao?.ocupado)
   }
 
+
+  const montagemStream = monitor.montagem as MontagemStream | null;
+  const statusEsteiras: Record<Estacao, string> = {
+    [Estacao.Estoque]: montagemStream?.supervisorioEstoque ?? '',
+    [Estacao.Processo]: montagemStream?.supervisorioProcesso ?? '',
+    [Estacao.Montagem]: montagemStream?.supervisorioMontagem ?? '',
+    [Estacao.Expedicao]: montagemStream?.supervisorioExpedicao ?? '',
+  };
 
   return {
     estoque,
@@ -155,6 +164,7 @@ export function useEstacoesViewModel() {
     monitor,
     statusEstacoes,
     statusPipelines,
+    statusEsteiras,
     bancada,
     erro: estoque.erro ?? expedicao.erro,
     dismissErro,

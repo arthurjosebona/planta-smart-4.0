@@ -24,7 +24,7 @@ public class AppStateConfig {
     public void resetarStatus() {
         statusEstoque = 0;
         statusExpedicao = 0;
-        statusProducao = 0;
+        statusProcesso = 0;
         statusMontagem = 0;
     }
 }

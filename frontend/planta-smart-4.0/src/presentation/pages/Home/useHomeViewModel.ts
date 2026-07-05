@@ -1,11 +1,11 @@
 import { useIpsViewModel } from '@pages/Ips/useIpsViewModel';
-import { useConexaoStatus } from '../../hook/useConexaoStatus';
 import { usePingContext } from '@contexts/PingContext';
 import { useMonitorContext } from '@contexts/MonitorContext';
 import { useEstoqueContext } from '@contexts/EstoqueContext';
 import { useExpedicaoContext } from '@contexts/ExpedicaoContext';
 import { CorEstoque } from '@enums/CorEstoque';
 import { HomeStation, HomeSummary } from '@pages/Home/HomeModel';
+import { useStatusContext } from '@contexts/StatusContext';
 
 /**
  * ViewModel da Home: apresenta os detalhes da bancada em tempo real — status de
@@ -14,7 +14,7 @@ import { HomeStation, HomeSummary } from '@pages/Home/HomeModel';
  */
 export function useHomeViewModel() {
   const ips = useIpsViewModel(); // fonte dos IPs e do modo readOnly (consultados do backend)
-  const conectado = useConexaoStatus(); // status global de conexão (definido na tela de Conexão)
+  const conectado = useStatusContext(); // status global de conexão 
   const { pingMap } = usePingContext();
   const monitor = useMonitorContext();
   const estoque = useEstoqueContext();
