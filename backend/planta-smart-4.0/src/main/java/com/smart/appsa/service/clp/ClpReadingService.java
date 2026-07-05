@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
+import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.model.enums.Estacao;
+import com.smart.appsa.service.EstoqueService;
+import com.smart.appsa.service.ExpedicaoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 import com.smart.appsa.service.clp.reader.PlcReaderTask;
 import com.smart.appsa.service.clp.reader.StationReadConfig;
@@ -30,6 +33,9 @@ public class ClpReadingService {
     private final PlcConnectionService plcConnectionService;
     private final PlcDataStore dataStore;
     private final SseService sseService;
+    private final AppStateConfig appStateConfig;
+    private final EstoqueService estoqueService;
+    private final ExpedicaoService expedicaoService;
     private final Map<Estacao, PlcDataObserver> commServices;
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
@@ -39,6 +45,9 @@ public class ClpReadingService {
     public ClpReadingService(PlcConnectionService plcConnectionService,
                              PlcDataStore dataStore,
                              SseService sseService,
+                             AppStateConfig appStateConfig,
+                             EstoqueService estoqueService,
+                             ExpedicaoService expedicaoService,
                              EstoqueComm estoqueCommService,
                              ProcessoComm processoCommService,
                              MontagemComm montagemCommService,
@@ -46,6 +55,9 @@ public class ClpReadingService {
         this.plcConnectionService = plcConnectionService;
         this.dataStore = dataStore;
         this.sseService = sseService;
+        this.appStateConfig = appStateConfig;
+        this.estoqueService = estoqueService;
+        this.expedicaoService = expedicaoService;
         this.commServices = new EnumMap<>(Estacao.class);
         this.commServices.put(Estacao.ESTOQUE, estoqueCommService);
         this.commServices.put(Estacao.PROCESSO, processoCommService);
@@ -80,6 +92,8 @@ public class ClpReadingService {
                 return;
             }
 
+            sincronizarEstadoAtual(estacao);
+
             StationReadConfig config = configs.get(estacao);
             PlcReaderTask task = new PlcReaderTask(connector, ip, estacao, config.reads());
             // Ordem importa: o CommService parseia o modelo primeiro; depois guardamos o
@@ -96,6 +110,21 @@ public class ClpReadingService {
             resultados.put(estacao, true);
         });
         return resultados;
+    }
+
+    // Escreve o estado atual do banco no CLP recém-conectado (Estoque/Expedição), garantindo
+    // que ele reflita o banco assim que a leitura da bancada é iniciada. Em modo readOnly nada
+    // é escrito.
+    private void sincronizarEstadoAtual(Estacao estacao) {
+        if (appStateConfig.isReadOnly()) {
+            return;
+        }
+
+        switch (estacao) {
+            case ESTOQUE -> estoqueService.sincronizarEstoqueNoClp();
+            case EXPEDICAO -> expedicaoService.sincronizarExpedicaoNoClp();
+            default -> { }
+        }
     }
 
     // Cancela todas as threads de leitura e encerra as conexões com os CLPs.
