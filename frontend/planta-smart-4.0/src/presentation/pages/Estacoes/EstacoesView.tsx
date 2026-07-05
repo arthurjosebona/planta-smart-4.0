@@ -6,9 +6,10 @@ import { ViewEstoque } from '@components/molecules/ViewEstoque/ViewEstoque';
 import { ViewExpedicao } from '@components/molecules/ViewExpedicao/ViewExpedicao';
 import { OpEmCursoCard } from '@components/molecules/OpEmCursoCard/OpEmCursoCard';
 import { useEstacoesViewModel } from './useEstacoesViewModel';
+import { Estacao } from '@enums/Estacao';
 
 export default function EstacoesView() {
-  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, bancada, erro, dismissErro, pedidoAtual, tempoDecorrido } = useEstacoesViewModel();
+  const { estoque, expedicao, monitor, statusEstacoes, statusPipelines, statusEsteiras, bancada, erro, dismissErro, pedidoAtual, tempoDecorrido } = useEstacoesViewModel();
 
   const numeroOP = monitor.estoque?.numeroOP ?? 0;
   const statusProducao = monitor.estoque?.statusProducao ?? 0;
@@ -29,6 +30,14 @@ export default function EstacoesView() {
         <div className={styles.layout}>
           <section className={styles.estacoesSection}>
             <Estacoes status={monitor} statusEstacoes={statusEstacoes} statusPipelines={statusPipelines} />
+            <div className={styles.esteiraRow}>
+              {([Estacao.Estoque, Estacao.Processo, Estacao.Montagem, Estacao.Expedicao] as Estacao[]).map((estacao) => (
+                <div key={estacao} className={styles.esteiraCard}>
+                  <span className={styles.esteiraLabel}>{estacao}</span>
+                  <span className={styles.esteiraStatus}>{statusEsteiras[estacao] || '—'}</span>
+                </div>
+              ))}
+            </div>
           </section>
 
           <OpEmCursoCard pedido={pedidoAtual} pedidoEmCurso={!!monitor.estoque?.pedidoEmCurso} tempoDecorrido={tempoDecorrido} />
