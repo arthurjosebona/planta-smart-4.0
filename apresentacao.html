@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMART 4.0 — Apresentação</title>
+<style>
+  :root{
+    --bg:#0a0e1a; --bg2:#111827; --card:#161e2e; --card2:#1b2435;
+    --line:#26324a; --txt:#e9eef7; --mut:#93a3ba;
+    --accent:#38bdf8; --accent2:#22d3ee; --green:#34d399; --amber:#fbbf24;
+    --purple:#a78bfa; --red:#f87171; --pink:#f472b6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:radial-gradient(1100px 650px at 75% -10%,#15233f 0%,transparent 60%),
+               radial-gradient(800px 550px at 0% 100%,#10261f 0%,transparent 55%),var(--bg);
+    color:var(--txt);overflow:hidden;
+  }
+  /* DECK */
+  .deck{height:100vh;width:100vw;position:relative}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    padding:60px 64px 78px;overflow:auto;animation:fade .45s ease both;
+  }
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media(max-width:760px){.slide{padding:42px 24px 76px}}
+
+  .kicker{color:var(--accent2);font-weight:800;font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+  .kicker .step{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:3px 10px;color:var(--txt);font-size:11px;letter-spacing:1px}
+  .kicker .time{margin-left:auto;color:var(--mut);font-weight:700;letter-spacing:1px}
+  h1{font-size:clamp(30px,4.6vw,54px);font-weight:800;letter-spacing:-1px;line-height:1.08}
+  h2{font-size:clamp(24px,3.4vw,38px);font-weight:800;letter-spacing:-.6px;line-height:1.12;margin-bottom:8px}
+  .lead{color:var(--mut);font-size:clamp(15px,1.8vw,19px);max-width:900px;margin-top:14px}
+  .slide-body{flex:1;margin-top:26px;display:flex;flex-direction:column;justify-content:center}
+
+  /* generic blocks */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)} .g5{grid-template-columns:repeat(5,1fr)}
+  @media(max-width:860px){.g2,.g3,.g4,.g5{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
+
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:15px;padding:20px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--bar,var(--accent))}
+  .card .ic{font-size:26px}
+  .card h3{font-size:17px;font-weight:700;margin-top:10px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .card h3 .ver{font-size:11px;font-weight:700;background:var(--bg2);border:1px solid var(--line);color:var(--accent2);padding:2px 7px;border-radius:6px}
+  .card p{color:var(--mut);font-size:13.5px;margin-top:8px}
+
+  .row{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--lc,var(--accent));border-radius:12px;padding:14px 18px;flex-wrap:wrap}
+  .row .lname{font-weight:800;min-width:150px;font-size:15px}
+  .row .ldesc{color:var(--mut);font-size:14px;flex:1;min-width:220px}
+  .row .tag{font-size:11px;font-weight:700;color:var(--mut);background:var(--bg2);border:1px solid var(--line);padding:3px 9px;border-radius:6px}
+  .stack{display:flex;flex-direction:column;gap:10px}
+
+  code{font-family:'Cascadia Code',Consolas,monospace;background:var(--bg2);border:1px solid var(--line);padding:1px 7px;border-radius:6px;font-size:.88em;color:var(--accent2)}
+  .endpoint{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 16px;font-family:'Cascadia Code',Consolas,monospace;font-size:14px}
+  .verb{font-weight:800;font-size:12px;padding:3px 10px;border-radius:6px;min-width:62px;text-align:center}
+  .v-post{background:rgba(52,211,153,.16);color:var(--green)}
+  .v-get{background:rgba(56,189,248,.16);color:var(--accent)}
+  .v-put{background:rgba(251,191,36,.16);color:var(--amber)}
+  .v-del{background:rgba(248,113,113,.16);color:var(--red)}
+  .endpoint .desc{margin-left:auto;color:var(--mut);font-size:12.5px;font-family:'Segoe UI',sans-serif}
+
+  ul.clean{list-style:none;display:flex;flex-direction:column;gap:12px}
+  ul.clean li{display:flex;gap:13px;font-size:15.5px;align-items:flex-start}
+  ul.clean li .b{color:var(--accent2);font-weight:800;flex-shrink:0}
+  ul.clean li b{color:var(--txt)}
+  ul.clean li span.m{color:var(--mut)}
+
+  pre.code{background:#0c1322;border:1px solid var(--line);border-radius:13px;padding:18px 20px;overflow:auto;font-family:'Cascadia Code',Consolas,monospace;font-size:13.5px;line-height:1.65}
+  pre.code .kw{color:var(--pink)} pre.code .ty{color:var(--accent2)} pre.code .st{color:var(--green)} pre.code .cm{color:#5b6b85} pre.code .fn{color:var(--amber)}
+
+  .pill{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600}
+  .pills{display:flex;flex-wrap:wrap;gap:9px}
+
+  /* progress + controls */
+  .ctrl{position:fixed;bottom:18px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:14px;z-index:60}
+  .ctrl button{background:var(--card);border:1px solid var(--line);color:var(--txt);width:42px;height:42px;border-radius:11px;cursor:pointer;font-size:18px;transition:.2s}
+  .ctrl button:hover{background:var(--card2);border-color:#3a4d6e}
+  .counter{font-size:13px;color:var(--mut);font-weight:700;min-width:60px;text-align:center}
+  .progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));z-index:60;transition:width .4s}
+  .brandtag{position:fixed;top:16px;right:22px;font-size:12px;font-weight:800;letter-spacing:1px;color:var(--mut);z-index:60;display:flex;align-items:center;gap:8px}
+  .brandtag .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+
+  /* DER diagram */
+  .der{display:flex;flex-direction:column;align-items:center;gap:0;width:100%}
+  .ent{background:var(--card);border:1px solid var(--line);border-radius:12px;min-width:200px;overflow:hidden}
+  .ent .eh{background:var(--eh,var(--accent));color:#06121f;font-weight:800;padding:7px 14px;font-size:14px;letter-spacing:.5px}
+  .ent .ef{padding:9px 14px;font-size:12.5px;color:var(--mut);font-family:'Cascadia Code',monospace;line-height:1.7}
+  .rel{color:var(--accent2);font-weight:800;font-size:12px;padding:7px 0;text-align:center;font-family:'Cascadia Code',monospace}
+  .der-row{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center}
+
+  .tag-soft{font-size:11px;color:var(--mut);background:var(--bg2);border:1px solid var(--line);padding:2px 8px;border-radius:6px;font-weight:700}
+  .hint{position:fixed;bottom:20px;right:22px;color:var(--mut);font-size:12px;z-index:60}
+  .center{display:flex;flex-direction:column;justify-content:center;height:100%}
+  .authors{margin-top:28px;color:var(--mut);font-size:14px}
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<div class="brandtag"><span class="dot"></span>SMART 4.0</div>
+
+<div class="deck" id="deck">
+
+  <!-- 0 · CAPA -->
+  <section class="slide active">
+    <div class="center">
+      <div class="kicker">Ecossistema Digital · dbSmart40 <span class="time">Indústria 4.0</span></div>
+      <h1 style="font-size:clamp(40px,7vw,82px);background:linear-gradient(120deg,#fff 10%,var(--accent) 55%,var(--accent2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent">Bancada SMART 4.0</h1>
+      <p class="lead" style="font-size:22px">Software + hardware integrados para gerenciar uma linha de produção: rastreabilidade de pedidos e dados de chão de fábrica em tempo real.</p>
+      <div class="pills" style="margin-top:30px">
+        <span class="pill">🗂️ Etapa 1 · Modelagem</span>
+        <span class="pill">☕ Etapa 2 · Backend</span>
+        <span class="pill">⚛️ Etapa 3 · Frontend</span>
+      </div>
+      <div class="authors">SENAI · Técnico em Desenvolvimento de Sistemas — 3º Semestre</div>
+    </div>
+  </section>
+
+  <!-- 1 · ABERTURA -->
+  <section class="slide">
+    <div class="kicker">Abertura · Contexto <span class="step">~1 min</span><span class="time">⏱ 00:00</span></div>
+    <h2>Por que Indústria 4.0?</h2>
+    <p class="lead">A 4ª revolução industrial conecta máquinas, sensores e software. O que ela exige: <b>rastreabilidade</b> e <b>dados em tempo real</b> — saber o que cada peça é, onde está e em que etapa se encontra.</p>
+    <div class="slide-body">
+      <div class="grid g3">
+        <div class="card" style="--bar:var(--accent)"><span class="ic">📡</span><h3>Tempo real</h3><p>Cada estação reporta seu estado continuamente — nada de planilha manual.</p></div>
+        <div class="card" style="--bar:var(--green)"><span class="ic">🔎</span><h3>Rastreabilidade</h3><p>Todo bloco e lâmina é identificável do pedido até a expedição.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🤝</span><h3>Integração</h3><p>Robôs, painéis e apps falando a mesma língua: dados padronizados.</p></div>
+      </div>
+      <div class="row" style="--lc:var(--amber);margin-top:22px">
+        <span class="lname">🎯 O desafio</span>
+        <span class="ldesc">Construir o ecossistema digital <b>dbSmart40</b>: pedidos <b>simples, duplo e triplo</b>, montados com <b>blocos</b> e <b>lâminas</b> customizáveis (cor, padrão, posição).</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · ETAPA 1 INTRO -->
+  <section class="slide">
+    <div class="kicker">Etapa 1 · Modelagem de Dados <span class="step">~1,5 min</span><span class="time">⏱ 01:00</span></div>
+    <h2>Entidades principais</h2>
+    <p class="lead">Antes de uma linha de código, foi preciso modelar o domínio: o que existe no mundo real e como as peças se relacionam.</p>
+    <div class="slide-body">
+      <div class="grid g5">
+        <div class="card" style="--bar:var(--accent)"><span class="ic">📝</span><h3>Pedido</h3><p>A ordem de produção: tipo, cor da tampa, status.</p></div>
+        <div class="card" style="--bar:var(--amber)"><span class="ic">🧱</span><h3>Bloco</h3><p>Componente físico montado, ligado a 1 andar.</p></div>
+        <div class="card" style="--bar:var(--pink)"><span class="ic">🪶</span><h3>Lâmina</h3><p>Customização do bloco: cor, padrão, posição.</p></div>
+        <div class="card" style="--bar:var(--green)"><span class="ic">📦</span><h3>Estoque</h3><p>28 posições com peças por cor.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🚚</span><h3>Expedição</h3><p>12 posições de saída de pedidos.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · DER -->
+  <section class="slide">
+    <div class="kicker">Etapa 1 · Diagrama (DER) <span class="step">relacionamentos</span><span class="time">⏱ 01:30</span></div>
+    <h2>Como tudo se conecta</h2>
+    <div class="slide-body">
+      <div class="der">
+        <div class="der-row">
+          <div class="ent"><div class="eh" style="--eh:var(--green)">ESTOQUE</div><div class="ef">id · cor · vazia<br>28 posições</div></div>
+          <div style="text-align:center">
+            <div class="ent"><div class="eh" style="--eh:var(--accent)">PEDIDO</div><div class="ef">id · ordemDeProducao<br>tipo · corTampa · status</div></div>
+          </div>
+          <div class="ent"><div class="eh" style="--eh:var(--purple)">EXPEDIÇÃO</div><div class="ef">id · posição<br>12 posições</div></div>
+        </div>
+        <div class="rel">│ 1 ──&lt; N (@OneToMany)</div>
+        <div class="ent"><div class="eh" style="--eh:var(--amber)">BLOCO</div><div class="ef">id · andar · cor · pedido_id (@ManyToOne)</div></div>
+        <div class="rel">│ 1 ──&lt; 0..3 (@OneToMany)</div>
+        <div class="ent"><div class="eh" style="--eh:var(--pink)">LÂMINA</div><div class="ef">id · cor · padrão · posição · bloco_id</div></div>
+      </div>
+      <div class="grid g3" style="margin-top:26px">
+        <div class="row" style="--lc:var(--accent)"><span class="ldesc"><b>1 Pedido → N Blocos</b><br><span class="m">um pedido agrupa seus blocos</span></span></div>
+        <div class="row" style="--lc:var(--amber)"><span class="ldesc"><b>1 Bloco → 0–3 Lâminas</b><br><span class="m">bloco vinculado a 1 único pedido</span></span></div>
+        <div class="row" style="--lc:var(--pink)"><span class="ldesc"><b>1 Lâmina → 1 Bloco</b><br><span class="m">vínculo exclusivo</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · REGRAS DE NEGÓCIO -->
+  <section class="slide">
+    <div class="kicker">Etapa 1 · Regras de Negócio <span class="step">domínio</span><span class="time">⏱ 02:00</span></div>
+    <h2>Regras que o modelo precisa garantir</h2>
+    <div class="slide-body">
+      <ul class="clean">
+        <li><span class="b">▸</span><div><b>Pedido triplo exige exatamente 3 blocos</b> <span class="m">— simples = 1, duplo = 2, triplo = 3. O tipo precisa bater com a quantidade.</span></div></li>
+        <li><span class="b">▸</span><div><b>Vínculos exclusivos</b> <span class="m">— bloco pertence a um único pedido; lâmina pertence a um único bloco.</span></div></li>
+        <li><span class="b">▸</span><div><b>Estoque com 28 posições</b> <span class="m">— cada uma com uma cor; consumida ao montar um bloco.</span></div></li>
+        <li><span class="b">▸</span><div><b>Expedição com 12 posições</b> <span class="m">— pedido concluído ocupa uma vaga de saída.</span></div></li>
+        <li><span class="b">▸</span><div><b>Sem dois blocos no mesmo andar</b> <span class="m">— cada andar do pedido é único.</span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 · ETAPA 2 INTRO -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Backend <span class="step">~3 min</span><span class="time">⏱ 03:30</span></div>
+    <h2>Spring Boot + JPA</h2>
+    <p class="lead">O cérebro do sistema. Padroniza a comunicação em <b>JSON</b> entre robôs, painéis web e apps — todos consomem a mesma API.</p>
+    <div class="slide-body">
+      <div class="grid g4">
+        <div class="card" style="--bar:var(--green)"><span class="ic">🍃</span><h3>Spring Boot <span class="ver">4.0.5</span></h3><p>API REST, injeção de dependências, servidor embarcado.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🗃️</span><h3>Spring Data JPA</h3><p>ORM com Hibernate — entidades viram tabelas.</p></div>
+        <div class="card" style="--bar:var(--red)"><span class="ic">☕</span><h3>Java <span class="ver">17</span></h3><p>Linguagem base, tipada e robusta.</p></div>
+        <div class="card" style="--bar:#00758f"><span class="ic">🐬</span><h3>MySQL <span class="ver">8</span></h3><p>Persistência relacional dos dados.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · ARQUITETURA BACKEND -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Arquitetura em Camadas <span class="step">fluxo de uma requisição</span><span class="time">⏱ 04:00</span></div>
+    <h2>Controller → Service → Repository</h2>
+    <div class="slide-body">
+      <div class="stack">
+        <div class="row" style="--lc:var(--accent)"><span class="lname">Controller</span><span class="ldesc">Recebe a requisição HTTP, valida o formato e devolve a resposta. <code>PedidoController</code></span><span class="tag">REST</span></div>
+        <div class="row" style="--lc:var(--green)"><span class="lname">Service</span><span class="ldesc">Onde mora a regra de negócio — o "filtro de qualidade". <code>PedidoService</code></span><span class="tag">negócio</span></div>
+        <div class="row" style="--lc:var(--purple)"><span class="lname">Repository</span><span class="ldesc">Acesso ao banco via JPA, sem SQL escrito à mão. <code>PedidoRepository</code></span><span class="tag">dados</span></div>
+        <div class="row" style="--lc:var(--amber)"><span class="lname">Mapper + DTO</span><span class="ldesc">Traduz entidade ↔️ DTO de request/response. <code>PedidoMapper</code> — entidade nunca vaza pra fora.</span><span class="tag">transporte</span></div>
+      </div>
+      <p class="lead" style="margin-top:18px">Mapeamento ORM: <code>@OneToMany</code> / <code>@ManyToOne</code> ligando <b>Pedido → Blocos → Lâminas</b> automaticamente.</p>
+    </div>
+  </section>
+
+  <!-- 7 · ENDPOINTS -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · API REST <span class="step">endpoints reais</span><span class="time">⏱ 04:45</span></div>
+    <h2>O que a API expõe</h2>
+    <div class="slide-body">
+      <div class="stack">
+        <div class="endpoint"><span class="verb v-post">POST</span><span>/api/pedidos</span><span class="desc">cria um pedido</span></div>
+        <div class="endpoint"><span class="verb v-get">GET</span><span>/api/pedidos</span><span class="desc">lista todos</span></div>
+        <div class="endpoint"><span class="verb v-get">GET</span><span>/api/pedidos/{id}</span><span class="desc">busca por id</span></div>
+        <div class="endpoint"><span class="verb v-get">GET</span><span>/api/pedidos/op/{op}</span><span class="desc">busca por ordem de produção</span></div>
+        <div class="endpoint"><span class="verb v-put">PUT</span><span>/api/pedidos/start-production/{id}</span><span class="desc">inicia a produção</span></div>
+        <div class="endpoint"><span class="verb v-put">PUT</span><span>/api/pedidos/{id}</span><span class="desc">atualiza</span></div>
+        <div class="endpoint"><span class="verb v-del">DELETE</span><span>/api/pedidos/{id}</span><span class="desc">remove</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · SERVICE / VALIDAÇÕES -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Camada Service <span class="step">filtro de qualidade</span><span class="time">⏱ 05:15</span></div>
+    <h2>Validações reais de negócio</h2>
+    <div class="slide-body">
+      <ul class="clean">
+        <li><span class="b">✓</span><div><b>Campos obrigatórios</b> <span class="m">— blocos, tipo, cor da tampa &nbsp;→&nbsp;</span><code>RequiredFieldException</code></div></li>
+        <li><span class="b">✓</span><div><b>Tipo bate com a quantidade de blocos</b> <span class="m">→</span> <code>TipoIncompativelComBlocosException</code></div></li>
+        <li><span class="b">✓</span><div><b>Ordem de produção não se repete</b> <span class="m">→</span> <code>OrdemDeProducaoExistenteException</code></div></li>
+        <li><span class="b">✓</span><div><b>Nenhum andar duplicado</b> <span class="m">→</span> <code>DuplicateAndarException</code></div></li>
+        <li><span class="b">✓</span><div><b>Vínculo automático com estoque</b> <span class="m">— busca posição com a cor certa e marca como vazia &nbsp;→&nbsp;</span><code>EstoqueInsuficienteException</code></div></li>
+        <li><span class="b">✓</span><div><b>Conclusão associa à expedição</b> <span class="m">— status CONCLUIDO + vaga de saída &nbsp;→&nbsp;</span><code>ExpedicaoLotadaException</code></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9 · EXCEÇÕES (snippet + destaque) -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Tratamento de Erros <span class="step">destaque técnico</span><span class="time">⏱ 06:00</span></div>
+    <h2>Erros estruturados — não <code>try/catch</code> genérico</h2>
+    <p class="lead">Mais de <b>15 exceções de negócio customizadas</b>, capturadas por um <b>handler central</b> (<code>GlobalExceptionHandler</code>) que devolve um JSON de erro padronizado.</p>
+    <div class="slide-body">
+      <div class="grid g2" style="align-items:start">
+        <pre class="code"><span class="cm">// Camada Service — validação explícita</span>
+<span class="kw">if</span> (pedido.getTipo().getQtdBlocos() != blocos.size())
+    <span class="kw">throw new</span> <span class="ty">TipoIncompativelComBlocosException</span>();
+
+<span class="kw">if</span> (repo.existsByOrdemDeProducao(op))
+    <span class="kw">throw new</span> <span class="ty">OrdemDeProducaoExistenteException</span>();
+
+<span class="cm">// Handler central traduz p/ HTTP + JSON</span>
+<span class="fn">@ExceptionHandler</span>(<span class="ty">BusinessException</span>.<span class="kw">class</span>)
+<span class="ty">ResponseEntity</span>&lt;<span class="ty">ErrorResponseDTO</span>&gt; <span class="fn">handle</span>(...) { ... }</pre>
+        <div class="stack">
+          <div class="pills">
+            <span class="pill">TipoIncompativelComBlocos</span>
+            <span class="pill">OrdemDeProducaoExistente</span>
+            <span class="pill">DuplicateAndar</span>
+            <span class="pill">EstoqueInsuficiente</span>
+            <span class="pill">ExpedicaoLotada</span>
+            <span class="pill">PedidoNaoPendente</span>
+            <span class="pill">LaminasSize</span>
+            <span class="pill">DuplicatePosicao</span>
+            <span class="pill">CorIncompatibleWithEstoque</span>
+            <span class="pill">+ várias outras…</span>
+          </div>
+          <div class="row" style="--lc:var(--amber)"><span class="ldesc">💡 <b>Esticar:</b> comentar um bug real resolvido — constraint do Hibernate em <code>t_sa_bloco</code>.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · ETAPA 3 INTRO -->
+  <section class="slide">
+    <div class="kicker">Etapa 3 · Frontend <span class="step">~3,5 min</span><span class="time">⏱ 06:30</span></div>
+    <h2>React + TypeScript</h2>
+    <p class="lead">Aqui viramos <b>Designers de UX</b>: transformar o JSON da API em <b>decisão visual</b> para o operador na linha de produção.</p>
+    <div class="slide-body">
+      <div class="grid g4">
+        <div class="card" style="--bar:var(--accent)"><span class="ic">⚛️</span><h3>React <span class="ver">19</span></h3><p>UI por componentes e hooks.</p></div>
+        <div class="card" style="--bar:#3178c6"><span class="ic">🔷</span><h3>TypeScript</h3><p>Tipagem em todo o código.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">⚡</span><h3>Vite <span class="ver">8</span></h3><p>Build e dev server rápidos.</p></div>
+        <div class="card" style="--bar:var(--amber)"><span class="ic">🧊</span><h3>Three.js / R3F</h3><p>Visualização 3D da bancada.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · ARQUITETURA FRONT -->
+  <section class="slide">
+    <div class="kicker">Etapa 3 · Arquitetura <span class="step">MVVM + Atomic Design</span><span class="time">⏱ 07:00</span></div>
+    <h2>Camadas no frontend</h2>
+    <div class="slide-body">
+      <div class="stack">
+        <div class="row" style="--lc:var(--purple)"><span class="lname">domain/</span><span class="ldesc">Entidades, enums e interfaces de repositório — regras independentes de framework.</span></div>
+        <div class="row" style="--lc:var(--amber)"><span class="lname">infrastructure/</span><span class="ldesc">DTOs, mappers, <code>HttpClient</code> e implementações de repositório.</span></div>
+        <div class="row" style="--lc:var(--green)"><span class="lname">service/</span><span class="ldesc">Serviços de aplicação que orquestram domínio + infraestrutura.</span></div>
+        <div class="row" style="--lc:var(--accent)"><span class="lname">presentation/</span><span class="ldesc">Atomic Design: <b>átomos → moléculas → organismos → páginas</b>.</span></div>
+      </div>
+      <div class="row" style="--lc:var(--pink);margin-top:16px"><span class="lname">🏆 MVVM</span><span class="ldesc"><b>ViewModel separado da View</b> — <code>usePedidosViewModel.ts</code> (estado + lógica) e <code>PedidosView.tsx</code> (renderização). A View só desenha; o ViewModel decide.</span></div>
+    </div>
+  </section>
+
+  <!-- 12 · ESTOQUE DASHBOARD -->
+  <section class="slide">
+    <div class="kicker">Etapa 3 · Dashboard de Estoque <span class="step">organismo</span><span class="time">⏱ 07:45</span></div>
+    <h2>Grid de estoque com edição em lote</h2>
+    <div class="slide-body">
+      <div class="grid g2" style="align-items:start">
+        <div class="stack">
+          <div class="row" style="--lc:var(--green)"><span class="lname">EstoqueSection</span><span class="ldesc">Organismo que monta o painel completo de estoque.</span></div>
+          <div class="row" style="--lc:var(--accent)"><span class="lname">ViewEstoque</span><span class="ldesc">Grid das 28 posições, cada célula colorida pela peça.</span></div>
+          <div class="row" style="--lc:var(--amber)"><span class="lname">Modo edição</span><span class="ldesc">Seleciona várias células e troca a cor em lote via <code>ColorButtonGroup</code>.</span></div>
+        </div>
+        <div>
+          <p class="lead" style="margin-top:0;margin-bottom:12px">Exemplo do grid (28 posições):</p>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+            <!-- 28 cells -->
+            <div style="aspect-ratio:1;border-radius:7px;background:#ef4444"></div><div style="aspect-ratio:1;border-radius:7px;background:#3b82f6"></div><div style="aspect-ratio:1;border-radius:7px;background:#22c55e"></div><div style="aspect-ratio:1;border-radius:7px;background:#1e293b;border:1px dashed #475569"></div><div style="aspect-ratio:1;border-radius:7px;background:#eab308"></div><div style="aspect-ratio:1;border-radius:7px;background:#ef4444"></div><div style="aspect-ratio:1;border-radius:7px;background:#3b82f6"></div>
+            <div style="aspect-ratio:1;border-radius:7px;background:#22c55e"></div><div style="aspect-ratio:1;border-radius:7px;background:#eab308;outline:2px solid #38bdf8"></div><div style="aspect-ratio:1;border-radius:7px;background:#eab308;outline:2px solid #38bdf8"></div><div style="aspect-ratio:1;border-radius:7px;background:#1e293b;border:1px dashed #475569"></div><div style="aspect-ratio:1;border-radius:7px;background:#ef4444"></div><div style="aspect-ratio:1;border-radius:7px;background:#3b82f6"></div><div style="aspect-ratio:1;border-radius:7px;background:#22c55e"></div>
+            <div style="aspect-ratio:1;border-radius:7px;background:#3b82f6"></div><div style="aspect-ratio:1;border-radius:7px;background:#ef4444"></div><div style="aspect-ratio:1;border-radius:7px;background:#22c55e"></div><div style="aspect-ratio:1;border-radius:7px;background:#eab308"></div><div style="aspect-ratio:1;border-radius:7px;background:#1e293b;border:1px dashed #475569"></div><div style="aspect-ratio:1;border-radius:7px;background:#3b82f6"></div><div style="aspect-ratio:1;border-radius:7px;background:#ef4444"></div>
+            <div style="aspect-ratio:1;border-radius:7px;background:#22c55e"></div><div style="aspect-ratio:1;border-radius:7px;background:#eab308"></div><div style="aspect-ratio:1;border-radius:7px;background:#ef4444"></div><div style="aspect-ratio:1;border-radius:7px;background:#3b82f6"></div><div style="aspect-ratio:1;border-radius:7px;background:#22c55e"></div><div style="aspect-ratio:1;border-radius:7px;background:#1e293b;border:1px dashed #475569"></div><div style="aspect-ratio:1;border-radius:7px;background:#eab308"></div>
+          </div>
+          <p style="color:var(--mut);font-size:12px;margin-top:10px">🔵 células selecionadas · ▢ posição vazia</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · PEDIDO CARD -->
+  <section class="slide">
+    <div class="kicker">Etapa 3 · PedidoCard <span class="step">organismo</span><span class="time">⏱ 08:30</span></div>
+    <h2>O cartão do pedido</h2>
+    <div class="slide-body">
+      <div class="grid g2" style="align-items:start">
+        <div class="stack">
+          <div class="row" style="--lc:var(--accent)"><span class="lname">PedidoCardHeader</span><span class="ldesc">Status, ordem de produção e botão <b>"Iniciar produção"</b>.</span></div>
+          <div class="row" style="--lc:var(--amber)"><span class="lname">PedidoCardFields</span><span class="ldesc">Tipo, cor da tampa, blocos e datas de expedição.</span></div>
+          <div class="row" style="--lc:var(--green)"><span class="lname">Composição</span><span class="ldesc">Moléculas montando o organismo — Atomic Design na prática.</span></div>
+        </div>
+        <!-- mock card -->
+        <div class="card" style="--bar:var(--amber);max-width:360px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span class="tag-soft" style="color:var(--amber);border-color:var(--amber)">● PENDENTE</span>
+            <span style="font-family:monospace;color:var(--mut);font-size:13px">OP #1042</span>
+          </div>
+          <h3 style="margin-top:14px">Pedido Triplo</h3>
+          <div style="margin-top:12px;font-size:13.5px;color:var(--mut);line-height:2">
+            Cor da tampa: <span style="color:#ef4444">● Vermelho</span><br>
+            Blocos: <b style="color:var(--txt)">3</b> · Andares 1, 2, 3<br>
+            Entrada exp.: <b style="color:var(--txt)">—</b>
+          </div>
+          <button style="margin-top:16px;width:100%;background:var(--accent);color:#06121f;border:none;border-radius:10px;padding:11px;font-weight:800;cursor:pointer">▶ Iniciar produção</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 · GESTÃO + CONFIGURADOR + UX -->
+  <section class="slide">
+    <div class="kicker">Etapa 3 · Gestão &amp; Usabilidade <span class="step">decisão visual</span><span class="time">⏱ 09:15</span></div>
+    <h2>Do JSON à decisão do operador</h2>
+    <div class="slide-body">
+      <div class="grid g3">
+        <div class="card" style="--bar:var(--accent)"><span class="ic">📋</span><h3>Gestão de Pedidos</h3><p>Lista com <b>filtro por status</b> e alerta visual para pedidos <b>Pendente</b>.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🧩</span><h3>Configurador dinâmico</h3><p>Formulário que <b>se adapta ao tipo</b> — 1, 2 ou 3 blocos aparecem conforme a escolha.</p></div>
+        <div class="card" style="--bar:var(--green)"><span class="ic">🛡️</span><h3>Regras de usabilidade</h3><p>Botão desabilitado sem <code>ordem_producao</code>, alerta de indisponibilidade, <b>toast de sucesso</b>.</p></div>
+      </div>
+      <div class="row" style="--lc:var(--pink);margin-top:20px"><span class="lname">🎬 Demo</span><span class="ldesc">Parte mais visual da apresentação — ideal para <b>segurar mais tempo</b> com demonstração ao vivo do fluxo: criar pedido → iniciar produção → ver no estoque/expedição.</span></div>
+    </div>
+  </section>
+
+  <!-- 15 · FECHAMENTO -->
+  <section class="slide">
+    <div class="center">
+      <div class="kicker">Encerramento <span class="time">SMART 4.0</span></div>
+      <h1 style="font-size:clamp(32px,5vw,58px)">Um ciclo completo, ponta a ponta</h1>
+      <div class="grid g3" style="margin-top:34px">
+        <div class="card" style="--bar:var(--accent)"><span class="ic">🗂️</span><h3>Modelagem</h3><p>Domínio bem definido: entidades, relações e regras de negócio.</p></div>
+        <div class="card" style="--bar:var(--green)"><span class="ic">☕</span><h3>Backend</h3><p>API REST sólida com validações e erros estruturados.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">⚛️</span><h3>Frontend</h3><p>MVVM + Atomic Design transformando dados em UX.</p></div>
+      </div>
+      <p class="lead" style="margin-top:30px;font-size:20px">Da regra de negócio ao pixel na tela do operador. <b>Obrigado!</b></p>
+    </div>
+  </section>
+
+</div>
+
+<div class="ctrl">
+  <button id="prev">‹</button>
+  <span class="counter" id="counter">1 / 16</span>
+  <button id="next">›</button>
+</div>
+<div class="hint">← → para navegar · F para tela cheia</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const bar=document.getElementById('bar');
+  const counter=document.getElementById('counter');
+  let i=0;
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    counter.textContent=(i+1)+' / '+slides.length;
+  }
+  document.getElementById('next').onclick=()=>show(i+1);
+  document.getElementById('prev').onclick=()=>show(i-1);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ')show(i+1);
+    if(e.key==='ArrowLeft'||e.key==='PageUp')show(i-1);
+    if(e.key==='Home')show(0);
+    if(e.key==='End')show(slides.length-1);
+    if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  });
+  show(0);
+</script>
+</body>
+</html>
