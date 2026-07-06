@@ -124,7 +124,7 @@
 
   <!-- 1 · ABERTURA -->
   <section class="slide">
-    <div class="kicker">Abertura · Contexto <span class="step">~1 min</span><span class="time">⏱ 00:00</span></div>
+    <div class="kicker">Abertura · Contexto </div>
     <h2>Por que Indústria 4.0?</h2>
     <p class="lead">A 4ª revolução industrial conecta máquinas, sensores e software. O que ela exige: <b>rastreabilidade</b> e <b>dados em tempo real</b> — saber o que cada peça é, onde está e em que etapa se encontra.</p>
     <div class="slide-body">
@@ -140,9 +140,28 @@
     </div>
   </section>
 
+  <!-- 1b · BANCADA FÍSICA / ESTAÇÕES -->
+  <section class="slide">
+    <div class="kicker">Abertura · A Bancada Física <span class="step">chão de fábrica</span></div>
+    <h2>Quatro estações, quatro CLPs Siemens</h2>
+    <p class="lead">A Bancada Smart 4.0 é uma linha de produção didática. Cada estação tem um <b>CLP Siemens</b> dedicado que o backend lê e comanda por <b>S7 / TCP</b>.</p>
+    <div class="slide-body">
+      <div class="grid g4">
+        <div class="card" style="--bar:var(--green)"><span class="ic">📦</span><h3>Estoque</h3><p>Armazena as peças por cor — origem dos blocos.</p></div>
+        <div class="card" style="--bar:var(--accent)"><span class="ic">⚙️</span><h3>Processo</h3><p>Processa a peça antes da montagem.</p></div>
+        <div class="card" style="--bar:var(--amber)"><span class="ic">🤖</span><h3>Montagem</h3><p>Monta blocos e lâminas conforme o pedido.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🚚</span><h3>Expedição</h3><p>Recebe o pedido concluído para saída.</p></div>
+      </div>
+      <div class="row" style="--lc:var(--accent2);margin-top:22px">
+        <span class="lname">🔁 Fluxo</span>
+        <span class="ldesc"><b>Estoque → Processo → Montagem → Expedição</b> — o software acompanha cada peça em tempo real ao longo da linha.</span>
+      </div>
+    </div>
+  </section>
+
   <!-- 2 · ETAPA 1 INTRO -->
   <section class="slide">
-    <div class="kicker">Etapa 1 · Modelagem de Dados <span class="step">~1,5 min</span><span class="time">⏱ 01:00</span></div>
+    <div class="kicker">Etapa 1 · Modelagem de Dados </div>
     <h2>Entidades principais</h2>
     <p class="lead">Antes de uma linha de código, foi preciso modelar o domínio: o que existe no mundo real e como as peças se relacionam.</p>
     <div class="slide-body">
@@ -158,7 +177,7 @@
 
   <!-- 3 · DER -->
   <section class="slide">
-    <div class="kicker">Etapa 1 · Diagrama (DER) <span class="step">relacionamentos</span><span class="time">⏱ 01:30</span></div>
+    <div class="kicker">Etapa 1 · Diagrama (DER) <span class="step">relacionamentos</span></div>
     <h2>Como tudo se conecta</h2>
     <div class="slide-body">
       <div class="der">
@@ -184,7 +203,7 @@
 
   <!-- 4 · REGRAS DE NEGÓCIO -->
   <section class="slide">
-    <div class="kicker">Etapa 1 · Regras de Negócio <span class="step">domínio</span><span class="time">⏱ 02:00</span></div>
+    <div class="kicker">Etapa 1 · Regras de Negócio <span class="step">domínio</span></div>
     <h2>Regras que o modelo precisa garantir</h2>
     <div class="slide-body">
       <ul class="clean">
@@ -199,7 +218,7 @@
 
   <!-- 5 · ETAPA 2 INTRO -->
   <section class="slide">
-    <div class="kicker">Etapa 2 · Backend <span class="step">~3 min</span><span class="time">⏱ 03:30</span></div>
+    <div class="kicker">Etapa 2 · Backend </div>
     <h2>Spring Boot + JPA</h2>
     <p class="lead">O cérebro do sistema. Padroniza a comunicação em <b>JSON</b> entre robôs, painéis web e apps — todos consomem a mesma API.</p>
     <div class="slide-body">
@@ -212,24 +231,26 @@
     </div>
   </section>
 
-  <!-- 6 · ARQUITETURA BACKEND -->
+  <!-- 6 · ARQUITETURA BACKEND (MVC) -->
   <section class="slide">
-    <div class="kicker">Etapa 2 · Arquitetura em Camadas <span class="step">fluxo de uma requisição</span><span class="time">⏱ 04:00</span></div>
-    <h2>Controller → Service → Repository</h2>
+    <div class="kicker">Etapa 2 · Arquitetura MVC <span class="step">padrão em camadas</span></div>
+    <h2>Model · View · Controller</h2>
+    <p class="lead">O backend segue o padrão <b>MVC</b>, organizando o código em camadas com responsabilidades bem separadas. Cada requisição percorre esse fluxo de cima a baixo — e volta.</p>
     <div class="slide-body">
       <div class="stack">
-        <div class="row" style="--lc:var(--accent)"><span class="lname">Controller</span><span class="ldesc">Recebe a requisição HTTP, valida o formato e devolve a resposta. <code>PedidoController</code></span><span class="tag">REST</span></div>
-        <div class="row" style="--lc:var(--green)"><span class="lname">Service</span><span class="ldesc">Onde mora a regra de negócio — o "filtro de qualidade". <code>PedidoService</code></span><span class="tag">negócio</span></div>
-        <div class="row" style="--lc:var(--purple)"><span class="lname">Repository</span><span class="ldesc">Acesso ao banco via JPA, sem SQL escrito à mão. <code>PedidoRepository</code></span><span class="tag">dados</span></div>
-        <div class="row" style="--lc:var(--amber)"><span class="lname">Mapper + DTO</span><span class="ldesc">Traduz entidade ↔️ DTO de request/response. <code>PedidoMapper</code> — entidade nunca vaza pra fora.</span><span class="tag">transporte</span></div>
+        <div class="row" style="--lc:var(--accent)"><span class="lname">🎮 Controller</span><span class="ldesc">Porta de entrada REST — recebe a requisição HTTP, valida o formato e devolve a resposta. <code>PedidoController</code></span><span class="tag">C · REST</span></div>
+        <div class="row" style="--lc:var(--green)"><span class="lname">⚙️ Service</span><span class="ldesc">Onde mora a regra de negócio — o "filtro de qualidade" que garante as validações do domínio. <code>PedidoService</code></span><span class="tag">negócio</span></div>
+        <div class="row" style="--lc:var(--purple)"><span class="lname">🗃️ Repository</span><span class="ldesc">Acesso ao banco via Spring Data JPA, sem SQL escrito à mão. <code>PedidoRepository</code></span><span class="tag">dados</span></div>
+        <div class="row" style="--lc:var(--red)"><span class="lname">🧱 Model</span><span class="ldesc">As entidades JPA do domínio — <code>Pedido</code>, <code>Bloco</code>, <code>Lamina</code> — mapeadas para tabelas.</span><span class="tag">M · domínio</span></div>
+        <div class="row" style="--lc:var(--amber)"><span class="lname">📤 View (DTO)</span><span class="ldesc">A "view" da API REST: <code>PedidoResponseDTO</code> em JSON. O <code>PedidoMapper</code> traduz entidade ↔️ DTO — a entidade nunca vaza pra fora.</span><span class="tag">V · resposta</span></div>
       </div>
-      <p class="lead" style="margin-top:18px">Mapeamento ORM: <code>@OneToMany</code> / <code>@ManyToOne</code> ligando <b>Pedido → Blocos → Lâminas</b> automaticamente.</p>
+      <p class="lead" style="margin-top:16px">🔁 Fluxo: <b>Controller → Service → Repository → Model</b> &nbsp;·&nbsp; resposta volta como <b>View (DTO/JSON)</b>. Mapeamento ORM <code>@OneToMany</code> / <code>@ManyToOne</code> liga <b>Pedido → Blocos → Lâminas</b>.</p>
     </div>
   </section>
 
   <!-- 7 · ENDPOINTS -->
   <section class="slide">
-    <div class="kicker">Etapa 2 · API REST <span class="step">endpoints reais</span><span class="time">⏱ 04:45</span></div>
+    <div class="kicker">Etapa 2 · API REST <span class="step">endpoints reais</span></div>
     <h2>O que a API expõe</h2>
     <div class="slide-body">
       <div class="stack">
@@ -246,7 +267,7 @@
 
   <!-- 8 · SERVICE / VALIDAÇÕES -->
   <section class="slide">
-    <div class="kicker">Etapa 2 · Camada Service <span class="step">filtro de qualidade</span><span class="time">⏱ 05:15</span></div>
+    <div class="kicker">Etapa 2 · Camada Service <span class="step">filtro de qualidade</span></div>
     <h2>Validações reais de negócio</h2>
     <div class="slide-body">
       <ul class="clean">
@@ -262,7 +283,7 @@
 
   <!-- 9 · EXCEÇÕES (snippet + destaque) -->
   <section class="slide">
-    <div class="kicker">Etapa 2 · Tratamento de Erros <span class="step">destaque técnico</span><span class="time">⏱ 06:00</span></div>
+    <div class="kicker">Etapa 2 · Tratamento de Erros <span class="step">destaque técnico</span></div>
     <h2>Erros estruturados — não <code>try/catch</code> genérico</h2>
     <p class="lead">Mais de <b>15 exceções de negócio customizadas</b>, capturadas por um <b>handler central</b> (<code>GlobalExceptionHandler</code>) que devolve um JSON de erro padronizado.</p>
     <div class="slide-body">
@@ -296,9 +317,78 @@
     </div>
   </section>
 
+  <!-- 9b · INTEGRAÇÃO COM OS CLPs (S7) -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Integração Industrial <span class="step">o diferencial do projeto</span></div>
+    <h2>Falando direto com o CLP em S7/TCP</h2>
+    <p class="lead">Não há biblioteca pronta: o próprio backend implementa o <b>protocolo S7 da Siemens</b> sobre <b>TCP porta 102</b> — abre o socket, monta os frames e lê/escreve os data blocks do CLP.</p>
+    <div class="slide-body">
+      <div class="grid g4">
+        <div class="card" style="--bar:var(--accent)"><span class="ic">🔌</span><h3>S7ProtocolClient</h3><p>Socket TCP + frames binários do protocolo Siemens.</p></div>
+        <div class="card" style="--bar:var(--green)"><span class="ic">🧩</span><h3>PlcConnector</h3><p>Conexão por estação e leitura/escrita dos data blocks.</p></div>
+        <div class="card" style="--bar:var(--amber)"><span class="ic">📥</span><h3>…Comm por estação</h3><p><code>EstoqueComm</code>, <code>ProcessoComm</code>, <code>MontagemComm</code>, <code>ExpedicaoComm</code>.</p></div>
+        <div class="card" style="--bar:var(--red)"><span class="ic">🛡️</span><h3>Modo somente-leitura</h3><p>Toda escrita é bloqueada quando <code>readOnly</code> está ativo — segurança na bancada.</p></div>
+      </div>
+      <div class="stack" style="margin-top:18px">
+        <div class="endpoint"><span class="verb v-post">POST</span><span>/api/smart/start-readings</span><span class="desc">inicia leitura com o mapa de IPs das estações</span></div>
+        <div class="endpoint"><span class="verb v-post">POST</span><span>/api/smart/ping</span><span class="desc">testa a conectividade de cada CLP</span></div>
+        <div class="endpoint"><span class="verb v-post">POST</span><span>/api/smart/readonly</span><span class="desc">liga/desliga o modo seguro de escrita</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9c · SSE TEMPO REAL -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Tempo Real <span class="step">Server-Sent Events</span></div>
+    <h2>Do CLP à tela sem recarregar a página</h2>
+    <p class="lead">O backend lê os CLPs em ciclo contínuo e faz <b>push</b> do estado para o frontend via <b>SSE</b> — uma conexão aberta que transmite os dados assim que mudam.</p>
+    <div class="slide-body">
+      <div class="grid g2" style="align-items:start">
+        <div class="stack">
+          <div class="row" style="--lc:var(--green)"><span class="lname">ClpReadingService</span><span class="ldesc">Faz a varredura periódica dos CLPs e atualiza o <code>PlcDataStore</code>.</span></div>
+          <div class="row" style="--lc:var(--accent)"><span class="lname">SseService</span><span class="ldesc">Mantém os <code>SseEmitter</code> abertos e emite os eventos.</span></div>
+          <div class="row" style="--lc:var(--amber)"><span class="lname">Frontend</span><span class="ldesc">Assina o stream e re-renderiza as estações em tempo real.</span></div>
+        </div>
+        <div class="stack">
+          <div class="endpoint"><span class="verb v-get">GET</span><span>/api/smart/stream/{bancada}</span><span class="desc">stream SSE ao vivo</span></div>
+          <div class="endpoint"><span class="verb v-get">GET</span><span>/api/smart/data/{clp}</span><span class="desc">snapshot atual de um CLP</span></div>
+          <div class="row" style="--lc:var(--pink)"><span class="ldesc">💡 <b>Esticar:</b> por que SSE e não polling? — menos requisições, latência baixa e conexão única mantida pelo servidor.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9d · QUALIDADE / TESTES -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Qualidade <span class="step">testes automatizados</span></div>
+    <h2>Testado de ponta a ponta</h2>
+    <p class="lead">A regra de negócio é coberta por <b>testes unitários</b> (services isolados) e <b>testes de integração</b> (fluxo real com banco <b>H2</b> em memória).</p>
+    <div class="slide-body">
+      <div class="grid g2">
+        <div class="card" style="--bar:var(--green)"><span class="ic">🧪</span><h3>Unitários</h3><p><code>PedidoServiceTest</code>, <code>EstoqueServiceTest</code>, <code>BlocoServiceTest</code>… — validam as regras isolando dependências com mocks.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🔗</span><h3>Integração</h3><p><code>PedidoFluxoIntegrationTest</code>, <code>EstoqueFluxoIntegrationTest</code>, <code>PersistenciaIntegrationTest</code> — do controller ao banco.</p></div>
+      </div>
+      <div class="row" style="--lc:var(--amber);margin-top:20px"><span class="lname">🏃 Rodar</span><span class="ldesc"><code>./mvnw test</code> — testes separados por pacote (<b>unitario</b> / <b>integracao</b>), banco H2 em memória, sem depender do MySQL.</span></div>
+    </div>
+  </section>
+
+  <!-- 9e · DOCUMENTAÇÃO / SWAGGER -->
+  <section class="slide">
+    <div class="kicker">Etapa 2 · Documentação <span class="step">Swagger / OpenAPI</span></div>
+    <h2>A API se documenta sozinha</h2>
+    <p class="lead">Com <b>OpenAPI 3</b> a especificação é gerada a partir do código — quem consome a API tem uma página interativa para explorar e testar todos os endpoints.</p>
+    <div class="slide-body">
+      <div class="grid g3">
+        <div class="card" style="--bar:var(--green)"><span class="ic">📖</span><h3>Swagger UI</h3><p>Interface interativa listando todos os endpoints REST.</p></div>
+        <div class="card" style="--bar:var(--accent)"><span class="ic">📄</span><h3>OpenApiConfig</h3><p>Título, descrição e versão da <b>Planta Smart 4.0 — API</b>.</p></div>
+        <div class="card" style="--bar:var(--purple)"><span class="ic">🤝</span><h3>Contrato</h3><p>Frontend e backend combinam pelo mesmo contrato documentado.</p></div>
+      </div>
+    </div>
+  </section>
+
   <!-- 10 · ETAPA 3 INTRO -->
   <section class="slide">
-    <div class="kicker">Etapa 3 · Frontend <span class="step">~3,5 min</span><span class="time">⏱ 06:30</span></div>
+    <div class="kicker">Etapa 3 · Frontend </div>
     <h2>React + TypeScript</h2>
     <p class="lead">Aqui viramos <b>Designers de UX</b>: transformar o JSON da API em <b>decisão visual</b> para o operador na linha de produção.</p>
     <div class="slide-body">
@@ -313,7 +403,7 @@
 
   <!-- 11 · ARQUITETURA FRONT -->
   <section class="slide">
-    <div class="kicker">Etapa 3 · Arquitetura <span class="step">MVVM + Atomic Design</span><span class="time">⏱ 07:00</span></div>
+    <div class="kicker">Etapa 3 · Arquitetura <span class="step">MVVM + Atomic Design</span></div>
     <h2>Camadas no frontend</h2>
     <div class="slide-body">
       <div class="stack">
@@ -328,7 +418,7 @@
 
   <!-- 12 · ESTOQUE DASHBOARD -->
   <section class="slide">
-    <div class="kicker">Etapa 3 · Dashboard de Estoque <span class="step">organismo</span><span class="time">⏱ 07:45</span></div>
+    <div class="kicker">Etapa 3 · Dashboard de Estoque <span class="step">organismo</span></div>
     <h2>Grid de estoque com edição em lote</h2>
     <div class="slide-body">
       <div class="grid g2" style="align-items:start">
@@ -354,7 +444,7 @@
 
   <!-- 13 · PEDIDO CARD -->
   <section class="slide">
-    <div class="kicker">Etapa 3 · PedidoCard <span class="step">organismo</span><span class="time">⏱ 08:30</span></div>
+    <div class="kicker">Etapa 3 · PedidoCard <span class="step">organismo</span></div>
     <h2>O cartão do pedido</h2>
     <div class="slide-body">
       <div class="grid g2" style="align-items:start">
@@ -383,7 +473,7 @@
 
   <!-- 14 · GESTÃO + CONFIGURADOR + UX -->
   <section class="slide">
-    <div class="kicker">Etapa 3 · Gestão &amp; Usabilidade <span class="step">decisão visual</span><span class="time">⏱ 09:15</span></div>
+    <div class="kicker">Etapa 3 · Gestão &amp; Usabilidade <span class="step">decisão visual</span></div>
     <h2>Do JSON à decisão do operador</h2>
     <div class="slide-body">
       <div class="grid g3">
