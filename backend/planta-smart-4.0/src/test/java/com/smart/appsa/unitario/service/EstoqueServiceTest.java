@@ -1,4 +1,6 @@
-package com.smart.appsa.service;
+package com.smart.appsa.unitario.service;
+
+import com.smart.appsa.service.EstoqueService;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +33,7 @@ public class EstoqueServiceTest {
     @InjectMocks
     private EstoqueService estoqueService;
 
-    // ─── CRUD ────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€ CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     public void deveRetornarTodoOEstoque() {
@@ -134,7 +136,7 @@ public class EstoqueServiceTest {
         verify(estoqueRepository, times(1)).countByCorEstoque(CorEstoque.AZUL);
     }
 
-    // ─── FALHA — CAMPOS FALTANDO ─────────────────────────────────────────────────
+    // â”€â”€â”€ FALHA â€” CAMPOS FALTANDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     public void deveLancarExcecaoAoBuscarIdInexistente() {
@@ -154,7 +156,7 @@ public class EstoqueServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> estoqueService.findEntityById(99L));
     }
 
-    // ─── FALHA — REGRAS DE NEGÓCIO ───────────────────────────────────────────────
+    // â”€â”€â”€ FALHA â€” REGRAS DE NEGÃ“CIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     public void deveLancarExcecaoAoAtribuirCorEmIdInexistente() {
@@ -166,7 +168,7 @@ public class EstoqueServiceTest {
                 () -> estoqueService.assignBlockColor(99L, CorEstoque.AZUL));
     }
 
-    // ─── HELPER ──────────────────────────────────────────────────────────────────
+    // â”€â”€â”€ HELPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private Estoque createEstoque(Long id, int posicaoFisica, CorEstoque cor) {
         return Estoque.builder()

@@ -1,4 +1,8 @@
-package com.smart.appsa.service;
+package com.smart.appsa.unitario.service;
+
+import com.smart.appsa.service.BlocoService;
+import com.smart.appsa.service.EstoqueService;
+import com.smart.appsa.service.LaminaService;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,10 @@
-package com.smart.appsa.service;
+package com.smart.appsa.unitario.service;
+
+import com.smart.appsa.service.BlocoService;
+import com.smart.appsa.service.EstoqueService;
+import com.smart.appsa.service.ExpedicaoService;
+import com.smart.appsa.service.PedidoService;
+import com.smart.appsa.service.SmartService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,7 +63,7 @@ public class PedidoServiceTest {
     @InjectMocks
     private PedidoService pedidoService;
 
-    // ─── create ───────────────────────────────────────────────────────────────
+    // â”€â”€â”€ create â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     void deveCriarPedidoComCamposValidos() {
@@ -174,7 +180,7 @@ public class PedidoServiceTest {
         verify(pedidoRepository, never()).save(any());
     }
 
-    // ─── findById / findAll ───────────────────────────────────────────────────
+    // â”€â”€â”€ findById / findAll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     void deveRetornarPedidoQuandoBuscarPorIdValido() {
@@ -220,7 +226,7 @@ public class PedidoServiceTest {
         verify(pedidoRepository, times(1)).findAll();
     }
 
-    // ─── startProduction ─────────────────────────────────────────────────────
+    // â”€â”€â”€ startProduction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     void deveIniciarProducaoEAtribuirStatusProducaoQuandoIdValido() {
@@ -272,7 +278,7 @@ public class PedidoServiceTest {
         verify(pedidoRepository, never()).save(any());
     }
 
-    // ─── delete ───────────────────────────────────────────────────────────────
+    // â”€â”€â”€ delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     void deveDeletarPedidoPendenteComSucesso() {
@@ -302,7 +308,7 @@ public class PedidoServiceTest {
         verify(pedidoRepository, never()).delete(any());
     }
 
-    // ─── update ───────────────────────────────────────────────────────────────
+    // â”€â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     void deveAtualizarPedidoPendenteComCamposValidos() {
@@ -394,7 +400,7 @@ public class PedidoServiceTest {
         verify(pedidoRepository, never()).save(any());
     }
 
-    // ─── helpers ──────────────────────────────────────────────────────────────
+    // â”€â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private Pedido createPedido() {
         Pedido pedido = Pedido.builder()
