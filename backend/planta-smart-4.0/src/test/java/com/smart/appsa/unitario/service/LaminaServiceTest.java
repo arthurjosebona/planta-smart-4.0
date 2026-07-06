@@ -1,4 +1,6 @@
-package com.smart.appsa.service;
+package com.smart.appsa.unitario.service;
+
+import com.smart.appsa.service.LaminaService;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +37,7 @@ public class LaminaServiceTest {
     @InjectMocks
     private LaminaService laminaService;
 
-    // ─── CRUD ────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€ CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     public void deveRetornarTodasAsLaminas() {
@@ -127,7 +129,7 @@ public class LaminaServiceTest {
         verify(laminaRepository, times(1)).deleteById(1L);
     }
 
-    // ─── FALHA — CAMPOS FALTANDO ─────────────────────────────────────────────────
+    // â”€â”€â”€ FALHA â€” CAMPOS FALTANDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     public void deveLancarExcecaoQuandoCorForNula() {
@@ -165,7 +167,7 @@ public class LaminaServiceTest {
         assertThrows(RequiredFieldException.class, () -> laminaService.create(lamina));
     }
 
-    // ─── FALHA — REGRAS DE NEGÓCIO ───────────────────────────────────────────────
+    // â”€â”€â”€ FALHA â€” REGRAS DE NEGÃ“CIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     public void deveLancarExcecaoAoBuscarLaminaIdInexistente() {
@@ -202,7 +204,7 @@ public class LaminaServiceTest {
                 .id(2L)
                 .cor(CorLamina.VERMELHO)
                 .padrao(PadraoLamina.CASA)
-                .posicao(PosicaoLamina.ESQUERDA) // mesma posição — deve lançar exceção
+                .posicao(PosicaoLamina.ESQUERDA) // mesma posiÃ§Ã£o â€” deve lanÃ§ar exceÃ§Ã£o
                 .bloco(bloco)
                 .build();
 
@@ -214,7 +216,7 @@ public class LaminaServiceTest {
                 () -> laminaService.update(1L, outraLamina));
     }
 
-    // ─── HELPERS ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private Lamina createLamina(Long id, CorLamina cor, PadraoLamina padrao, PosicaoLamina posicao) {
         return Lamina.builder()

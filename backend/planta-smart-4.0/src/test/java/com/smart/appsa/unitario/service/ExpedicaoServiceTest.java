@@ -1,4 +1,6 @@
-package com.smart.appsa.service;
+package com.smart.appsa.unitario.service;
+
+import com.smart.appsa.service.ExpedicaoService;
 
 import java.util.List;
 import java.util.Optional;

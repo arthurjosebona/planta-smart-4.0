@@ -1,4 +1,6 @@
-package com.smart.appsa.service;
+package com.smart.appsa.unitario.service;
+
+import com.smart.appsa.service.SmartService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,11 +42,11 @@ public class SmartServiceTest {
     @InjectMocks
     private SmartService smartService;
 
-    // ─── enviarParaProducao ─────────────────────────────────────────────────────
+    // â”€â”€â”€ enviarParaProducao â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Test
     void deveLancarEsteiraDesativadaExceptionQuandoSupervisorioNaoEstiverLivre() {
-        // Estoque fora de "LIVRE" já barra o envio (short-circuit no primeiro check).
+        // Estoque fora de "LIVRE" jÃ¡ barra o envio (short-circuit no primeiro check).
         when(montagemInfo.getSupervisorioEstoque()).thenReturn("DESLIGADO");
 
         assertThrows(EsteiraDesativadaException.class,
@@ -54,7 +56,7 @@ public class SmartServiceTest {
 
     @Test
     void deveLancarClpComunicacaoExceptionQuandoConexaoIndisponivel() {
-        // Todas as esteiras livres, mas o CLP não responde (conexão nula).
+        // Todas as esteiras livres, mas o CLP nÃ£o responde (conexÃ£o nula).
         when(montagemInfo.getSupervisorioEstoque()).thenReturn("LIVRE");
         when(montagemInfo.getSupervisorioExpedicao()).thenReturn("LIVRE");
         when(montagemInfo.getSupervisorioMontagem()).thenReturn("LIVRE");
