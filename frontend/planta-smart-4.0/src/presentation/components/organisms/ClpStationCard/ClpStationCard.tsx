@@ -104,9 +104,22 @@ function EstoqueFields({ data }: { data: EstoqueStream }) {
         <ClpValueField label="statusMontagem" value={data.statusMontagem} />
         <ClpValueField label="statusExpedicao" value={data.statusExpedicao} />
         <ClpValueField label="statusProducao" value={data.statusProducao} />
+        <ClpValueField label="registroInicioPedido" value={formatTimestampUtc(data.registroInicioPedido)} />
       </div>
     </>
   );
+}
+
+// O backend envia um LocalDateTime (sem offset) sempre em UTC — sem o sufixo
+// 'Z' o Date interpretaria a string no fuso local do navegador (ver useTempoDecorrido).
+function formatTimestampUtc(registro: string | null | undefined): string {
+  if (!registro) return '—';
+
+  const registroUtc = /[zZ]|[+-]\d{2}:\d{2}$/.test(registro) ? registro : `${registro}Z`;
+  const data = new Date(registroUtc);
+  if (Number.isNaN(data.getTime())) return '—';
+
+  return data.toLocaleString();
 }
 
 function ProcessoFields({ data }: { data: ProcessoStream }) {

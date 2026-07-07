@@ -9,7 +9,14 @@ export function useTempoDecorrido(registroEntrada: string | Date | null | undefi
       return;
     }
 
-    const inicio = new Date(registroEntrada).getTime();
+    // O backend envia um LocalDateTime (sem offset) sempre em UTC; sem o
+    // sufixo 'Z' o Date interpretaria a string no fuso local do navegador.
+    const registroUtc =
+      typeof registroEntrada === 'string' && !/[zZ]|[+-]\d{2}:\d{2}$/.test(registroEntrada)
+        ? `${registroEntrada}Z`
+        : registroEntrada;
+
+    const inicio = new Date(registroUtc).getTime();
 
     function atualizar() {
       const diffMs = Date.now() - inicio;

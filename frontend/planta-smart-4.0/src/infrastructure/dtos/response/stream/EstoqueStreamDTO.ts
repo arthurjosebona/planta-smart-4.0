@@ -27,4 +27,5 @@ export interface EstoqueStreamDTO {
   startOP: boolean;
   finishOP: boolean;
   cancelOP: boolean;
+  registroInicioPedido: string;
 }

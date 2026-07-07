@@ -78,7 +78,7 @@ public class MontagemComm implements PlcDataObserver {
         byte[] blocoDb600 = java.util.Arrays.copyOfRange(dadosMontagem, 25, 41);
         byte[] blocoDb92  = java.util.Arrays.copyOfRange(dadosMontagem, 41, 57);
         byte[] blocoDb60  = java.util.Arrays.copyOfRange(dadosMontagem, 57, 73);
-        
+
         montagemInfo.setSupervisorioEstoque(lerStringS7(blocoDb30));
         montagemInfo.setSupervisorioProcesso(lerStringS7(blocoDb600));
         montagemInfo.setSupervisorioMontagem(lerStringS7(blocoDb92));
