@@ -132,6 +132,12 @@ public class SmartService {
             // Iniciar pedido
             System.out.println("SETAR FLAG INICIAR PEDIDO");
             plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("TRUE"));
+    
+            Thread.sleep(800);
+
+            System.out.println("RESETAR FLAG INICIAR PEDIDO");
+            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
+        
         } catch (Exception ex) {
 
         }
