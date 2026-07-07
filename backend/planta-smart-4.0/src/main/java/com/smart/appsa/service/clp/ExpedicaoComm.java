@@ -11,6 +11,7 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
 import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.mapper.PedidoMapper;
+import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
 import com.smart.appsa.service.ExpedicaoService;
@@ -296,6 +297,8 @@ public class ExpedicaoComm implements PlcDataObserver {
                     try {
                         plcConnectorExp.writeInt(DB_EXPEDICAO, offset, 0);
 
+                        System.out.printf("\n\n\n\nREMOVENDO PEDIDO DA EXPEDIÇÃO: \nCLP: %d\n\n\n\n", expedicaoInfoClp.getPosicaoRemovidoExpedicao());
+
                         Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
                             pedidoService.findByOp(
                                 expedicaoService.findByPosicaoFisica(
@@ -303,6 +306,8 @@ public class ExpedicaoComm implements PlcDataObserver {
                                 ).getOrdemDeProducaoAtual()
                             )
                         );
+
+                        System.out.printf("Pedido a ser tratado para saída: \nID: %d\n OP: %d\nToString: %s", expedido.getId(), expedido.getOrdemDeProducao(), expedido.toString());
 
                         pedidoService.handleExitExpedicao(expedido);
                         expedicaoService.assignOrdemAtPosicao(expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
