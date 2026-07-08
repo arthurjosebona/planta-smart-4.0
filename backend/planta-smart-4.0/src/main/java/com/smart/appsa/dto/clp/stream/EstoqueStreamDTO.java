@@ -1,5 +1,6 @@
 package com.smart.appsa.dto.clp.stream;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.smart.appsa.model.enums.StatusEstacao;
@@ -30,5 +31,6 @@ public record EstoqueStreamDTO(
         int statusMontagem,
         int statusExpedicao,
         int statusProducao,
-        boolean pedidoEmCurso) {
-}
+        boolean pedidoEmCurso,
+        LocalDateTime registroInicioPedido
+) {}

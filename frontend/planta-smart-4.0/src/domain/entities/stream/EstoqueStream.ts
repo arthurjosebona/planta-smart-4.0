@@ -29,4 +29,5 @@ export interface EstoqueStream {
   startOP: boolean;
   finishOP: boolean;
   cancelOP: boolean;
+  registroInicioPedido: string;
 }

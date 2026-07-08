@@ -60,7 +60,9 @@ public final class ClpStreamMapper {
                 s.getStatusMontagem(),
                 s.getStatusExpedicao(),
                 s.getStatusProducao(),
-                s.isPedidoEmCurso());
+                s.isPedidoEmCurso(),
+                s.getRegistroInicioPedido()
+            );
     }
 
     public static ExpedicaoStreamDTO toExpedicaoDTO(ExpedicaoInfoClp info, AppStateConfig s) {

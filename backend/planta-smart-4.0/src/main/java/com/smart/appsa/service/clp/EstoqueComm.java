@@ -1,5 +1,8 @@
 package com.smart.appsa.service.clp;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
@@ -125,6 +128,8 @@ public class EstoqueComm implements PlcDataObserver {
             System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
+            // UTC explícito: evita ambiguidade de fuso quando o frontend interpreta a string.
+            appStateConfig.setRegistroInicioPedido(LocalDateTime.now(ZoneOffset.UTC));
             pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
