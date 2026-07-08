@@ -5,7 +5,7 @@ export class HttpClient {
   private readonly defaultHeaders: Record<string, string>;
 
   constructor() {
-    this.baseURL = 'http://localhost:8088';
+    this.baseURL = import.meta.env.VITE_BASE_URL;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
     };
