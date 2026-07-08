@@ -2,6 +2,7 @@ import { useEstoqueContext } from '@contexts/EstoqueContext';
 import { useExpedicaoContext } from '@contexts/ExpedicaoContext';
 import { useMonitorContext } from '@contexts/MonitorContext';
 import { usePingContext } from '@contexts/PingContext';
+import { useStatusContext } from '@contexts/StatusContext';
 import { StatusEstacao } from '@enums/StatusEstacao';
 import { CorEstoque } from '@enums/CorEstoque';
 import type { Estoque } from '@entities/Estoque';
@@ -65,10 +66,10 @@ function useLatch(trigger: boolean | undefined, reset: boolean | undefined): boo
 //   return EstacaoStatusModule.Aguardando; // fallback enquanto não ocupou nem finalizou
 // }
 
-function computePipelineStatus(ligado: boolean, ocupado: boolean): EstacaoStatusPipe {
-  if (!ligado) return EstacaoStatusPipe.Desligado;
-  if (ocupado) return EstacaoStatusPipe.Ocupado;
-  return EstacaoStatusPipe.Ligado;
+function computePipelineStatus(online: boolean, pausado: boolean): EstacaoStatusPipe {
+  if (online) return EstacaoStatusPipe.Ligado;
+  if (pausado) return EstacaoStatusPipe.Ocupado;
+  return EstacaoStatusPipe.Desligado;
 }
 
 export function useEstacoesViewModel() {
@@ -76,8 +77,12 @@ export function useEstacoesViewModel() {
   const expedicao = useExpedicaoContext();
   const monitor: MonitorModel = useMonitorContext();
   const { pingMap } = usePingContext();
+  const { conectado } = useStatusContext();
+  const hasEverConnected = useRef(false);
   const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(null);
   const ultimaOpBuscada = useRef<number | null>(null);
+
+  if (conectado) hasEverConnected.current = true;
 
   useEffect(() => {
     if (!monitor.estoque?.numeroOP || monitor.estoque?.numeroOP == 0 || monitor.estoque?.numeroOP === ultimaOpBuscada.current) return;
@@ -141,12 +146,14 @@ export function useEstacoesViewModel() {
     [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque.statusExpedicao],
   }
 
+  const pausado = !conectado && hasEverConnected.current;
+
   const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
-    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, !!monitor.estoque.ocupado),
-    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, !!monitor.processo.ocupado),
-    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, !!monitor.montagem.ocupado),
-    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, !!monitor.expedicao.ocupado)
-  }
+    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, pausado),
+    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, pausado),
+    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, pausado),
+    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, pausado),
+  };
 
 
   return {
