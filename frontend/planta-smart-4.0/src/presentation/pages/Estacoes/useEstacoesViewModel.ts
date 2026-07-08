@@ -139,12 +139,17 @@ export function useEstacoesViewModel() {
   //   ),
   // }
 
-  const statusEstacoes: Record<Estacao, EstacaoStatusModule> = {
-    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque.statusEstoque],
-    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque.statusProcesso],
-    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque.statusMontagem],
-    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque.statusExpedicao],
-  }
+  const statusEstacoes: Record<Estacao, EstacaoStatusModule> = conectado ? {
+    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque?.statusEstoque ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque?.statusProcesso ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque?.statusMontagem ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque?.statusExpedicao ?? 0] ?? EstacaoStatusModule.Aguardando,
+  } : {
+    [Estacao.Estoque]: EstacaoStatusModule.Desligado,
+    [Estacao.Processo]: EstacaoStatusModule.Desligado,
+    [Estacao.Montagem]: EstacaoStatusModule.Desligado,
+    [Estacao.Expedicao]: EstacaoStatusModule.Desligado,
+  };
 
   const pausado = !conectado && hasEverConnected.current;
 
