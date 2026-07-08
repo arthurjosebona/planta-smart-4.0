@@ -83,8 +83,8 @@ public class SseService {
     private Object build(Estacao estacao) {
         return switch (estacao) {
             case ESTOQUE -> ClpStreamMapper.toEstoqueDTO(estoqueInfo, appState);
-            case PROCESSO -> ClpStreamMapper.toEstacaoDTO(estacao, processoInfo, appState.getStatusProcesso());
-            case MONTAGEM -> ClpStreamMapper.toEstacaoDTO(estacao, montagemInfo, appState.getStatusMontagem());
+            case PROCESSO -> ClpStreamMapper.toProcessoDTO(estacao, processoInfo, appState.getStatusProcesso());
+            case MONTAGEM -> ClpStreamMapper.toMontagemDTO(estacao, montagemInfo, appState.getStatusMontagem());
             case EXPEDICAO -> ClpStreamMapper.toExpedicaoDTO(expedicaoInfo, appState);
         };
     }

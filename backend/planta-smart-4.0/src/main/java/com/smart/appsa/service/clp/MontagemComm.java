@@ -68,6 +68,44 @@ public class MontagemComm implements PlcDataObserver {
         montagemInfo.setAguardando((dadosMontagem[6] & 0x02) != 0);
         montagemInfo.setManual((dadosMontagem[6] & 0x04) != 0);
         montagemInfo.setEmergencia((dadosMontagem[6] & 0x08) != 0);
+
+        lerProvisorioBancadas(dadosMontagem);
+    }
+
+    private void lerProvisorioBancadas(byte[] dadosMontagem) {
+        // Cada bloco DB de bancada tem 16 bytes, (tamanho total + conteúdo real + 14 chars)
+        byte[] blocoDb30  = java.util.Arrays.copyOfRange(dadosMontagem, 9, 25);
+        byte[] blocoDb600 = java.util.Arrays.copyOfRange(dadosMontagem, 25, 41);
+        byte[] blocoDb92  = java.util.Arrays.copyOfRange(dadosMontagem, 41, 57);
+        byte[] blocoDb60  = java.util.Arrays.copyOfRange(dadosMontagem, 57, 73);
+
+        montagemInfo.setSupervisorioEstoque(lerStringS7(blocoDb30));
+        montagemInfo.setSupervisorioProcesso(lerStringS7(blocoDb600));
+        montagemInfo.setSupervisorioMontagem(lerStringS7(blocoDb92));
+        montagemInfo.setSupervisorioExpedicao(lerStringS7(blocoDb60));
+    }
+
+    // Decodifica um bloco STRING no formato S7 (Siemens):
+    // byte[0] = tamanho máximo declarado, byte[1] = tamanho atual (length),
+    // byte[2..] = caracteres ASCII válidos até 'length'.
+    private String lerStringS7(byte[] dados) {
+        if (dados == null || dados.length < 2) {
+            return "";
+        }
+
+        int maxLen = dados[0] & 0xFF;
+        int curLen = dados[1] & 0xFF;
+
+        // Proteção contra dados corrompidos ou tamanho maior que o buffer disponível
+        int disponivel = dados.length - 2;
+        int tamanhoReal = Math.min(curLen, disponivel);
+        tamanhoReal = Math.min(tamanhoReal, maxLen);
+
+        if (tamanhoReal <= 0) {
+            return "";
+        }
+
+        return new String(dados, 2, tamanhoReal, java.nio.charset.StandardCharsets.US_ASCII).trim();
     }
 
     // Nenhuma operação em andamento (start, finish e cancel todas em FALSE):

@@ -1,0 +1,29 @@
+package com.smart.appsa.dto.clp.stream;
+
+import com.smart.appsa.model.enums.StatusEstacao;
+
+import lombok.Builder;
+
+// DTO de stream comum das estações sem dados específicos (PROCESSO e MONTAGEM).
+// Por ser um {@code record}, o {@code equals} gerado permite detectar mudança de
+// conteúdo entre dois ciclos de leitura (multiplexação só emite quando muda).
+@Builder
+public record MontagemStreamDTO(
+        String estacao,
+        StatusEstacao status,
+        int numeroOP,
+        boolean ocupado,
+        boolean aguardando,
+        boolean manual,
+        boolean emergencia,
+        boolean recebidoOp,
+        boolean startOP,
+        boolean finishOP,
+        boolean cancelOP,
+        int statusBancada,
+        String supervisorioEstoque,
+        String supervisorioProcesso,
+        String supervisorioMontagem,
+        String supervisorioExpedicao
+    ) {
+}

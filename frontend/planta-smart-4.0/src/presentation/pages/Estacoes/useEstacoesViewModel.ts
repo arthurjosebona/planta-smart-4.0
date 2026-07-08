@@ -15,6 +15,7 @@ import { Pedido } from '@entities/Pedido';
 import { pedidoService } from '@config/diContainer';
 import { useTempoDecorrido } from '@hooks/useTempoDecorrido';
 import { MonitorModel } from '@pages/Monitor/MonitorModel';
+import { MontagemStream } from '@entities/stream/MontagemStream';
 
 // Converte o vetor de cores do magazine de estoque recebido via SSE
 // (posicoesOcupadas) em entidades Estoque para exibição somente-leitura.
@@ -161,12 +162,21 @@ export function useEstacoesViewModel() {
   };
 
 
+  const montagemStream = monitor.montagem as MontagemStream | null;
+  const statusEsteiras: Record<Estacao, string> = {
+    [Estacao.Estoque]: montagemStream?.supervisorioEstoque ?? '',
+    [Estacao.Processo]: montagemStream?.supervisorioProcesso ?? '',
+    [Estacao.Montagem]: montagemStream?.supervisorioMontagem ?? '',
+    [Estacao.Expedicao]: montagemStream?.supervisorioExpedicao ?? '',
+  };
+
   return {
     estoque,
     expedicao,
     monitor,
     statusEstacoes,
     statusPipelines,
+    statusEsteiras,
     bancada,
     erro: estoque.erro ?? expedicao.erro,
     dismissErro,
