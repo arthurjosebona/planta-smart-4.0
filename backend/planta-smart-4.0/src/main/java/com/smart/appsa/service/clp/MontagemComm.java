@@ -10,6 +10,7 @@ import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 // Handler da estação MONTAGEM (CLP 3 / DB57).
 //
@@ -20,6 +21,7 @@ import lombok.AllArgsConstructor;
 //
 // <p>Toda escrita no CLP é condicionada a {@code !appStateConfig.isReadOnly()}:
 // em modo somente-leitura a aplicação observa, mas nunca escreve de volta.
+@Slf4j
 @Service
 @AllArgsConstructor
 public class MontagemComm implements PlcDataObserver {
@@ -114,8 +116,10 @@ public class MontagemComm implements PlcDataObserver {
         if (!montagemInfo.isStartOP() && !montagemInfo.isFinishOP() && !montagemInfo.isCancelOP()) {
             if (!appStateConfig.isReadOnly()) {
                 try {
+                    log.debug("MONTAGEM: escrevendo DB{}:{}.{} = false (RecebidoOP)", DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP);
                     plcConnectorMon.writeBit(DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, false);
                 } catch (Exception ex) {
+                    log.error("MONTAGEM: erro ao baixar flag RecebidoOP [DB57:0.0]: {}", ex.getMessage());
                 }
             }
         }
@@ -134,8 +138,10 @@ public class MontagemComm implements PlcDataObserver {
             
             if (!appStateConfig.isReadOnly()) {
                 try {
+                    log.debug("MONTAGEM: escrevendo DB{}:{}.{} = true (RecebidoOP startOP)", DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP);
                     plcConnectorMon.writeBit(DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception ex) {
+                    log.error("MONTAGEM [startOp]: erro ao subir flag RecebidoOP [DB57:0.0]: {}", ex.getMessage());
                 }
             }
         }
@@ -148,9 +154,10 @@ public class MontagemComm implements PlcDataObserver {
         if (montagemInfo.isFinishOP() && !montagemInfo.isRecebidoOp()) {
             if (!appStateConfig.isReadOnly()) {
                 try {
+                    log.debug("MONTAGEM: escrevendo DB{}:{}.{} = true (RecebidoOP finishOP)", DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP);
                     plcConnectorMon.writeBit(DB_MONTAGEM, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("MONTAGEM [finishOp]: erro ao subir flag RecebidoOP [DB57:0.0]: {}", e.getMessage());
                 }
                 if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                     appStateConfig.setStatusMontagem((byte) 2);

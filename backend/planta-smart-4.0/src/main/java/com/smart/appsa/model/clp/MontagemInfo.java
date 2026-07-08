@@ -2,8 +2,6 @@ package com.smart.appsa.model.clp;
 
 import org.springframework.stereotype.Component;
 
-import com.smart.appsa.model.enums.StatusEsteira;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

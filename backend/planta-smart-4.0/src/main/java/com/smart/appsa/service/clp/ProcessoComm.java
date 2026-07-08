@@ -10,6 +10,7 @@ import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 // Handler da estação PROCESSO (CLP 2 / DB2).
 //
@@ -20,6 +21,7 @@ import lombok.AllArgsConstructor;
 //
 // <p>Toda escrita no CLP é condicionada a {@code !appStateConfig.isReadOnly()}:
 // em modo somente-leitura a aplicação observa, mas nunca escreve de volta.
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProcessoComm implements PlcDataObserver {
@@ -76,8 +78,10 @@ public class ProcessoComm implements PlcDataObserver {
         if (!processoInfo.isStartOP() && !processoInfo.isFinishOP() && !processoInfo.isCancelOP()) {
             if (!appStateConfig.isReadOnly()) {
                 try {
+                    log.debug("PROCESSO: escrevendo DB{}:{}.{} = false (RecebidoOP)", DB_PROCESSO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP);
                     plcConnectorPro.writeBit(DB_PROCESSO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, false);
                 } catch (Exception ex) {
+                    log.error("PROCESSO: erro ao baixar flag RecebidoOP [DB2:0.0]: {}", ex.getMessage());
                 }
             }
         }
@@ -96,9 +100,10 @@ public class ProcessoComm implements PlcDataObserver {
 
             if (!appStateConfig.isReadOnly()) {
                 try {
+                    log.debug("PROCESSO: escrevendo DB{}:{}.{} = true (RecebidoOP startOP)", DB_PROCESSO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP);
                     plcConnectorPro.writeBit(DB_PROCESSO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("PROCESSO [startOp]: erro ao subir flag RecebidoOP [DB2:0.0]: {}", e.getMessage());
                 }
             }
         }
@@ -111,9 +116,10 @@ public class ProcessoComm implements PlcDataObserver {
         if (processoInfo.isFinishOP() && !processoInfo.isRecebidoOp()) {
             if (!appStateConfig.isReadOnly()) {
                 try {
+                    log.debug("PROCESSO: escrevendo DB{}:{}.{} = true (RecebidoOP finishOP)", DB_PROCESSO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP);
                     plcConnectorPro.writeBit(DB_PROCESSO, OFFSET_STATUS_OP, BIT_RECEBIDO_OP, true);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("PROCESSO [finishOp]: erro ao subir flag RecebidoOP [DB2:0.0]: {}", e.getMessage());
                 }
                 if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                     appStateConfig.setStatusProcesso((byte) 2);

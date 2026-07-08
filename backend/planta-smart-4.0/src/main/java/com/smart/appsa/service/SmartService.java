@@ -14,6 +14,7 @@ import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.exception.ClpComunicacaoException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
@@ -27,6 +28,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SmartService {
@@ -49,9 +51,9 @@ public class SmartService {
         // eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, detalhes.getPosicaoExpedicao(), detalhes.getNumeroPedido()));
 
         try {
-            // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
+            log.info("SMART: escrevendo bloco pedido DB9:2 (60 bytes) no CLP {}", config.getIpClp());
             connector.writeBlock(9, 2, 60, buffer);
-            System.out.println("Dados enviados para o CLP: " + config.getIpClp());
+            log.info("SMART: dados do pedido enviados para o CLP {}", config.getIpClp());
             enviarTampa(config.getTampaPedido());
             iniciarExecucaoPedido(config.getIpClp());
 
@@ -86,23 +88,15 @@ public class SmartService {
         return buffer.array();
     }
 
-    // Printar bloco de bytes do Pedido no console
-    public void printHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        System.out.println("--- BLOCO DE BYTES (HEXADECIMAL) ---");
-
+    private void printHex(byte[] bytes) {
+        if (!log.isDebugEnabled()) return;
+        StringBuilder sb = new StringBuilder("--- BLOCO DE BYTES (HEXADECIMAL) ---\n");
         for (int i = 0; i < bytes.length; i++) {
-            // Converte o byte para Hex e garante que tenha 2 dígitos (ex: 0A em vez de A)
             sb.append(String.format("%02X ", bytes[i]));
-
-            // Opcional: Quebra de linha a cada 10 bytes para facilitar a leitura
-            if ((i + 1) % 10 == 0) {
-                sb.append("\n");
-            }
+            if ((i + 1) % 10 == 0) sb.append("\n");
         }
-
-        System.out.println(sb.toString());
-        System.out.println("------------------------------------");
+        sb.append("\n------------------------------------");
+        log.debug("SMART: {}", sb);
     }
 
     // Envia comando para a Planta Smart iniciar a produção do Pedido
@@ -113,31 +107,27 @@ public class SmartService {
         }
 
         try {
+            log.debug("SMART: inicializando flags da estação ESTOQUE no CLP {}", ipClp);
+            plcConnector.writeBit(9, 0, 0, false);
+            plcConnector.writeBit(9, 64, 0, false);
+            plcConnector.writeBit(9, 64, 1, false);
+            plcConnector.writeBit(9, 62, 0, false);
 
-            // Inicializa as flags da estação ESTOQUE
-            //plcConnector.connect();
-            plcConnector.writeBit(9, 0, 0, Boolean.parseBoolean("FALSE"));
-            plcConnector.writeBit(9, 64, 0, Boolean.parseBoolean("FALSE"));
-            plcConnector.writeBit(9, 64, 1, Boolean.parseBoolean("FALSE"));
-            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
-
-            // plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
-            // Iniciar pedido
-            System.out.println("SETAR FLAG INICIAR PEDIDO");
-            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("TRUE"));
+            log.info("SMART: setando flag IniciarPedido [DB9:62.0] = true no CLP {}", ipClp);
+            plcConnector.writeBit(9, 62, 0, true);
 
             Thread.sleep(800);
 
-            System.out.println("RESETAR FLAG INICIAR PEDIDO");
-            plcConnector.writeBit(9, 62, 0, Boolean.parseBoolean("FALSE"));
+            log.info("SMART: resetando flag IniciarPedido [DB9:62.0] = false no CLP {}", ipClp);
+            plcConnector.writeBit(9, 62, 0, false);
 
         } catch (Exception ex) {
-
+            log.error("SMART: erro ao iniciar execução do pedido no CLP {}: {}", ipClp, ex.getMessage());
         }
     }
 
     public void enviarTampa(int tampa) {
-        System.out.println("\n\nSELETOR DE TAMPAS INSTALADO NA BANCADA\n\n");
+        log.info("SMART: enviando comando de tampa {} ao ESP32", tampa);
         // Passo 2) Selecionar a tampa via POST
         try {
             RestTemplate apiSeletorTampa = new RestTemplate();
@@ -165,41 +155,38 @@ public class SmartService {
             );
 
             Map<String, Object> body = response.getBody();
-            System.out.println("Resposta do ESP32: " + body);
+            log.debug("SMART: resposta do ESP32: {}", body);
 
-            // Verificação robusta
             if (body == null || body.get("status") == null) {
-                System.out.println("Deu erro");
+                log.error("SMART: ESP32 retornou resposta inválida para tampa {}", tampa);
                 return;
             }
 
             String status = body.get("status").toString();
 
-            // Verificação flexível (ignora maiúsculas/minúsculas)
             if (!status.toLowerCase().contains("ok")) {
-                System.out.println("Deu erro");
+                log.error("SMART: ESP32 retornou status de erro '{}' para tampa {}", status, tampa);
                 return;
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Deu erro");
-            return;
+            log.error("SMART: erro ao enviar comando de tampa {} ao ESP32: {}", tampa, e.getMessage(), e);
         }
     }
 
     public boolean sendBlockBytesToClp(String ipClp, int db, int offset, byte[] dados, int size) {
         PlcConnector plcConnector = plcConnectionService.getConnection(ipClp);
         if (plcConnector == null) {
-            System.out.println("Sem conexão com CLP " + ipClp);
+            log.warn("SMART: sem conexão com CLP {} para escrita em DB{}:{}", ipClp, db, offset);
             return false;
         }
         if (!appStateConfig.isReadOnly()) {
             try {
-                plcConnector.writeBlock(db, offset, size, dados); // escreve no bloco de dados
+                log.info("SMART: escrevendo {} bytes em DB{}:{} no CLP {}", size, db, offset, ipClp);
+                plcConnector.writeBlock(db, offset, size, dados);
                 return true;
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("SMART: erro ao escrever em DB{}:{} no CLP {}: {}", db, offset, ipClp, e.getMessage(), e);
                 return false;
             }
         }
