@@ -50,6 +50,14 @@ export class ConexaoService {
     }
   }
 
+  async desconectar(): Promise<void> {
+    try {
+      await this.repository.desconectar();
+    } finally {
+      this.setConectado(false);
+    }
+  }
+
   /** Inscreve um listener para mudanças de status; retorna a função de unsubscribe. */
   subscribe = (listener: Listener): (() => void) => {
     this.listeners.add(listener);
