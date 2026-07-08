@@ -360,9 +360,17 @@ public class ExpedicaoComm implements PlcDataObserver {
             appStateConfig.setPedidoEmCurso(false);
             eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
             opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
-            pedidoService.updateToConcluido(
-                PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
-            );
+            // A OP pode ter sido criada por outro supervisório e não existir no banco desta
+            // instância: nesse caso findByOp lança ResourceNotFoundException. A persistência é
+            // um efeito colateral opcional — isolada em try/catch para nunca impedir o reset do
+            // estado da bancada (pedidoEmCurso já baixado acima + resetarStatus abaixo).
+            try {
+                pedidoService.updateToConcluido(
+                    PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
+                );
+            } catch (Exception e) {
+                System.out.println("AVISO: OP " + opAtual + " não concluída no banco (pedido externo?): " + e.getMessage());
+            }
             appStateConfig.resetarStatus();
         }
     }
