@@ -93,7 +93,7 @@ export function useEstacoesViewModel() {
       .then(setPedidoAtual)
   }, [monitor.estoque?.numeroOP]);
 
-  const tempoDecorrido = useTempoDecorrido(pedidoAtual?.registroEntradaEstoque);
+  const tempoDecorrido = useTempoDecorrido(monitor.estoque?.registroInicioPedido);
 
   function dismissErro() {
     estoque.dismissErro();

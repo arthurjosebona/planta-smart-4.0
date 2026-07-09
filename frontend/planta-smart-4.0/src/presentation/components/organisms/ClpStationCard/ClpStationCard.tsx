@@ -4,12 +4,13 @@ import { ClpValueField } from '@components/atoms/ClpValueField/ClpValueField';
 import styles from './clpStationCard.module.css';
 import { EstoqueStream } from '@entities/stream/EstoqueStream';
 import { ExpedicaoStream } from '@entities/stream/ExpedicaoStream';
-import { ProcessoMontagemStream } from '@entities/stream/ProcessoMontagemStream';
+import { ProcessoStream } from '@entities/stream/ProcessoStream';
+import { MontagemStream } from '@entities/stream/MontagemStream';
 
 interface ClpStationCardProps {
   label: string;
   color: string;
-  data: EstoqueStream | ExpedicaoStream | ProcessoMontagemStream | null;
+  data: EstoqueStream | ExpedicaoStream | ProcessoStream | MontagemStream | null;
   online: boolean;
 }
 
@@ -60,8 +61,11 @@ export function ClpStationCard({ label, color, data, online }: ClpStationCardPro
           />
 
           {data.estacao === 'estoque' && <EstoqueFields data={data} />}
-          {(data.estacao === 'processo' || data.estacao === 'montagem') && (
+          {data.estacao === 'processo' && (
             <ProcessoFields data={data} />
+          )}
+          {data.estacao === 'montagem' && (
+            <MontagemFields data={data} />
           )}
           {data.estacao === 'expedicao' && <ExpedicaoFields data={data} />}
         </div>
@@ -100,12 +104,25 @@ function EstoqueFields({ data }: { data: EstoqueStream }) {
         <ClpValueField label="statusMontagem" value={data.statusMontagem} />
         <ClpValueField label="statusExpedicao" value={data.statusExpedicao} />
         <ClpValueField label="statusProducao" value={data.statusProducao} />
+        <ClpValueField label="registroInicioPedido" value={formatTimestampUtc(data.registroInicioPedido)} />
       </div>
     </>
   );
 }
 
-function ProcessoFields({ data }: { data: ProcessoMontagemStream }) {
+// O backend envia um LocalDateTime (sem offset) sempre em UTC — sem o sufixo
+// 'Z' o Date interpretaria a string no fuso local do navegador (ver useTempoDecorrido).
+function formatTimestampUtc(registro: string | null | undefined): string {
+  if (!registro) return '—';
+
+  const registroUtc = /[zZ]|[+-]\d{2}:\d{2}$/.test(registro) ? registro : `${registro}Z`;
+  const data = new Date(registroUtc);
+  if (Number.isNaN(data.getTime())) return '—';
+
+  return data.toLocaleString();
+}
+
+function ProcessoFields({ data }: { data: ProcessoStream }) {
   return (
     <>
       <div className={styles.values}>
@@ -113,6 +130,22 @@ function ProcessoFields({ data }: { data: ProcessoMontagemStream }) {
       </div>
     </>
   );
+}
+
+function MontagemFields ({ data }: {data: MontagemStream}) {
+  return (
+    <>
+      <div className={styles.values}>
+        <ClpValueField label="statusBancada" value={data.statusBancada} />
+      </div>
+      <div className={styles.values}>
+        <ClpValueField label="supervisorioEstoque" value={data.supervisorioEstoque} />
+        <ClpValueField label="supervisorioProcesso" value={data.supervisorioProcesso} />
+        <ClpValueField label="supervisorioMontagem" value={data.supervisorioMontagem} />
+        <ClpValueField label="supervisorioExpedicao" value={data.supervisorioExpedicao} />
+      </div>
+    </>
+  )
 }
 
 function ExpedicaoFields({ data }: { data: ExpedicaoStream }) {

@@ -1,5 +1,7 @@
 package com.smart.appsa.config;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
@@ -20,6 +22,10 @@ public class AppStateConfig {
     private volatile boolean blockFinished;
     private volatile boolean aux_expedicao;
     private volatile int posicaoExpedicaoSolicitada;
+
+    // Sempre em UTC (ver EstoqueComm#confirmarInicioPedido). O frontend precisa
+    // interpretar essa string como UTC, já que LocalDateTime não carrega zona.
+    private volatile LocalDateTime registroInicioPedido;
 
     public void resetarStatus() {
         statusEstoque = 0;
