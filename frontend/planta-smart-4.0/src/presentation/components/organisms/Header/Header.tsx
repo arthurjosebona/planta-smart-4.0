@@ -66,7 +66,7 @@ const NAV_ITEMS: (NavItem | 'separator')[] = [
   'separator',
   { href: '/ips', label: 'Conexão', icon: IconIps },
   'separator',
-  { href: '/store', label: 'Store', icon: IconStore },
+  { href: '/store', label: 'Loja', icon: IconStore },
   'separator',
   { href: '/pedidos', label: 'Pedidos', icon: IconPedido },
   'separator',
