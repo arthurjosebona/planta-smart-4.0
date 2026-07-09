@@ -257,6 +257,7 @@ public class PedidoService {
     @Transactional
     public void updateToConcluido(Pedido pedido) {
         pedido.setStatus(StatusPedido.CONCLUIDO);
+        pedido.setRegistroEntradaExpedicao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
 
