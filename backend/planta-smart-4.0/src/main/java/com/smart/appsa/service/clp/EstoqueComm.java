@@ -11,6 +11,7 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
+import com.smart.appsa.model.clp.InfoPedidoReadClp;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.service.EstoqueService;
 import com.smart.appsa.service.PedidoService;
@@ -51,6 +52,7 @@ public class EstoqueComm implements PlcDataObserver {
 
     private PlcConnectionService plcConnectionService;
     private EstoqueInfoClp estoqueInfoClp;
+    private InfoPedidoReadClp infoPedidoReadClp;
     private AppStateConfig appStateConfig;
     private EstoqueService estoqueService;
     private PedidoService pedidoService;
@@ -114,6 +116,42 @@ public class EstoqueComm implements PlcDataObserver {
         estoqueInfoClp.setRemoverEstoque((dadosEstoque[106] & 0x02) != 0);
         estoqueInfoClp.setRetornoEstoqueCheio((dadosEstoque[106] & 0x04) != 0);
         estoqueInfoClp.setCorGuardarEstoque(((dadosEstoque[108] & 0xFF) << 8) | (dadosEstoque[109] & 0xFF));
+
+        // lerInfoPedido(dadosEstoque);
+    }
+
+    private void lerInfoPedido(byte[] dadosEstoque) {
+        infoPedidoReadClp.setCorAndar1(((dadosEstoque[2]  & 0xFF) << 8) | (dadosEstoque[3]  & 0xFF));
+        infoPedidoReadClp.setPosicaoEstoqueAndar1(((dadosEstoque[4]  & 0xFF) << 8) | (dadosEstoque[5]  & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_1_Andar_1",    ((dadosEstoque[6]  & 0xFF) << 8) | (dadosEstoque[7]  & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_2_Andar_1",    ((dadosEstoque[8]  & 0xFF) << 8) | (dadosEstoque[9]  & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_3_Andar_1",    ((dadosEstoque[10] & 0xFF) << 8) | (dadosEstoque[11] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_1_Andar_1", ((dadosEstoque[12] & 0xFF) << 8) | (dadosEstoque[13] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_2_Andar_1", ((dadosEstoque[14] & 0xFF) << 8) | (dadosEstoque[15] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_3_Andar_1", ((dadosEstoque[16] & 0xFF) << 8) | (dadosEstoque[17] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Processamento_Andar_1",   ((dadosEstoque[18] & 0xFF) << 8) | (dadosEstoque[19] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Andar_2",             ((dadosEstoque[20] & 0xFF) << 8) | (dadosEstoque[21] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Posicao_Estoque_Andar_2", ((dadosEstoque[22] & 0xFF) << 8) | (dadosEstoque[23] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_1_Andar_2",    ((dadosEstoque[24] & 0xFF) << 8) | (dadosEstoque[25] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_2_Andar_2",    ((dadosEstoque[26] & 0xFF) << 8) | (dadosEstoque[27] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_3_Andar_2",    ((dadosEstoque[28] & 0xFF) << 8) | (dadosEstoque[29] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_1_Andar_2", ((dadosEstoque[30] & 0xFF) << 8) | (dadosEstoque[31] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_2_Andar_2", ((dadosEstoque[32] & 0xFF) << 8) | (dadosEstoque[33] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_3_Andar_2", ((dadosEstoque[34] & 0xFF) << 8) | (dadosEstoque[35] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Processamento_Andar_2",   ((dadosEstoque[36] & 0xFF) << 8) | (dadosEstoque[37] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Andar_3",             ((dadosEstoque[38] & 0xFF) << 8) | (dadosEstoque[39] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Posicao_Estoque_Andar_3", ((dadosEstoque[40] & 0xFF) << 8) | (dadosEstoque[41] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_1_Andar_3",    ((dadosEstoque[42] & 0xFF) << 8) | (dadosEstoque[43] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_2_Andar_3",    ((dadosEstoque[44] & 0xFF) << 8) | (dadosEstoque[45] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Cor_Lamina_3_Andar_3",    ((dadosEstoque[46] & 0xFF) << 8) | (dadosEstoque[47] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_1_Andar_3", ((dadosEstoque[48] & 0xFF) << 8) | (dadosEstoque[49] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_2_Andar_3", ((dadosEstoque[50] & 0xFF) << 8) | (dadosEstoque[51] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Padrao_Lamina_3_Andar_3", ((dadosEstoque[52] & 0xFF) << 8) | (dadosEstoque[53] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Processamento_Andar_3",   ((dadosEstoque[54] & 0xFF) << 8) | (dadosEstoque[55] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Numero_Pedido",           ((dadosEstoque[56] & 0xFF) << 8) | (dadosEstoque[57] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Andares",                 ((dadosEstoque[58] & 0xFF) << 8) | (dadosEstoque[59] & 0xFF));
+        System.out.printf("  %-28s = %d%n", "Posicao_Expedicao",       ((dadosEstoque[60] & 0xFF) << 8) | (dadosEstoque[61] & 0xFF));
+        System.out.println("------------------------------------------------");
     }
 
     // iniciarPedido == true & ocupado == true:
