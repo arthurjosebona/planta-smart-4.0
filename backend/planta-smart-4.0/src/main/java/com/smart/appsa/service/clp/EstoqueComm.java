@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.enums.CorEstoque;
@@ -164,6 +165,11 @@ public class EstoqueComm implements PlcDataObserver {
         if (estoqueInfoClp.isStartOP() & !estoqueInfoClp.isRecebidoOp()) {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusEstoque((byte) 1);
+            }
+            try {
+                pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
+            } catch(ResourceNotFoundException ex) {
+                System.out.println("Pedido entrou no estoque com OP não persistida, possível pedido externo de outro sistema.");
             }
             if (!appStateConfig.isReadOnly()) {
                 try {

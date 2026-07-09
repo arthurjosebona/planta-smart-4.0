@@ -10,6 +10,7 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
 import com.smart.appsa.events.UpdateExpedicaoEvent;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
 import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.Pedido;
@@ -308,17 +309,22 @@ public class ExpedicaoComm implements PlcDataObserver {
                         System.out.println(">> posicaoFisicaEncontrada=" + posicaoFisicaEncontrada);
                         System.out.println(">> ordemDeProducaoAtual=" + opRemover);
 
-                        Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
-                            pedidoService.findByOp(opRemover)
-                        );
+                        try {
+                            Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
+                                pedidoService.findByOp(opRemover)
+                            );
+                            System.out.println(">> Id pedido encontrado: " + expedido.getId());
 
-                        System.out.println(">> Id pedido encontrado: " + expedido.getId());
+                            System.out.println(">> Chamando pedidoService.handleExitExpedicao(...)");
+                            pedidoService.handleExitExpedicao(expedido);
+                        } catch (ResourceNotFoundException ex) {
+                            System.out.println("Pedido não encontrado ao remover da expedicao, possível pedido externo de outro sistema");
+                        }
 
-                        System.out.println(">> Chamando pedidoService.handleExitExpedicao(...)");
-                        pedidoService.handleExitExpedicao(expedido);
+                        
                         System.out.println(">> handleExitExpedicao OK");
                         System.out.println(">> Zerando ordem na posição " + posicaoFisicaEncontrada + " (assignOrdemAtPosicao)");
-                        expedicaoService.assignOrdemAtPosicao(expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
+                        expedicaoService.assignOrdemAtPosicao(posicaoFisicaEncontrada, 0);
                     } catch (Exception e) {
                         System.out.println("ERRO: Na tentativa de remover da Expedição");
                         e.printStackTrace();
