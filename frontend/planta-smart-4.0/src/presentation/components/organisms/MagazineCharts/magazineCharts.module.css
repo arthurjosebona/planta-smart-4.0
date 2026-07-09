@@ -1,0 +1,74 @@
+@reference "@styles/global.css";
+
+.panel {
+  @apply flex flex-col rounded-xl;
+  gap: var(--spacing-4);
+  padding: var(--spacing-5);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.chart {
+  @apply flex flex-col;
+  gap: var(--spacing-2);
+}
+
+.chart-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+}
+
+.chart-empty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  padding: var(--spacing-4) 0;
+  text-align: center;
+}
+
+.legend {
+  @apply flex flex-col;
+  gap: 5px;
+  list-style: none;
+}
+
+.legend-item {
+  @apply flex items-center;
+  gap: var(--spacing-2);
+}
+
+.legend-dot {
+  @apply flex-shrink-0 rounded-sm;
+  width: 8px;
+  height: 8px;
+}
+
+.legend-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+
+.legend-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
