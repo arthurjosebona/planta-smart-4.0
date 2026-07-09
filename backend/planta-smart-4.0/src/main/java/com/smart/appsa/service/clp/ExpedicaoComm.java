@@ -372,6 +372,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");
             appStateConfig.setPedidoEmCurso(false);
             eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
+            expedicaoService.assignOrdemAtPosicao(opAtual, expedicaoInfoClp.getPosicaoGuardadoExpedicao());
             opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
             pedidoService.updateToConcluido(
                 PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))

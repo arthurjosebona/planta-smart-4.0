@@ -130,6 +130,7 @@ public class EstoqueComm implements PlcDataObserver {
             appStateConfig.setStatusProducao((byte) 0);
             // UTC explícito: evita ambiguidade de fuso quando o frontend interpreta a string.
             appStateConfig.setRegistroInicioPedido(LocalDateTime.now(ZoneOffset.UTC));
+            System.out.printf("\n\nEntrada estoque, salvando no banco: %d\n", estoqueInfoClp.getNumeroOP());
             pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {

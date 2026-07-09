@@ -265,7 +265,6 @@ public class PedidoService {
     public void handleEntradaEstoque(Integer op) {
         Pedido pedido = pedidoRepository.findByOrdemDeProducao(op)
             .orElseThrow(() -> new ResourceNotFoundException("Pedido", "OP", op));
-        if (pedido.getRegistroEntradaEstoque() != null) return;
         pedido.setRegistroEntradaEstoque(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
