@@ -16,7 +16,7 @@
   --color-lamina-preto: #484848;
   --color-lamina-branco: #f0f0ee;
 
-  --color-estoque-vazio: #2c2d30;
+  --color-estoque-vazio: #B1AEAF;
   --color-estoque-vazio-border: rgba(255, 255, 255, 0.1);
 
   --color-bg-page: #0e0f11;
@@ -25,8 +25,8 @@
   --color-bg-overlay: rgba(14, 15, 17, 0.85);
 
   --color-text-primary: #e8e8e6;
-  --color-text-secondary: #9a9996;
-  --color-text-muted: #5c5b58;
+  --color-text-secondary: #b4b3b0;
+  --color-text-muted: #7e7d7a;
 
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.18);

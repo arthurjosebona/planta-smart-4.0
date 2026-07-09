@@ -1,10 +1,14 @@
 package com.smart.appsa.service.clp;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import org.springframework.stereotype.Service;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.enums.CorEstoque;
@@ -125,6 +129,9 @@ public class EstoqueComm implements PlcDataObserver {
             System.out.printf("\n\n\n\n\n\n\n\nDEFININDO PEDIDO EM CURSO PARA TRUE\n\n\n\n\n\n\n\n");
             appStateConfig.setStatusEstoque((byte) 0);
             appStateConfig.setStatusProducao((byte) 0);
+            // UTC explícito: evita ambiguidade de fuso quando o frontend interpreta a string.
+            appStateConfig.setRegistroInicioPedido(LocalDateTime.now(ZoneOffset.UTC));
+            System.out.printf("\n\nEntrada estoque, salvando no banco: %d\n", estoqueInfoClp.getNumeroOP());
             pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
             if (!appStateConfig.isReadOnly()) {
                 try {
@@ -158,6 +165,11 @@ public class EstoqueComm implements PlcDataObserver {
         if (estoqueInfoClp.isStartOP() & !estoqueInfoClp.isRecebidoOp()) {
             if (appStateConfig.getStatusProducao() == 0 & appStateConfig.isPedidoEmCurso()) {
                 appStateConfig.setStatusEstoque((byte) 1);
+            }
+            try {
+                pedidoService.handleEntradaEstoque(estoqueInfoClp.getNumeroOP());
+            } catch(ResourceNotFoundException ex) {
+                System.out.println("Pedido entrou no estoque com OP não persistida, possível pedido externo de outro sistema.");
             }
             if (!appStateConfig.isReadOnly()) {
                 try {
@@ -246,6 +258,7 @@ public class EstoqueComm implements PlcDataObserver {
                 try {
                     // Grava a cor no CLP e persiste a posição com a cor adicionada na API.
                     plcConnectorEst.writeByte(DB_ESTOQUE, offset, (byte) estoqueInfoClp.getCorGuardarEstoque());
+                    System.out.printf("\nDefinindo o estoque no banco de acordo com a adição do bloco | Posicao: %s | Cor: %s\n\n", estoqueInfoClp.getPosicaoEstoque(), estoqueInfoClp.getCorGuardarEstoque());
                     estoqueService.assignBlockColorByPosicaoFisica(
                         estoqueInfoClp.getPosicaoEstoque(),
                         CorEstoque.fromValue(estoqueInfoClp.getCorGuardarEstoque())

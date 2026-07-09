@@ -5,6 +5,7 @@ import { useStatusContext } from '@contexts/StatusContext';
 
 export function useIpsViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
+  const { conectado } = useStatusContext();
 
   // Sincroniza o estado inicial do readOnly com o backend ao montar.
   useEffect(() => {
@@ -95,6 +96,20 @@ export function useIpsViewModel() {
     }
   }
 
+  async function desconectar() {
+    setModel((s) => ({ ...s, loading: true, erro: null, sucesso: null }));
+    try {
+      await conexaoService.desconectar();
+      setModel((s) => ({ ...s, loading: false, sucesso: 'Desconectado com sucesso.' }));
+    } catch {
+      setModel((s) => ({
+        ...s,
+        loading: false,
+        erro: 'Falha ao desconectar. Tente novamente.',
+      }));
+    }
+  }
+
   function dismissErro() {
     setModel((s) => ({ ...s, erro: null }));
   }
@@ -105,9 +120,11 @@ export function useIpsViewModel() {
 
   return {
     model,
+    conectado,
     handleFaixaChange,
     confirmarFaixa,
     conectar,
+    desconectar,
     toggleReadOnly,
     dismissErro,
     dismissSucesso,

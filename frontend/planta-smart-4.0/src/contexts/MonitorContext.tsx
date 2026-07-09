@@ -5,7 +5,7 @@ import { ProcessoMontagemStreamDTO } from '@dtos/response/stream/ProcessoMontage
 import { ExpedicaoStreamDTO } from '@dtos/response/stream/ExpedicaoStreamDTO';
 import { EstacaoStreamMapper } from '@mappers/EstacaoStreamMapper';
 
-const SSE_URL = 'http://localhost:8088/api/smart/stream';
+const SSE_URL = import.meta.env.VITE_BASE_URL + '/api/smart/stream';
 
 type MonitorContextValue = MonitorModel;
 

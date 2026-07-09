@@ -201,25 +201,31 @@ Os arquivos otimizados são gerados em `dist/`. Para pré-visualizar o build:
 npm run preview
 ```
 
+### 4. Variável de ambiente
+
+O frontend lê a URL do backend a partir da variável **`VITE_BASE_URL`** (injetada pelo Vite em *build-time*). Crie um arquivo `.env` na raiz de `frontend/planta-smart-4.0/`:
+
+```env
+VITE_BASE_URL=http://localhost:8080
+```
+
+> Por ser embutida no bundle durante o build, qualquer alteração em `VITE_BASE_URL` exige um novo `npm run build` (ou rebuild da imagem Docker).
+
 ---
 
 ## 🐳 Docker
 
-Há um `Dockerfile` (em `src/Dockerfile`) com build multi-stage: o primeiro estágio gera o build de produção com `node:22-alpine` e o segundo serve o conteúdo de `dist/` com `serve` na porta **3000**.
-## Comandos para iniciar o Docker
+O frontend possui um `Dockerfile` (na raiz de `frontend/planta-smart-4.0/`) com build multi-stage: o primeiro estágio gera o build de produção com `node:22-alpine` e o segundo serve o conteúdo de `dist/` com `serve` na porta **3000**. A variável `VITE_BASE_URL` é passada como `ARG` de build.
 
-### 1. Cria uma imagem Docker a partir do arquivo Dockerfile
-docker build -t smart-frontend .
+Recomenda-se subir o frontend junto com o backend e o banco via `docker-compose.yml` (na raiz do repositório) — consulte o guia completo em [**DOCKER.md**](../../DOCKER.md).
 
-### 2. Cria e inicia um container usando a imagem smart-frontend.
-
-docker run -p 3000:3000 smart-frontend 
-# Depois acessa em http://localhost:3000.
+Para buildar apenas a imagem do frontend de forma isolada:
 
 ```bash
 # a partir da pasta que contém o Dockerfile
-docker build -t planta-smart-frontend .
+docker build -t planta-smart-frontend --build-arg VITE_BASE_URL=http://localhost:8080 .
 docker run -p 3000:3000 planta-smart-frontend
+# Acesse em http://localhost:3000
 ```
 
 ---
@@ -248,10 +254,12 @@ npm run lint
 
 ## 🌐 Integração com o Backend
 
-- **API REST:** o `HttpClient` (`src/infrastructure/http/HttpClient.ts`) centraliza as chamadas HTTP (`GET`/`POST`/`PUT`/`PATCH`/`DELETE`) e aponta para `http://localhost:8080` por padrão. Ele trata respostas `204 No Content` e endpoints que respondem em texto puro (ex.: `POST /api/smart/readonly`), além de encapsular erros em `HttpError`. Para apontar para outro endereço, ajuste a `baseURL` no `HttpClient`.
+- **API REST:** o `HttpClient` (`src/infrastructure/http/HttpClient.ts`) centraliza as chamadas HTTP (`GET`/`POST`/`PUT`/`PATCH`/`DELETE`) e usa como base a variável **`VITE_BASE_URL`**. Ele trata respostas `204 No Content` e endpoints que respondem em texto puro (ex.: `POST /api/smart/readonly`), além de encapsular erros em `HttpError`.
 
-- **Streaming (SSE):** o `MonitorContext` consome o stream de eventos da bancada. A URL padrão é `http://localhost:8088/api/smart/stream` e pode ser sobrescrita pela variável de ambiente **`VITE_SSE_URL`** (ex.: em um arquivo `.env` na raiz do projeto):
+- **Streaming (SSE):** o `MonitorContext` consome o stream de eventos da bancada em `${VITE_BASE_URL}/api/smart/stream`, escutando os eventos `estoque`, `processo`, `montagem` e `expedicao`.
+
+- **Configuração:** ambos derivam do mesmo `.env`:
 
   ```env
-  VITE_SSE_URL=http://localhost:8088/api/smart/stream
+  VITE_BASE_URL=http://localhost:8080
   ```

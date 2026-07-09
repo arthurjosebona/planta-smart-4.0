@@ -2,6 +2,7 @@ import { useDashboardViewModel } from '@pages/Dashboard/useDashboardViewModel';
 import { EstoqueSection } from '@components/organisms/EstoqueSection/EstoqueSection';
 import { ExpedicaoSection } from '@components/organisms/ExpedicaoSection/ExpedicaoSection';
 import { ExpedicaoDetalheModal } from '@components/organisms/ExpedicaoDetalheModal/ExpedicaoDetalheModal';
+import { MagazineCharts } from '@components/organisms/MagazineCharts/MagazineCharts';
 import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
 import styles from './dashboardView.module.css';
 import { AppTemplate } from '@components/template/AppTemplate';
@@ -48,32 +49,35 @@ export default function DashboardView() {
           />
         )}
 
-        <div className={styles.sections}>
-          <EstoqueSection
-            estoque={model.estoque}
-            editMode={model.editMode}
-            selectedIds={model.selectedIds}
-            loading={model.loading}
-            onEnterEdit={enterEditMode}
-            onCancel={cancelEditMode}
-            onToggleBloco={toggleBlocoSelection}
-            onChangeColor={changeBlockColor}
-            onClean={cleanEstoque}
-            onSave={saveEstoque}
-          />
-          <ExpedicaoSection
-            expedicao={model.expedicao}
-            editMode={model.expedicaoEditMode}
-            selectedId={model.selectedExpedicaoId}
-            opInput={model.opInput}
-            loading={model.loading}
-            onEnterEdit={enterExpedicaoEditMode}
-            onCancel={cancelExpedicaoEditMode}
-            onToggleSlot={selectSlot}
-            onSelectSlot={abrirDetalheExpedicao}
-            onOpInputChange={changeOpInput}
-            onSave={saveExpedicao}
-          />
+        <div className={styles['dashboard-layout']}>
+          <div className={styles.sections}>
+            <EstoqueSection
+              estoque={model.estoque}
+              editMode={model.editMode}
+              selectedIds={model.selectedIds}
+              loading={model.loading}
+              onEnterEdit={enterEditMode}
+              onCancel={cancelEditMode}
+              onToggleBloco={toggleBlocoSelection}
+              onChangeColor={changeBlockColor}
+              onClean={cleanEstoque}
+              onSave={saveEstoque}
+            />
+            <ExpedicaoSection
+              expedicao={model.expedicao}
+              editMode={model.expedicaoEditMode}
+              selectedId={model.selectedExpedicaoId}
+              opInput={model.opInput}
+              loading={model.loading}
+              onEnterEdit={enterExpedicaoEditMode}
+              onCancel={cancelExpedicaoEditMode}
+              onToggleSlot={selectSlot}
+              onSelectSlot={abrirDetalheExpedicao}
+              onOpInputChange={changeOpInput}
+              onSave={saveExpedicao}
+            />
+          </div>
+          <MagazineCharts estoque={model.estoque} expedicao={model.expedicao} />
         </div>
 
         {detalheSlot && (

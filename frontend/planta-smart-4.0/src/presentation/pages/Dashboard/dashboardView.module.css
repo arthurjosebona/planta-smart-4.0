@@ -6,19 +6,24 @@
   gap: var(--spacing-4);
 }
 
-.sections {
+.dashboard-layout {
   @apply flex flex-row items-start;
   gap: var(--spacing-6);
 }
 
-.sections > * {
-  flex: 1;
+.sections {
+  @apply flex flex-col flex-1;
+  gap: var(--spacing-6);
   min-width: 0;
 }
 
-@media (max-width: 768px) {
-  .sections {
+@media (max-width: 900px) {
+  .dashboard-layout {
     flex-direction: column;
+  }
+
+  .sections > * {
+    width: 100%;
   }
 }
 

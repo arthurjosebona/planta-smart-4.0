@@ -10,7 +10,9 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
 import com.smart.appsa.events.UpdateExpedicaoEvent;
+import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.PedidoMapper;
+import com.smart.appsa.model.Expedicao;
 import com.smart.appsa.model.Pedido;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
 import com.smart.appsa.service.ExpedicaoService;
@@ -262,9 +264,10 @@ public class ExpedicaoComm implements PlcDataObserver {
                     int offset = OFFSET_MAGAZINE + (expedicaoInfoClp.getPosicaoGuardarExp() - 1) * 2;
                     try {
                         plcConnectorExp.writeInt(DB_EXPEDICAO, offset, expedicaoInfoClp.getOpGuardadoExpedicao());
+                        System.out.printf("\n\n\n\nSalvando expedição no banco de dados\nOp:%s\nPosicao:%s\n\n\n\n", expedicaoInfoClp.getOpGuardadoExpedicao(), expedicaoInfoClp.getPosicaoGuardadoExpedicao());
                         expedicaoService.assignOrdemAtPosicao(
                             expedicaoInfoClp.getOpGuardadoExpedicao(),
-                            expedicaoInfoClp.getPosicaoGuardarExp()
+                            expedicaoInfoClp.getPosicaoGuardadoExpedicao()
                         );
                     } catch (Exception e) {
                         System.out.println("ERRO: Na tentativa de adicionar na Expedição");
@@ -290,22 +293,38 @@ public class ExpedicaoComm implements PlcDataObserver {
                     System.out.println(
                             "ERRO [Remover Expedição]: Atualização da Flag RecebidoExpedicao [DB9:2.0] para TRUE");
                 }
-
+                System.out.println("posicaoRemovidoExpedicao=" + expedicaoInfoClp.getPosicaoRemovidoExpedicao());
                 if (expedicaoInfoClp.getPosicaoRemovidoExpedicao() > 0) {
                     int offset = OFFSET_MAGAZINE + (expedicaoInfoClp.getPosicaoRemovidoExpedicao() - 1) * 2;
                     try {
+                        System.out.println(">> Zerando posição no magazine (writeInt=0)");
                         plcConnectorExp.writeInt(DB_EXPEDICAO, offset, 0);
 
-                        Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
-                            pedidoService.findByOp(
-                                expedicaoService.findByPosicaoFisica(
-                                    expedicaoInfoClp.getPosicaoRemovidoExpedicao()
-                                ).getOrdemDeProducaoAtual()
-                            )
+                        System.out.println(">> Buscando posição física: " + expedicaoInfoClp.getPosicaoRemovidoExpedicao());
+                        Expedicao expedicao = expedicaoService.findByPosicaoFisica(
+                            expedicaoInfoClp.getPosicaoRemovidoExpedicao()
                         );
+                        int posicaoFisicaEncontrada = expedicao.getPosicaoFisica();
+                        int opRemover = expedicao.getOrdemDeProducaoAtual();
+                        System.out.println(">> posicaoFisicaEncontrada=" + posicaoFisicaEncontrada);
+                        System.out.println(">> ordemDeProducaoAtual=" + opRemover);
 
-                        pedidoService.handleExitExpedicao(expedido);
-                        expedicaoService.assignOrdemAtPosicao(expedicaoInfoClp.getPosicaoRemovidoExpedicao(), 0);
+                        try {
+                            Pedido expedido = PedidoMapper.mapEntityByResponseDTO(
+                                pedidoService.findByOp(opRemover)
+                            );
+                            System.out.println(">> Id pedido encontrado: " + expedido.getId());
+
+                            System.out.println(">> Chamando pedidoService.handleExitExpedicao(...)");
+                            pedidoService.handleExitExpedicao(expedido);
+                        } catch (ResourceNotFoundException ex) {
+                            System.out.println("Pedido não encontrado ao remover da expedicao, possível pedido externo de outro sistema");
+                        }
+
+                        
+                        System.out.println(">> handleExitExpedicao OK");
+                        System.out.println(">> Zerando ordem na posição " + posicaoFisicaEncontrada + " (assignOrdemAtPosicao)");
+                        expedicaoService.assignOrdemAtPosicao(posicaoFisicaEncontrada, 0);
                     } catch (Exception e) {
                         System.out.println("ERRO: Na tentativa de remover da Expedição");
                         e.printStackTrace();
@@ -359,6 +378,7 @@ public class ExpedicaoComm implements PlcDataObserver {
             System.out.println("DEFININDO PEDIDO EM CURSO PARA FALSE");
             appStateConfig.setPedidoEmCurso(false);
             eventPublisher.publishEvent(new UpdateExpedicaoEvent(this, expedicaoInfoClp.getPosicaoGuardadoExpedicao(), opAtual));
+            expedicaoService.assignOrdemAtPosicao(opAtual, expedicaoInfoClp.getPosicaoGuardadoExpedicao());
             opAntiga = expedicaoInfoClp.getOpGuardadoExpedicao();
             pedidoService.updateToConcluido(
                 PedidoMapper.mapEntityByResponseDTO(pedidoService.findByOp(opAtual))
