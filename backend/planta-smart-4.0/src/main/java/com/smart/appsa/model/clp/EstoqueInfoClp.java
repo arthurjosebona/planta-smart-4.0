@@ -16,65 +16,35 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class EstoqueInfoClp extends EstacaoInfoClp {
-    // ----- Descrição do bloco do Andar 1 do pedido -----
-    // Cor do bloco do andar 1 (0-VAZIO, 1-PRETO, 2-VERMELHO, 3-AZUL).
-    private int cor_Andar_1;
-    // Posição no magazine de estoque de onde o bloco do andar 1 deve ser retirado.
-    private int posicao_Estoque_Andar_1;
-    // Cor da 1ª lâmina do andar 1.
-    private int cor_Lamina_1_Andar_1;
-    // Cor da 2ª lâmina do andar 1.
-    private int cor_Lamina_2_Andar_1;
-    // Cor da 3ª lâmina do andar 1.
-    private int cor_Lamina_3_Andar_1;
-    // Padrão de usinagem da 1ª lâmina do andar 1.
-    private int padrao_Lamina_1_Andar_1;
-    // Padrão de usinagem da 2ª lâmina do andar 1.
-    private int padrao_Lamina_2_Andar_1;
-    // Padrão de usinagem da 3ª lâmina do andar 1.
-    private int padrao_Lamina_3_Andar_1;
-    // Tipo de processamento a aplicar no bloco do andar 1.
-    private int processamento_Andar_1;
-
-    // ----- Descrição do bloco do Andar 2 do pedido -----
-    // Cor do bloco do andar 2 (0-VAZIO, 1-PRETO, 2-VERMELHO, 3-AZUL).
-    private int cor_Andar_2;
-    // Posição no magazine de estoque de onde o bloco do andar 2 deve ser retirado.
-    private int posicao_Estoque_Andar_2;
-    // Cor da 1ª lâmina do andar 2.
-    private int cor_Lamina_1_Andar_2;
-    // Cor da 2ª lâmina do andar 2.
-    private int cor_Lamina_2_Andar_2;
-    // Cor da 3ª lâmina do andar 2.
-    private int cor_Lamina_3_Andar_2;
-    // Padrão de usinagem da 1ª lâmina do andar 2.
-    private int padrao_Lamina_1_Andar_2;
-    // Padrão de usinagem da 2ª lâmina do andar 2.
-    private int padrao_Lamina_2_Andar_2;
-    // Padrão de usinagem da 3ª lâmina do andar 2.
-    private int padrao_Lamina_3_Andar_2;
-    // Tipo de processamento a aplicar no bloco do andar 2.
-    private int processamento_Andar_2;
-
-    // ----- Descrição do bloco do Andar 3 do pedido -----
-    // Cor do bloco do andar 3 (0-VAZIO, 1-PRETO, 2-VERMELHO, 3-AZUL).
-    private int cor_Andar_3;
-    // Posição no magazine de estoque de onde o bloco do andar 3 deve ser retirado.
-    private int posicao_Estoque_Andar_3;
-    // Cor da 1ª lâmina do andar 3.
-    private int cor_Lamina_1_Andar_3;
-    // Cor da 2ª lâmina do andar 3.
-    private int cor_Lamina_2_Andar_3;
-    // Cor da 3ª lâmina do andar 3.
-    private int cor_Lamina_3_Andar_3;
-    // Padrão de usinagem da 1ª lâmina do andar 3.
-    private int padrao_Lamina_1_Andar_3;
-    // Padrão de usinagem da 2ª lâmina do andar 3.
-    private int padrao_Lamina_2_Andar_3;
-    // Padrão de usinagem da 3ª lâmina do andar 3.
-    private int padrao_Lamina_3_Andar_3;
-    // Tipo de processamento a aplicar no bloco do andar 3.
-    private int processamento_Andar_3;
+    private int corAndar1;
+    private int posicaoEstoqueAndar1;
+    private int corLamina1Andar1;
+    private int corLamina2Andar1;
+    private int corLamina3Andar1;
+    private int padraoLamina1Andar1;
+    private int padraoLamina2Andar1;
+    private int padraoLamina3Andar1;
+    private int processamentoAndar1;
+    private int corAndar2;
+    private int posicaoEstoqueAndar2;
+    private int corLamina1Andar2;
+    private int corLamina2Andar2;
+    private int corLamina3Andar2;
+    private int padraoLamina1Andar2;
+    private int padraoLamina2Andar2;
+    private int padraoLamina3Andar2;
+    private int processamentoAndar2;
+    private int corAndar3;
+    private int posicaoEstoqueAndar3;
+    private int corLamina1Andar3;
+    private int corLamina2Andar3;
+    private int corLamina3Andar3;
+    private int padraoLamina1Andar3;
+    private int padraoLamina2Andar3;
+    private int padraoLamina3Andar3;
+    private int processamentoAndar3;
+    private int numeroPedido;
+    private int posicaoExpedicao;
 
     // Número do pedido associado às informações de andares acima.
     private int numeroPedidoEst;

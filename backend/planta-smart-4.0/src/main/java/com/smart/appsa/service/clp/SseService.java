@@ -14,15 +14,19 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.mapper.ClpStreamMapper;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
+import com.smart.appsa.model.clp.InfoPedidoReadClp;
 import com.smart.appsa.model.clp.MontagemInfo;
 import com.smart.appsa.model.clp.ProcessoInfo;
 import com.smart.appsa.model.enums.Estacao;
+
+import lombok.RequiredArgsConstructor;
 
 // Camada SSE no padrão Observer. É notificada (via {@link #publicar(Estacao)}) ao final de
 // cada ciclo de leitura de um CLP, monta o DTO da estação e <b>só emite quando o conteúdo
 // mudou</b> em relação ao último ciclo. Uma única conexão pode receber eventos de várias
 // estações (multiplexação): cada evento é nomeado pelo {@code nome} da estação.
 @Service
+@RequiredArgsConstructor
 public class SseService {
 
     // Um assinante e o conjunto de estações que ele quer receber.
@@ -36,18 +40,8 @@ public class SseService {
     private final ProcessoInfo processoInfo;
     private final MontagemInfo montagemInfo;
     private final ExpedicaoInfoClp expedicaoInfo;
+    private final InfoPedidoReadClp infoPedidoReadClp;
     private final AppStateConfig appState;
-
-    public SseService(EstoqueInfoClp estoqueInfo, ProcessoInfo processoInfo,
-                      MontagemInfo montagemInfo, ExpedicaoInfoClp expedicaoInfo,
-                      AppStateConfig appState) {
-        this.estoqueInfo = estoqueInfo;
-        this.processoInfo = processoInfo;
-        this.montagemInfo = montagemInfo;
-        this.expedicaoInfo = expedicaoInfo;
-        this.appState = appState;
-    }
-    
     public SseEmitter subscribe(Set<Estacao> estacoes) {
         SseEmitter emitter = new SseEmitter(0L); // sem timeout
         Subscriber sub = new Subscriber(emitter, Set.copyOf(estacoes));
