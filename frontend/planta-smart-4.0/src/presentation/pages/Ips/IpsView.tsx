@@ -22,6 +22,7 @@ export default function IpsView() {
     conectar,
     desconectar,
     toggleReadOnly,
+    toggleSeletorDeTampas,
     dismissErro,
     dismissSucesso,
     monitor, 
@@ -103,6 +104,18 @@ export default function IpsView() {
             />
             <span className={styles.readOnlyLabel}>
               Modo readOnly
+            </span>
+          </label>
+
+          <label className={styles.readOnlyRow}>
+            <input
+              type="checkbox"
+              className={styles.readOnlyCheckbox}
+              checked={model.hasSeletorDeTampas}
+              onChange={(e) => toggleSeletorDeTampas(e.target.checked)}
+            />
+            <span className={styles.readOnlyLabel}>
+              Seletor de tampas
             </span>
           </label>
 

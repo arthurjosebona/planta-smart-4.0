@@ -32,6 +32,16 @@ export function useIpsViewModel() {
       });
   }, []);
 
+  // Sincroniza o estado inicial do seletor de tampas com o backend ao montar.
+  useEffect(() => {
+    conexaoService
+      .getSeletorDeTampas()
+      .then((hasSeletorDeTampas) => setModel((s) => ({ ...s, hasSeletorDeTampas })))
+      .catch(() => {
+        /* mantém o padrão (false) caso o backend esteja indisponível */
+      });
+  }, []);
+
   async function toggleReadOnly(value: boolean) {
     const anterior = model.readOnly;
     // Atualização otimista — reverte se a chamada falhar.
@@ -43,6 +53,21 @@ export function useIpsViewModel() {
         ...s,
         readOnly: anterior,
         erro: 'Não foi possível alterar o modo somente-leitura.',
+      }));
+    }
+  }
+
+  async function toggleSeletorDeTampas(value: boolean) {
+    const anterior = model.hasSeletorDeTampas;
+    // Atualização otimista — reverte se a chamada falhar.
+    setModel((s) => ({ ...s, hasSeletorDeTampas: value, erro: null }));
+    try {
+      await conexaoService.setSeletorDeTampas(value);
+    } catch {
+      setModel((s) => ({
+        ...s,
+        hasSeletorDeTampas: anterior,
+        erro: 'Não foi possível alterar o seletor de tampas.',
       }));
     }
   }
@@ -162,6 +187,7 @@ export function useIpsViewModel() {
     conectar,
     desconectar,
     toggleReadOnly,
+    toggleSeletorDeTampas,
     dismissErro,
     dismissSucesso,
     monitor,

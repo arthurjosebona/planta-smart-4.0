@@ -3,6 +3,7 @@ import { IConexaoRepository } from '@repositories/IConexaoRepository';
 import { ModuloIP } from '@entities/ModuloIP';
 import { ClpPingResponseDTO } from '@dtos/response/ClpPingResponseDTO';
 import { ClpReadOnlyResponseDTO } from '@dtos/response/ClpReadOnlyResponseDTO';
+import { ClpHasSeletorDeTampasResponseDTO } from '@dtos/response/ClpHasSeletorDeTampasResponseDTO';
 import { StartReadingsResponseDTO } from '@dtos/response/StartReadingsResponseDTO';
 import { ConexaoMapper } from '../mappers/ConexaoMapper';
 
@@ -44,5 +45,16 @@ export class ConexaoRepository implements IConexaoRepository {
     // Rota: GET /api/smart/readonly → { readOnly: boolean }
     const dto = await this.httpClient.get<ClpReadOnlyResponseDTO>('/api/smart/readonly');
     return dto.readOnly;
+  }
+
+  async setSeletorDeTampas(value: boolean): Promise<void> {
+    // Rota: POST /api/smart/seletor-de-tampas?value=true|false — valor via query param, sem body
+    await this.httpClient.post<void>(`/api/smart/seletor-de-tampas?value=${value}`, {});
+  }
+
+  async getSeletorDeTampas(): Promise<boolean> {
+    // Rota: GET /api/smart/seletor-de-tampas → { hasSeletorDeTampas: boolean }
+    const dto = await this.httpClient.get<ClpHasSeletorDeTampasResponseDTO>('/api/smart/seletor-de-tampas');
+    return dto.hasSeletorDeTampas;
   }
 }

@@ -76,6 +76,14 @@ export class ConexaoService {
     return this.repository.getReadOnly();
   }
 
+  async setSeletorDeTampas(value: boolean): Promise<void> {
+    return this.repository.setSeletorDeTampas(value);
+  }
+
+  async getSeletorDeTampas(): Promise<boolean> {
+    return this.repository.getSeletorDeTampas();
+  }
+
   private setConectado(value: boolean): void {
     if (this.conectado === value) return;
     this.conectado = value;

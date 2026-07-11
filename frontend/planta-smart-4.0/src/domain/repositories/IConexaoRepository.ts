@@ -9,4 +9,6 @@ export interface IConexaoRepository {
   pingAll(): Promise<ClpPingResponseDTO[]>;
   setReadOnly(value: boolean): Promise<void>;
   getReadOnly(): Promise<boolean>;
+  setSeletorDeTampas(value: boolean): Promise<void>;
+  getSeletorDeTampas(): Promise<boolean>;
 }
