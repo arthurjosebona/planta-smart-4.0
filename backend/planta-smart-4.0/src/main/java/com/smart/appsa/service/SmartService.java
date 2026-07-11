@@ -10,12 +10,10 @@ import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
-import com.smart.appsa.events.UpdateExpedicaoEvent;
 import com.smart.appsa.exception.ClpComunicacaoException;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +30,6 @@ import java.util.Map;
 public class SmartService {
     private final PlcConnectionService plcConnectionService;
     private final AppStateConfig appStateConfig;
-    private final ApplicationEventPublisher eventPublisher;
     
     public void enviarParaProducao(PedidoConfigDTO config, PedidoInfoDTO detalhes) {
         // 1. Converter o DTO para um bloco de bytes (byte[])
@@ -52,7 +49,7 @@ public class SmartService {
             // 3. Escrever bloco de bytes no CLP (ex: a partir da DB19, offset 2)
             connector.writeBlock(9, 2, 60, buffer);
             System.out.println("Dados enviados para o CLP: " + config.getIpClp());
-            enviarTampa(config.getTampaPedido());
+            if (appStateConfig.isHasSeletorDeTampas()) enviarTampa(config.getTampaPedido());
             iniciarExecucaoPedido(config.getIpClp());
 
         } catch (Exception ex) {

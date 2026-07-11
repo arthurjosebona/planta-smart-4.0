@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
+import com.smart.appsa.dto.clp.ClpHasSeletorDeTampasDTO;
 import com.smart.appsa.dto.clp.ClpReadOnlyDTO;
 import com.smart.appsa.dto.clp.ClpStatusPingDTO;
 import com.smart.appsa.dto.clp.StartReadingsResponseDTO;
@@ -150,4 +151,17 @@ public class SmartController {
     public ResponseEntity<ClpReadOnlyDTO> getReadOnly() {
         return ResponseEntity.ok(ClpReadOnlyDTO.builder().readOnly(appStateConfig.isReadOnly()).build());
     }
+
+    @PostMapping("/seletor-de-tampas")
+    public ResponseEntity<String> setSeletorDeTampas(@RequestParam boolean value) {
+        appStateConfig.setHasSeletorDeTampas(value);
+        return ResponseEntity.ok("Seletor de tampas: " + value);
+    }
+
+    @GetMapping("/seletor-de-tampas")
+    public ResponseEntity<ClpHasSeletorDeTampasDTO> getSeletorDeTampas() {
+        return ResponseEntity.ok(ClpHasSeletorDeTampasDTO.builder().hasSeletorDeTampas(appStateConfig.isHasSeletorDeTampas()).build());
+    }
+
+
 }

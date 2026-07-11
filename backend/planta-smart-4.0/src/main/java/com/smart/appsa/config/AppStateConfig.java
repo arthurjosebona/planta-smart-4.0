@@ -23,6 +23,9 @@ public class AppStateConfig {
     private volatile boolean aux_expedicao;
     private volatile int posicaoExpedicaoSolicitada;
 
+    // Flag global para garantir que não tente conectar com o seletor de tampas se não houver
+    private volatile boolean hasSeletorDeTampas = false;
+
     // Sempre em UTC (ver EstoqueComm#confirmarInicioPedido). O frontend precisa
     // interpretar essa string como UTC, já que LocalDateTime não carrega zona.
     private volatile LocalDateTime registroInicioPedido;

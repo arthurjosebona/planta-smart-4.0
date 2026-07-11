@@ -2,8 +2,9 @@ package com.smart.appsa.model.clp;
 
 import org.springframework.stereotype.Component;
 
+import com.smart.appsa.config.AppStateConfig;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 // Estado da estação EXPEDIÇÃO (CLP 4) lido do DB9.
@@ -13,9 +14,13 @@ import lombok.Setter;
 // adição/remoção de pedidos finalizados.
 @Getter
 @Setter
-@NoArgsConstructor
 @Component
 public class ExpedicaoInfoClp extends EstacaoInfoClp {
+
+    public ExpedicaoInfoClp(AppStateConfig appStateConfig) {
+        super(appStateConfig);
+    }
+
     // Confirmação (Node -> CLP) de que a aplicação tratou a última adição/remoção na expedição.
     boolean recebidoExpedicao;
     // Solicita ao CLP que inicie a rotina de guardar o bloco na posição informada.

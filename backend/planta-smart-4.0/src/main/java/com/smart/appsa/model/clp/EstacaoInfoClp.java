@@ -1,9 +1,7 @@
 package com.smart.appsa.model.clp;
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.smart.appsa.config.AppStateConfig;
-import com.smart.appsa.model.enums.Estacao;
 import com.smart.appsa.model.enums.StatusEstacao;
 
 import lombok.Getter;

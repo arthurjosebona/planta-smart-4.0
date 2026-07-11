@@ -2,8 +2,9 @@ package com.smart.appsa.model.clp;
 
 import org.springframework.stereotype.Component;
 
+import com.smart.appsa.config.AppStateConfig;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 // Estado da estação ESTOQUE (CLP 1) lido do DB9.
@@ -14,8 +15,12 @@ import lombok.Setter;
 @Component
 @Getter
 @Setter
-@NoArgsConstructor
 public class EstoqueInfoClp extends EstacaoInfoClp {
+
+    public EstoqueInfoClp(AppStateConfig appStateConfig) {
+        super(appStateConfig);
+    }
+
     private int corAndar1;
     private int posicaoEstoqueAndar1;
     private int corLamina1Andar1;
