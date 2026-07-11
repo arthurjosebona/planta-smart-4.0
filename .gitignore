@@ -36,6 +36,5 @@ build/
 .env
 
 build.log
-CLAUDE.md
 *.log
 *.zip
