@@ -60,7 +60,9 @@ export function ClpStationCard({ label, color, data, online }: ClpStationCardPro
             ]}
           />
 
-          {data.estacao === 'estoque' && <EstoqueFields data={data} />}
+          {data.estacao === 'estoque' && (
+            <EstoqueFields data={data} />
+          )}
           {data.estacao === 'processo' && (
             <ProcessoFields data={data} />
           )}

@@ -1,6 +1,7 @@
 import type { MonitorModel } from '@pages/Monitor/MonitorModel';
 import type { PingMap } from '@contexts/PingContext';
 import { ClpStationCard } from '@components/organisms/ClpStationCard/ClpStationCard';
+import { InfoPedidoCard } from '@components/organisms/InfoPedidoCard/InfoPedidoCard';
 import styles from './clpMonitorGrid.module.css';
 
 const STATIONS = [
@@ -27,6 +28,9 @@ export function ClpMonitorGrid({ model, pingMap }: ClpMonitorGridProps) {
           online={pingMap[key]}
         />
       ))}
+      <div className={styles.pedidoRow}>
+        <InfoPedidoCard data={model.estoque} />
+      </div>
     </div>
   );
 }
