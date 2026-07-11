@@ -1,11 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StoreModel, StoreModelInitial } from '@pages/Ips/IpsModel';
 import { conexaoService } from '@config/diContainer';
 import { useStatusContext } from '@contexts/StatusContext';
+import { EstacaoStatusModule, IntToEstacaoStatusModule } from '@enums/EstacaoStatusModule';
+import { Estacao } from '@enums/Estacao';
+import { useMonitorContext } from '@contexts/MonitorContext';
+import { usePingContext } from '@contexts/PingContext';
+import { EstacaoStatusPipe } from '@enums/EstacaoStatusPipe';
+
+
+function computePipelineStatus(online: boolean, pausado: boolean): EstacaoStatusPipe {
+  if (online) return EstacaoStatusPipe.Ligado;
+  if (pausado) return EstacaoStatusPipe.Ocupado;
+  return EstacaoStatusPipe.Desligado;
+}
 
 export function useIpsViewModel() {
   const [model, setModel] = useState<StoreModel>(StoreModelInitial);
   const { conectado } = useStatusContext();
+  const monitor = useMonitorContext();
+  const { pingMap } = usePingContext();
+  const hasEverConnected = useRef(false);
 
   // Sincroniza o estado inicial do readOnly com o backend ao montar.
   useEffect(() => {
@@ -118,6 +133,27 @@ export function useIpsViewModel() {
     setModel((s) => ({ ...s, sucesso: null }));
   }
 
+  const statusEstacoes: Record<Estacao, EstacaoStatusModule> = conectado ? {
+    [Estacao.Estoque]: IntToEstacaoStatusModule[monitor.estoque?.statusEstoque ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Processo]: IntToEstacaoStatusModule[monitor.estoque?.statusProcesso ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Montagem]: IntToEstacaoStatusModule[monitor.estoque?.statusMontagem ?? 0] ?? EstacaoStatusModule.Aguardando,
+    [Estacao.Expedicao]: IntToEstacaoStatusModule[monitor.estoque?.statusExpedicao ?? 0] ?? EstacaoStatusModule.Aguardando,
+  } : {
+    [Estacao.Estoque]: EstacaoStatusModule.Desligado,
+    [Estacao.Processo]: EstacaoStatusModule.Desligado,
+    [Estacao.Montagem]: EstacaoStatusModule.Desligado,
+    [Estacao.Expedicao]: EstacaoStatusModule.Desligado,
+  };
+
+  const pausado = !conectado && hasEverConnected.current;
+
+  const statusPipelines: Record<Estacao, EstacaoStatusPipe> = {
+    [Estacao.Estoque]: computePipelineStatus(!!pingMap.estoque, pausado),
+    [Estacao.Processo]: computePipelineStatus(!!pingMap.processo, pausado),
+    [Estacao.Montagem]: computePipelineStatus(!!pingMap.montagem, pausado),
+    [Estacao.Expedicao]: computePipelineStatus(!!pingMap.expedicao, pausado),
+  };
+
   return {
     model,
     conectado,
@@ -128,5 +164,8 @@ export function useIpsViewModel() {
     toggleReadOnly,
     dismissErro,
     dismissSucesso,
+    monitor,
+    statusEstacoes,
+    statusPipelines,
   };
 }

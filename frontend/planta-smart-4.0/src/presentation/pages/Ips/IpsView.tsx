@@ -3,6 +3,7 @@ import { AppTemplate } from '@components/template/AppTemplate';
 import { FeedbackBanner } from '@components/atoms/FeedbackBanner/FeedbackBanner';
 import styles from './ipsView.module.css';
 import image from '@assets/bancada/Smart40.png';
+import { Estacoes } from '@components/organisms/EstacoesSection/EstacoesSection';
 
 
 const MODULE_CLASSES: Record<string, string> = {
@@ -23,6 +24,9 @@ export default function IpsView() {
     toggleReadOnly,
     dismissErro,
     dismissSucesso,
+    monitor, 
+    statusEstacoes, 
+    statusPipelines,
   } = useIpsViewModel();
 
   return (
@@ -124,13 +128,7 @@ export default function IpsView() {
         </section>
 
         {/* ── Painel direito ── */}
-        <aside className={styles.bancada}>
-          <img
-            src={image}
-            alt="Bancada Smart 4.0"
-            className={styles.bancadaImg}
-          />
-        </aside>
+        <Estacoes status={monitor} statusEstacoes={statusEstacoes} statusPipelines={statusPipelines} />
 
       </main>
     </AppTemplate>
