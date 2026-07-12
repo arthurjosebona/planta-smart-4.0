@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { MonitorModel, MonitorModelInitial } from '@pages/Monitor/MonitorModel';
 import { EstoqueStreamDTO } from '@dtos/response/stream/EstoqueStreamDTO';
-import { ProcessoMontagemStreamDTO } from '@dtos/response/stream/ProcessoMontagemStreamDTO';
+import { ProcessoMontagemStreamDTO } from '@dtos/response/stream/ProcessoStreamDTO';
 import { ExpedicaoStreamDTO } from '@dtos/response/stream/ExpedicaoStreamDTO';
 import { EstacaoStreamMapper } from '@mappers/EstacaoStreamMapper';
 

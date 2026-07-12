@@ -1,7 +1,7 @@
 import { StatusEstacao } from "@enums/StatusEstacao";
 
-export interface ProcessoMontagemStream {
-  estacao: 'processo' | 'montagem';
+export interface MontagemStream {
+  estacao: 'montagem';
   status: StatusEstacao;
   numeroOP: number;
   ocupado: boolean;
@@ -13,4 +13,8 @@ export interface ProcessoMontagemStream {
   finishOP: boolean;
   cancelOP: boolean;
   statusBancada: number;
+  supervisorioEstoque: string;
+  supervisorioProcesso: string;
+  supervisorioMontagem: string;
+  supervisorioExpedicao: string;
 }

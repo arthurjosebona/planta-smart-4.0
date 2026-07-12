@@ -1,5 +1,5 @@
-export interface ProcessoMontagemStreamDTO {
-  estacao: 'processo' | 'montagem';
+export interface ProcessoStreamDTO {
+  estacao: 'processo';
   status: string;
   numeroOP: number;
   ocupado: boolean;
