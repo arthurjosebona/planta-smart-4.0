@@ -2,8 +2,12 @@ package com.smart.appsa.service;
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
@@ -11,6 +15,7 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.config.ClpIpConfig;
 import com.smart.appsa.dto.request.EstoqueRequestDTO;
 import com.smart.appsa.dto.response.EstoqueResponseDTO;
+import com.smart.appsa.events.UpdateAllEstoqueEvent;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.mapper.EstoqueMapper;
 import com.smart.appsa.model.Estoque;
@@ -35,6 +40,7 @@ public class EstoqueService {
     private final PlcConnectionService plcConnectionService;
     private final ClpIpConfig clpIpConfig;
     private final AppStateConfig appStateConfig;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public List<EstoqueResponseDTO> findAll() {
@@ -94,6 +100,12 @@ public class EstoqueService {
         for (EstoqueRequestDTO e : estoque) {
             assignBlockColor(e.id(), e.corEstoque());
         }
+        eventPublisher.publishEvent(new UpdateAllEstoqueEvent(this));
+    }
+
+    @Async("appTaskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onUpdateEstoqueEvent(UpdateAllEstoqueEvent event) {
         escreverEstoqueNoClp();
     }
 

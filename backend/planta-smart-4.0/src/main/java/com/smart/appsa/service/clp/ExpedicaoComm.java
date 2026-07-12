@@ -400,7 +400,7 @@ public class ExpedicaoComm implements PlcDataObserver {
     //     }
     // }
 
-    @Async("plcWriteExpedicaoExecutor")
+    @Async("appTaskExecutor")
     @EventListener
     public void atualizarPosicaoExpedicao(UpdateExpedicaoEvent event) {
         System.out.println("Evento de atualizar posição expedição");
