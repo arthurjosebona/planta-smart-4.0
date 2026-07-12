@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.smart.appsa.clpcomm.PlcConnectionService;
 import com.smart.appsa.clpcomm.PlcConnector;
 import com.smart.appsa.config.AppStateConfig;
-import com.smart.appsa.model.clp.ProcessoInfo;
+import com.smart.appsa.model.clp.ProcessoInfoClp;
 import com.smart.appsa.service.PedidoService;
 import com.smart.appsa.service.clp.reader.PlcDataObserver;
 
@@ -31,7 +31,7 @@ public class ProcessoComm implements PlcDataObserver {
     private static final int BIT_RECEBIDO_OP = 0;
 
     private PlcConnectionService plcConnectionService;
-    private ProcessoInfo processoInfo;
+    private ProcessoInfoClp processoInfo;
     private AppStateConfig appStateConfig;
     private PedidoService pedidoService;
 

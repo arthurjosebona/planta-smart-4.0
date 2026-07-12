@@ -14,9 +14,8 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.mapper.ClpStreamMapper;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
-import com.smart.appsa.model.clp.InfoPedidoReadClp;
-import com.smart.appsa.model.clp.MontagemInfo;
-import com.smart.appsa.model.clp.ProcessoInfo;
+import com.smart.appsa.model.clp.MontagemInfoClp;
+import com.smart.appsa.model.clp.ProcessoInfoClp;
 import com.smart.appsa.model.enums.Estacao;
 
 import lombok.RequiredArgsConstructor;
@@ -37,11 +36,11 @@ public class SseService {
     private final Map<Estacao, Object> ultimoDto = new ConcurrentHashMap<>();
 
     private final EstoqueInfoClp estoqueInfo;
-    private final ProcessoInfo processoInfo;
-    private final MontagemInfo montagemInfo;
+    private final ProcessoInfoClp processoInfo;
+    private final MontagemInfoClp montagemInfo;
     private final ExpedicaoInfoClp expedicaoInfo;
-    private final InfoPedidoReadClp infoPedidoReadClp;
     private final AppStateConfig appState;
+
     public SseEmitter subscribe(Set<Estacao> estacoes) {
         SseEmitter emitter = new SseEmitter(0L); // sem timeout
         Subscriber sub = new Subscriber(emitter, Set.copyOf(estacoes));
@@ -77,8 +76,8 @@ public class SseService {
     private Object build(Estacao estacao) {
         return switch (estacao) {
             case ESTOQUE -> ClpStreamMapper.toEstoqueDTO(estoqueInfo, appState);
-            case PROCESSO -> ClpStreamMapper.toEstacaoDTO(estacao, processoInfo, appState.getStatusProcesso());
-            case MONTAGEM -> ClpStreamMapper.toEstacaoDTO(estacao, montagemInfo, appState.getStatusMontagem());
+            case PROCESSO -> ClpStreamMapper.toProcessoDTO(estacao, processoInfo, appState.getStatusProcesso());
+            case MONTAGEM -> ClpStreamMapper.toMontagemDTO(estacao, montagemInfo, appState);
             case EXPEDICAO -> ClpStreamMapper.toExpedicaoDTO(expedicaoInfo, appState);
         };
     }

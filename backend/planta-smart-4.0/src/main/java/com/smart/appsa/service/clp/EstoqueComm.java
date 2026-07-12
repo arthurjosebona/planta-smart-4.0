@@ -11,7 +11,6 @@ import com.smart.appsa.config.AppStateConfig;
 import com.smart.appsa.exception.core.ResourceNotFoundException;
 import com.smart.appsa.model.Estoque;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
-import com.smart.appsa.model.clp.InfoPedidoReadClp;
 import com.smart.appsa.model.enums.CorEstoque;
 import com.smart.appsa.service.EstoqueService;
 import com.smart.appsa.service.PedidoService;
@@ -52,7 +51,6 @@ public class EstoqueComm implements PlcDataObserver {
 
     private PlcConnectionService plcConnectionService;
     private EstoqueInfoClp estoqueInfoClp;
-    private InfoPedidoReadClp infoPedidoReadClp;
     private AppStateConfig appStateConfig;
     private EstoqueService estoqueService;
     private PedidoService pedidoService;

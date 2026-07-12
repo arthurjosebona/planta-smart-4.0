@@ -23,7 +23,7 @@ import com.smart.appsa.dto.clp.PedidoConfigDTO;
 import com.smart.appsa.dto.clp.PedidoInfoDTO;
 import com.smart.appsa.exception.ClpComunicacaoException;
 import com.smart.appsa.exception.EsteiraDesativadaException;
-import com.smart.appsa.model.clp.MontagemInfo;
+import com.smart.appsa.model.clp.MontagemInfoClp;
 
 @ExtendWith(MockitoExtension.class)
 public class SmartServiceTest {
@@ -33,7 +33,7 @@ public class SmartServiceTest {
     @Mock
     private AppStateConfig appStateConfig;
     @Mock
-    private MontagemInfo montagemInfo;
+    private MontagemInfoClp montagemInfo;
     @Mock
     private PlcConnector plcConnector;
 

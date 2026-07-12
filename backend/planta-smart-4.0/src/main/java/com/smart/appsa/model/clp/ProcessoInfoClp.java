@@ -4,20 +4,20 @@ import org.springframework.stereotype.Component;
 
 import com.smart.appsa.config.AppStateConfig;
 
-// Estado da estação MONTAGEM (CLP 3) lido do DB57.
+// Estado da estação PROCESSO (CLP 2) lido do DB2.
 //
-// <p>A montagem só expõe as flags comuns de operação e estado herdadas de
+// <p>O processo só expõe as flags comuns de operação e estado herdadas de
 // {@link EstacaoInfoClp} (recebidoOp, start/finish/cancelOP, ocupado, etc.);
 // por isso não acrescenta atributos próprios.
 @Component
-public class MontagemInfo extends EstacaoInfoClp {
+public class ProcessoInfoClp extends EstacaoInfoClp {
 
-    public MontagemInfo(AppStateConfig appStateConfig) {
+    public ProcessoInfoClp(AppStateConfig appStateConfig) {
         super(appStateConfig);
     }
 
     @Override
     protected byte getStatusByte() {
-        return appStateConfig.getStatusMontagem();
+        return appStateConfig.getStatusProcesso();
     }
 }

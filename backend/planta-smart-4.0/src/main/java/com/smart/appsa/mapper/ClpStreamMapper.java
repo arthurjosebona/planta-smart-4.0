@@ -4,23 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.smart.appsa.config.AppStateConfig;
-import com.smart.appsa.dto.clp.stream.EstacaoStreamDTO;
 import com.smart.appsa.dto.clp.stream.EstoqueStreamDTO;
 import com.smart.appsa.dto.clp.stream.ExpedicaoStreamDTO;
+import com.smart.appsa.dto.clp.stream.MontagemStreamDTO;
+import com.smart.appsa.dto.clp.stream.ProcessoStreamDTO;
 import com.smart.appsa.model.clp.EstacaoInfoClp;
 import com.smart.appsa.model.clp.EstoqueInfoClp;
 import com.smart.appsa.model.clp.ExpedicaoInfoClp;
+import com.smart.appsa.model.clp.MontagemInfoClp;
 import com.smart.appsa.model.enums.Estacao;
 
-// Converte os modelos parseados dos CLPs ({@code *InfoClp}) nos DTOs de stream.
 public final class ClpStreamMapper {
 
     private ClpStreamMapper() {
     }
 
-    // Estações sem payload específico (PROCESSO e MONTAGEM).
-    public static EstacaoStreamDTO toEstacaoDTO(Estacao estacao, EstacaoInfoClp info, int statusBancada) {
-        return new EstacaoStreamDTO(
+    public static ProcessoStreamDTO toProcessoDTO(Estacao estacao, EstacaoInfoClp info, int statusBancada) {
+        return new ProcessoStreamDTO(
                 estacao.getNome(),
                 info.getStatus(),
                 info.getNumeroOP(),
@@ -33,6 +33,28 @@ public final class ClpStreamMapper {
                 info.isFinishOP(),
                 info.isCancelOP(),
                 statusBancada);
+    }
+
+    public static MontagemStreamDTO toMontagemDTO(Estacao estacao, MontagemInfoClp info, AppStateConfig state) {
+        return MontagemStreamDTO.builder()
+                .estacao(estacao.getNome())
+                .status(info.getStatus())
+                .numeroOP(info.getNumeroOP())
+                .ocupado(info.isOcupado())
+                .aguardando(info.isAguardando())
+                .manual(info.isManual())
+                .emergencia(info.isEmergencia())
+                .recebidoOp(info.isRecebidoOp())
+                .startOP(info.isStartOP())
+                .finishOP(info.isFinishOP())
+                .cancelOP(info.isCancelOP())
+                .statusBancada(state.getStatusMontagem())
+                .supervisorioEstoque(info.getSupervisorioEstoque())
+                .supervisorioProcesso(info.getSupervisorioProcesso())
+                .supervisorioMontagem(info.getSupervisorioMontagem())
+                .supervisorioExpedicao(info.getSupervisorioExpedicao())
+                .statusBancada(state.getStatusMontagem())
+                .build();
     }
 
     public static EstoqueStreamDTO toEstoqueDTO(EstoqueInfoClp info, AppStateConfig s) {
