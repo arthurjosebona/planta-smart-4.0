@@ -141,13 +141,20 @@ function MontagemFields ({ data }: {data: MontagemStream}) {
         <ClpValueField label="statusBancada" value={data.statusBancada} />
       </div>
       <div className={styles.values}>
-        <ClpValueField label="supervisorioEstoque" value={data.supervisorioEstoque} />
-        <ClpValueField label="supervisorioProcesso" value={data.supervisorioProcesso} />
-        <ClpValueField label="supervisorioMontagem" value={data.supervisorioMontagem} />
-        <ClpValueField label="supervisorioExpedicao" value={data.supervisorioExpedicao} />
+        <ClpValueField label="supervisorioEstoque" value={formatSupervisorio(data.supervisorioEstoque)} />
+        <ClpValueField label="supervisorioProcesso" value={formatSupervisorio(data.supervisorioProcesso)} />
+        <ClpValueField label="supervisorioMontagem" value={formatSupervisorio(data.supervisorioMontagem)} />
+        <ClpValueField label="supervisorioExpedicao" value={formatSupervisorio(data.supervisorioExpedicao)} />
       </div>
     </>
   )
+}
+
+function formatSupervisorio(value: string | null | undefined): string {
+  if (value == null) return '-';
+  const trimmed = value.trim();
+  if (trimmed === '' || trimmed.toLowerCase() === 'null') return '-';
+  return trimmed;
 }
 
 function ExpedicaoFields({ data }: { data: ExpedicaoStream }) {

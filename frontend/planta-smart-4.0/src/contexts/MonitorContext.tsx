@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { MonitorModel, MonitorModelInitial } from '@pages/Monitor/MonitorModel';
 import { EstoqueStreamDTO } from '@dtos/response/stream/EstoqueStreamDTO';
-import { ProcessoMontagemStreamDTO } from '@dtos/response/stream/ProcessoStreamDTO';
 import { ExpedicaoStreamDTO } from '@dtos/response/stream/ExpedicaoStreamDTO';
 import { EstacaoStreamMapper } from '@mappers/EstacaoStreamMapper';
+import { ProcessoStreamDTO } from '@dtos/response/stream/ProcessoStreamDTO';
+import { MontagemStreamDTO } from '@dtos/response/stream/MontagemStreamDTO';
 
 const SSE_URL = import.meta.env.VITE_BASE_URL + '/api/smart/stream';
 
@@ -31,8 +32,8 @@ export function MonitorProvider({ children }: { children: ReactNode }) {
 
     source.addEventListener('processo', (e) => {
       try {
-        const dto = JSON.parse((e as MessageEvent).data) as ProcessoMontagemStreamDTO;
-        setState((s) => ({ ...s, processo: EstacaoStreamMapper.mapProcessoMontagemByDTO(dto) }));
+        const dto = JSON.parse((e as MessageEvent).data) as ProcessoStreamDTO;
+        setState((s) => ({ ...s, processo: EstacaoStreamMapper.mapProcessoByDTO(dto) }));
       } catch (err) {
         console.error('Erro ao parsear evento processo:', err);
       }
@@ -40,8 +41,8 @@ export function MonitorProvider({ children }: { children: ReactNode }) {
 
     source.addEventListener('montagem', (e) => {
       try {
-        const dto = JSON.parse((e as MessageEvent).data) as ProcessoMontagemStreamDTO;
-        setState((s) => ({ ...s, montagem: EstacaoStreamMapper.mapProcessoMontagemByDTO(dto) }));
+        const dto = JSON.parse((e as MessageEvent).data) as MontagemStreamDTO;
+        setState((s) => ({ ...s, montagem: EstacaoStreamMapper.mapMontagemByDTO(dto) }));
       } catch (err) {
         console.error('Erro ao parsear evento montagem:', err);
       }
