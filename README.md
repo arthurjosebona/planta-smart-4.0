@@ -122,3 +122,17 @@ Pela Swagger UI é possível visualizar e **testar** cada endpoint diretamente n
   <a href="https://www.linkedin.com/in/arthur-jos%C3%A9-bona-3089283a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
   <a href="https://github.com/arthurjosebona"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" /></a>
 </p>
+
+<p align="center">
+  <b>Iago Carrera - Desenvolvedor Fullstack</b>  
+  <br/>
+  <a href="https://www.linkedin.com/in/iago-carrera"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="https://github.com/IagoCarrera"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" /></a>
+</p>
+
+<p align="center">
+  <b>Djúlia Sabrina Preti - Desenvolvedora Fullstack</b>  
+  <br/>
+  <a href="https://www.linkedin.com/in/djúlia-sabrina-preti-62958a267"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="https://github.com/Djulia-Preti"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" /></a>
+</p>
