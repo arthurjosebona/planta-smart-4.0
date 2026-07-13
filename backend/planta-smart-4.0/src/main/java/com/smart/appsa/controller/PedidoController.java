@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smart.appsa.dto.request.PedidoRequestDTO;
 import com.smart.appsa.dto.response.PedidoResponseDTO;
 import com.smart.appsa.service.PedidoService;
+import com.smart.appsa.service.ProducaoListService;
 
 import lombok.RequiredArgsConstructor;
 @RestController
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PedidoController {
     private final PedidoService pedidoService;
+    private final ProducaoListService producaoListService;
 
 
     @PostMapping("")
@@ -45,10 +47,15 @@ public class PedidoController {
     }
 
     @PutMapping("/start-production/{id}")
-    public ResponseEntity<PedidoResponseDTO> startProduction(@PathVariable Long id) {
-        return ResponseEntity.ok(pedidoService.startProduction(id));
+    public ResponseEntity<Void> startProduction(@PathVariable Long id) {
+        producaoListService.addOrder(id);
+        return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/production-queue") 
+    public ResponseEntity<List<Long>> getQueue() {
+        return ResponseEntity.ok(producaoListService.filaAtual());
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
