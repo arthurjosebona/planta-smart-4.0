@@ -138,12 +138,6 @@ function MontagemFields ({ data }: {data: MontagemStream}) {
       <div className={styles.values}>
         <ClpValueField label="statusBancada" value={data.statusBancada} />
       </div>
-      <div className={styles.values}>
-        <ClpValueField label="supervisorioEstoque" value={data.supervisorioEstoque} />
-        <ClpValueField label="supervisorioProcesso" value={data.supervisorioProcesso} />
-        <ClpValueField label="supervisorioMontagem" value={data.supervisorioMontagem} />
-        <ClpValueField label="supervisorioExpedicao" value={data.supervisorioExpedicao} />
-      </div>
     </>
   )
 }

@@ -101,7 +101,7 @@ export function MagazineCharts({ estoque, expedicao }: MagazineChartsProps) {
   const estOcupado = estoque.filter((e) => e.cor !== CorEstoque.Vazio).length;
   const estVazio = estoque.length - estOcupado;
 
-  const expOcupado = expedicao.filter((e) => e.ordemDeProducaoAtual !== null).length;
+  const expOcupado = expedicao.filter((e) => e.ordemDeProducaoAtual !== 0).length;
   const expVazio = expedicao.length - expOcupado;
 
   return (

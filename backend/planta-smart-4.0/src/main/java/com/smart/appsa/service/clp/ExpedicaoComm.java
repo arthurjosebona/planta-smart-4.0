@@ -324,7 +324,7 @@ public class ExpedicaoComm implements PlcDataObserver {
                         
                         System.out.println(">> handleExitExpedicao OK");
                         System.out.println(">> Zerando ordem na posição " + posicaoFisicaEncontrada + " (assignOrdemAtPosicao)");
-                        expedicaoService.assignOrdemAtPosicao(posicaoFisicaEncontrada, 0);
+                        expedicaoService.assignOrdemAtPosicao(0, posicaoFisicaEncontrada);
                     } catch (Exception e) {
                         System.out.println("ERRO: Na tentativa de remover da Expedição");
                         e.printStackTrace();
